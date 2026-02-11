@@ -1,0 +1,70 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for Ahmetli Medya
+// https://firebase.google.com/docs/storage/security
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function: Check if file is an image
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Helper function: Check file size (max 5MB)
+    function isUnder5MB() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // News images
+    match /news/{imageId} {
+      // Allow read for everyone (public images)
+      allow read: if true;
+
+      // Allow write only for authenticated users
+      // Only images under 5MB
+      allow create: if isAuthenticated()
+                    && isImage()
+                    && isUnder5MB();
+
+      // Allow update/delete only by authenticated users
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Media library images
+    match /media/{imageId} {
+      // Allow read for everyone
+      allow read: if true;
+
+      // Allow write only for authenticated users
+      allow create: if isAuthenticated()
+                    && isImage()
+                    && isUnder5MB();
+
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Thumbnails
+    match /thumbnails/{imageId} {
+      // Allow read for everyone
+      allow read: if true;
+
+      // Allow write only for authenticated users
+      allow create: if isAuthenticated()
+                    && isImage()
+                    && isUnder5MB();
+
+      allow update, delete: if isAuthenticated();
+    }
+
+    // Default: deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

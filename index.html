@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d4d3d">
+  <meta name="description" content="Ahmetli Medya - Üzüm diyarından güncel haberler. Gündem, üzüm & bağcılık, ekonomi, spor, magazin. Yerel haberler, güvenilir kaynak.">
+  <meta property="og:title" content="Ahmetli Medya - Güncel Haberler">
+  <meta property="og:description" content="Güvenilir yerel haberler, gündem, ekonomi, spor ve magazin.">
+  <meta property="og:type" content="website">
+  <title>Ahmetli Medya - Güncel Haberler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="reading-progress" role="presentation" aria-hidden="true">
+    <div class="reading-progress__bar" id="reading-progress-bar"></div>
+  </div>
+  <a href="#main-content" class="skip-link">İçeriğe atla</a>
+
+  <!-- Üst bar - koyu -->
+  <div class="top-bar">
+    <div class="top-bar__ticker-wrap" aria-label="Son dakika özeti">
+      <span class="top-bar__ticker-label">Son Dakika</span>
+      <div class="top-bar__ticker">
+        <div class="top-bar__ticker-inner">
+          <span>Üzüm hasadı bu yıl rekor beklentisi</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Belediyeler stratejik planlarını açıkladı</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>İhracat hedefleri aşılacak</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Belediyespor play-off finalinde</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>El sanatları festivali bu hafta sonu</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Akıllı şehir uygulaması devrede</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Okullarda deprem tatbikatı</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Parklar yenilendi</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Bağcılar kuru üzüm fiyatlarını değerlendirdi</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Belediyeler stratejik planlarını açıkladı</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>İhracat hedefleri aşılacak</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Üzüm hasadı bu yıl rekor beklentisi</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>İhracat hedefleri aşılacak</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Belediyespor play-off finalinde</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>El sanatları festivali bu hafta sonu</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Akıllı şehir uygulaması devrede</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Okullarda deprem tatbikatı</span>
+          <span class="top-bar__ticker-sep">•</span>
+          <span>Parklar yenilendi</span>
+        </div>
+      </div>
+    </div>
+    <div class="container top-bar__inner">
+      <span class="date" id="currentDate"></span>
+      <div class="top-bar__right">
+        <form class="search-form" role="search">
+          <input type="search" class="search-input" placeholder="Ara..." aria-label="Ara">
+          <button type="submit" class="search-btn" aria-label="Ara">Ara</button>
+        </form>
+        <nav class="top-nav">
+          <a href="#">Giriş</a>
+          <a href="#">Abone Ol</a>
+          <a href="#newsletter">Bülten</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo + slogan - Ahmetli Medya kimliği -->
+  <header class="main-header">
+    <div class="main-header__pattern" aria-hidden="true"></div>
+    <div class="container main-header__inner">
+      <a href="index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">A</span>
+        <span class="logo__word logo__word--ahmetli">Ahmetli</span> <span class="logo__word logo__word--medya">Medya</span>
+      </a>
+      <p class="tagline">Güvenilir haber, doğru bilgi</p>
+      <p class="tagline tagline--uzum">Üzüm diyarı Ahmetli</p>
+    </div>
+  </header>
+
+  <!-- Ana menü - kırmızı -->
+  <nav class="main-nav">
+    <div class="container main-nav__inner">
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link active">Ana Sayfa</a></li>
+        <li><a href="#" class="nav-link">Gündem</a></li>
+        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="#" class="nav-link">Ekonomi</a></li>
+        <li><a href="#" class="nav-link">Spor</a></li>
+        <li><a href="#" class="nav-link">Magazin</a></li>
+        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="#" class="nav-link">Teknoloji</a></li>
+        <li><a href="#" class="nav-link">Yaşam</a></li>
+      </ul>
+      <button type="button" class="nav-toggle" aria-label="Menü" aria-expanded="false" aria-controls="main-menu">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+    </div>
+    <div id="main-menu" class="nav-overlay" aria-hidden="true">
+      <ul class="nav-list nav-list--overlay">
+        <li><a href="#" class="nav-link active">Ana Sayfa</a></li>
+        <li><a href="#" class="nav-link">Gündem</a></li>
+        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="#" class="nav-link">Ekonomi</a></li>
+        <li><a href="#" class="nav-link">Spor</a></li>
+        <li><a href="#" class="nav-link">Magazin</a></li>
+        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="#" class="nav-link">Teknoloji</a></li>
+        <li><a href="#" class="nav-link">Yaşam</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main-content" class="main-content">
+    <div class="container">
+      <div class="content-wrap">
+        <!-- Sol: Ana içerik -->
+        <div class="content-main">
+          <!-- Manşet -->
+          <section class="manset">
+            <article class="manset__article" data-haber-id="1">
+              <a href="#" class="manset__link">
+                <div class="manset__img-wrap">
+                  <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900&h=500&fit=crop" alt="" width="900" height="500" loading="eager" fetchpriority="high">
+                  <span class="manset__kategori">Gündem</span>
+                </div>
+                <div class="manset__body">
+                  <h1 class="manset__title">Yerel Yönetimlerde Yeni Dönem: Belediyeler Stratejik Planlarını Açıkladı</h1>
+                  <p class="manset__ozet">Ahmetli ve çevre ilçelerde belediye başkanları, 2025 yılı stratejik hedeflerini ve yatırım planlarını vatandaşlarla paylaştı.</p>
+                  <span class="manset__meta">Ahmet Yılmaz · 2 saat önce · 5 dk okuma</span>
+                </div>
+              </a>
+              <div class="haber-aksiyonlar" aria-label="Haber aksiyonları">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen" title="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş" title="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+          </section>
+
+          <!-- 3'lü kartlar -->
+          <section class="uc-kart">
+            <article class="uc-kart__item" data-haber-id="2">
+              <a href="#">
+                <span class="uc-kart__kategori">Ekonomi</span>
+                <div class="uc-kart__img"><img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop" alt="" width="400" height="250" loading="lazy"></div>
+                <h2 class="uc-kart__title">Bölge Sanayisinde İhracat Rekoru Beklentisi</h2>
+                <span class="uc-kart__meta">1 saat önce · 3 dk</span>
+              </a>
+              <div class="haber-aksiyonlar haber-aksiyonlar--kart">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+            <article class="uc-kart__item" data-haber-id="3">
+              <a href="#">
+                <span class="uc-kart__kategori">Spor</span>
+                <div class="uc-kart__img"><img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=250&fit=crop" alt="" width="400" height="250" loading="lazy"></div>
+                <h2 class="uc-kart__title">İlçe Futbol Takımı Play-off Finaline Yükseldi</h2>
+                <span class="uc-kart__meta">3 saat önce · 2 dk</span>
+              </a>
+              <div class="haber-aksiyonlar haber-aksiyonlar--kart">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+            <article class="uc-kart__item" data-haber-id="4">
+              <a href="#">
+                <span class="uc-kart__kategori">Kültür-Sanat</span>
+                <div class="uc-kart__img"><img src="https://images.unsplash.com/photo-1516979187457-637ebb4ac834?w=400&h=250&fit=crop" alt="" width="400" height="250" loading="lazy"></div>
+                <h2 class="uc-kart__title">Geleneksel El Sanatları Festivali Başlıyor</h2>
+                <span class="uc-kart__meta">5 saat önce · 4 dk</span>
+              </a>
+              <div class="haber-aksiyonlar haber-aksiyonlar--kart">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+          </section>
+
+          <!-- Editörün Seçimi -->
+          <section class="editor-secimi">
+            <h2 class="editor-secimi__baslik">Editörün Seçimi</h2>
+            <ul class="editor-secimi__list">
+              <li><a href="#">Yerel yönetimlerde stratejik planlar açıklandı</a></li>
+              <li><a href="#">Bölge sanayisinde ihracat rekoru beklentisi</a></li>
+              <li><a href="#">Belediyespor play-off finaline yükseldi</a></li>
+              <li><a href="#">Akıllı şehir uygulaması devreye alındı</a></li>
+            </ul>
+          </section>
+
+          <!-- Başlık listesi (portal tarzı) -->
+          <section class="baslik-listesi">
+            <h2 class="baslik-listesi__baslik">Gündem</h2>
+            <ul>
+              <li><a href="#">Üzüm ve kuru üzüm fiyatları açıklandı</a></li>
+              <li><a href="#">Belediye meclisi yeni dönem toplantısını yaptı</a></li>
+              <li><a href="#">İlçede altyapı çalışmaları hız kazandı</a></li>
+              <li><a href="#">Park ve bahçeler düzenlemesi tamamlandı</a></li>
+              <li><a href="#">Yerel esnaftan ekonomi değerlendirmesi</a></li>
+              <li><a href="#">Eğitim yatırımları devam ediyor</a></li>
+            </ul>
+          </section>
+
+          <!-- Üzüm & Bağcılık bölümü -->
+          <section class="uzum-bolumu">
+            <h2 class="uzum-bolumu__baslik">Üzüm & Bağcılık</h2>
+            <div class="uzum-bolumu__grid">
+              <article class="uzum-bolumu__onemli">
+                <a href="#">
+                  <div class="uzum-bolumu__img"><img src="https://images.unsplash.com/photo-1615485737364-2b525c57d93d?w=800&h=533&fit=crop&q=90" alt="Taze yaş üzüm, bağ" width="800" height="533" loading="lazy"></div>
+                  <span class="uzum-bolumu__kategori">Ana geçim kaynağımız</span>
+                  <h3 class="uzum-bolumu__title">Bu Yıl Üzüm Hasadı Rekor Beklentisiyle Devam Ediyor</h3>
+                  <p class="uzum-bolumu__ozet">Ahmetli bağlarında hasat devam ediyor. Kuru üzüm ve sofralık üzüm fiyatları üreticiyi memnun etti.</p>
+                  <span class="uzum-bolumu__meta">Dün</span>
+                </a>
+              </article>
+              <ul class="uzum-bolumu__list">
+                <li><a href="#">Kuru üzüm ihracatında hedef aşılacak</a></li>
+                <li><a href="#">Bağcılar birliği toplantısı yapıldı</a></li>
+                <li><a href="#">Don riskine karşı alınacak önlemler</a></li>
+                <li><a href="#">Üzüm festivali tarihleri belli oldu</a></li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- 2 sütun haber kartları -->
+          <section class="haber-iki">
+            <article class="haber-iki__item" data-haber-id="5">
+              <a href="#">
+                <div class="haber-iki__img"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=300&fit=crop" alt="" width="500" height="300" loading="lazy"></div>
+                <span class="haber-iki__kategori">Teknoloji</span>
+                <h2 class="haber-iki__title">Belediye Akıllı Şehir Uygulamasını Devreye Aldı</h2>
+                <span class="haber-iki__meta">6 saat önce · 2 dk</span>
+              </a>
+              <div class="haber-aksiyonlar haber-aksiyonlar--kart">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+            <article class="haber-iki__item" data-haber-id="6">
+              <a href="#">
+                <div class="haber-iki__img"><img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=500&h=300&fit=crop" alt="" width="500" height="300" loading="lazy"></div>
+                <span class="haber-iki__kategori">Yaşam</span>
+                <h2 class="haber-iki__title">Okullarda Deprem Tatbikatı Düzenlendi</h2>
+                <span class="haber-iki__meta">8 saat önce · 3 dk</span>
+              </a>
+              <div class="haber-aksiyonlar haber-aksiyonlar--kart">
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--begen" aria-label="Beğen"><span class="haber-aksiyonlar__icon">♥</span><span class="haber-aksiyonlar__sayi">0</span></button>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--paylas" aria-label="Paylaş"><span class="haber-aksiyonlar__icon">⎘</span></button>
+                <a href="#" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--facebook" aria-label="Facebook'ta paylaş" title="Facebook'ta paylaş" target="_blank" rel="noopener"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <button type="button" class="haber-aksiyonlar__btn haber-aksiyonlar__btn--instagram" aria-label="Instagram'da paylaş" title="Instagram'da paylaş"><svg class="haber-aksiyonlar__svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></button>
+              </div>
+            </article>
+          </section>
+
+          <!-- Bülten -->
+          <section id="newsletter" class="newsletter">
+            <h2 class="newsletter__title">Bültenimize Abone Olun</h2>
+            <p class="newsletter__text">Güncel haberler e-posta adresinize gelsin.</p>
+            <form class="newsletter-form" id="newsletter-form" action="#" method="post">
+              <input type="email" class="newsletter-form__input" placeholder="E-posta" required>
+              <button type="submit" class="newsletter-form__btn">Abone Ol</button>
+            </form>
+            <p class="newsletter__success" id="newsletter-success" hidden>Teşekkürler! Bültenimize abone oldunuz.</p>
+          </section>
+        </div>
+
+        <!-- Sağ: Sidebar -->
+        <aside class="sidebar">
+          <div class="sidebar__tabs">
+            <div class="sidebar__tab-buttons" role="tablist">
+              <button type="button" class="sidebar__tab-btn active" role="tab" aria-selected="true" aria-controls="panel-son-dakika" id="tab-son-dakika">Son Dakika</button>
+              <button type="button" class="sidebar__tab-btn" role="tab" aria-selected="false" aria-controls="panel-cok-okunan" id="tab-cok-okunan">Çok Okunanlar</button>
+            </div>
+            <div id="panel-son-dakika" class="sidebar__tab-panel" role="tabpanel" aria-labelledby="tab-son-dakika">
+          <div class="sidebar__box sidebar__box--son-dakika">
+            <h3 class="sidebar__title">Son Dakika</h3>
+            <div class="son-dakika-ticker" aria-label="Son dakika haberleri kaydırmalı">
+              <div class="son-dakika-ticker__track">
+                <ul class="sidebar-list son-dakika-ticker__list">
+                  <li><a href="#">Üzüm hasadı rekor beklentisi</a></li>
+                  <li><a href="#">Belediyeler stratejik planlarını açıkladı</a></li>
+                  <li><a href="#">İhracat hedefleri aşılacak</a></li>
+                  <li><a href="#">Belediyespor play-off finalinde</a></li>
+                  <li><a href="#">El sanatları festivali bu hafta sonu</a></li>
+                  <li><a href="#">Akıllı şehir uygulaması devrede</a></li>
+                  <li><a href="#">Okullarda deprem tatbikatı</a></li>
+                  <li><a href="#">Parklar yenilendi</a></li>
+                </ul>
+                <ul class="sidebar-list son-dakika-ticker__list" aria-hidden="true">
+                  <li><a href="#">Üzüm hasadı rekor beklentisi</a></li>
+                  <li><a href="#">Belediyeler stratejik planlarını açıkladı</a></li>
+                  <li><a href="#">İhracat hedefleri aşılacak</a></li>
+                  <li><a href="#">Belediyespor play-off finalinde</a></li>
+                  <li><a href="#">El sanatları festivali bu hafta sonu</a></li>
+                  <li><a href="#">Akıllı şehir uygulaması devrede</a></li>
+                  <li><a href="#">Okullarda deprem tatbikatı</a></li>
+                  <li><a href="#">Parklar yenilendi</a></li>
+                </ul>
+              </div>
+            </div>
+            </div>
+            <div id="panel-cok-okunan" class="sidebar__tab-panel hidden" role="tabpanel" aria-labelledby="tab-cok-okunan" hidden>
+          <div class="sidebar__box sidebar__box--cok-okunan">
+            <h3 class="sidebar__title">Çok Okunanlar</h3>
+            <ul class="sidebar-list sidebar-list--numarali">
+              <li><a href="#">Yerel yönetimlerde yeni dönem</a></li>
+              <li><a href="#">Bölge sanayisinde ihracat rekoru</a></li>
+              <li><a href="#">Futbol takımı finalde</a></li>
+              <li><a href="#">El sanatları festivali</a></li>
+              <li><a href="#">Akıllı şehir uygulaması</a></li>
+            </ul>
+          </div>
+            </div>
+          </div>
+          <div class="sidebar__box sidebar__box--uzum">
+            <h3 class="sidebar__title sidebar__title--uzum">Üzüm & Bağcılık</h3>
+            <ul class="sidebar-list">
+              <li><a href="#">Üzüm hasadı rekor beklentisi</a></li>
+              <li><a href="#">Kuru üzüm fiyatları</a></li>
+              <li><a href="#">Bağcılar birliği toplantısı</a></li>
+              <li><a href="#">Üzüm festivali tarihleri</a></li>
+              <li><a href="#">Don riski ve önlemler</a></li>
+            </ul>
+          </div>
+          <div class="sidebar__box sidebar__box--hava">
+            <div class="hava-durumu__baslik">
+              <h3 class="sidebar__title">Hava Durumu</h3>
+              <span class="hava-durumu__sehir">Ahmetli</span>
+            </div>
+            <div class="hava-durumu__bugun" id="hava-bugun">
+              <div class="hava-durumu__bugun-ana">
+                <span class="hava-durumu__ikon-wrap" id="hava-bugun-ikon" aria-hidden="true"></span>
+                <div class="hava-durumu__bugun-sicaklik">
+                  <span class="hava-durumu__sicaklik-aktuel" id="hava-bugun-sicaklik">--</span>
+                  <span class="hava-durumu__aciklama" id="hava-bugun-aciklama">Yükleniyor…</span>
+                </div>
+              </div>
+              <div class="hava-durumu__min-max">
+                <span><strong id="hava-bugun-max">--</strong>° max</span>
+                <span><strong id="hava-bugun-min">--</strong>° min</span>
+              </div>
+            </div>
+            <ul class="hava-durumu__5gun" id="hava-5gun" aria-label="5 günlük tahmin">
+              <li class="hava-durumu__gun"><span class="hava-durumu__gun-ad" data-gun="">--</span><span class="hava-durumu__gun-ikon" aria-hidden="true"></span><span class="hava-durumu__gun-sicaklik"><strong data-max>--</strong>° / <span data-min>--</span>°</span></li>
+              <li class="hava-durumu__gun"><span class="hava-durumu__gun-ad" data-gun="">--</span><span class="hava-durumu__gun-ikon" aria-hidden="true"></span><span class="hava-durumu__gun-sicaklik"><strong data-max>--</strong>° / <span data-min>--</span>°</span></li>
+              <li class="hava-durumu__gun"><span class="hava-durumu__gun-ad" data-gun="">--</span><span class="hava-durumu__gun-ikon" aria-hidden="true"></span><span class="hava-durumu__gun-sicaklik"><strong data-max>--</strong>° / <span data-min>--</span>°</span></li>
+              <li class="hava-durumu__gun"><span class="hava-durumu__gun-ad" data-gun="">--</span><span class="hava-durumu__gun-ikon" aria-hidden="true"></span><span class="hava-durumu__gun-sicaklik"><strong data-max>--</strong>° / <span data-min>--</span>°</span></li>
+              <li class="hava-durumu__gun"><span class="hava-durumu__gun-ad" data-gun="">--</span><span class="hava-durumu__gun-ikon" aria-hidden="true"></span><span class="hava-durumu__gun-sicaklik"><strong data-max>--</strong>° / <span data-min>--</span>°</span></li>
+            </ul>
+            <p class="hava-durumu__kaynak">Kaynak: Open-Meteo</p>
+          </div>
+          <div class="sidebar__box sidebar__box--doviz">
+            <h3 class="sidebar__title">Döviz</h3>
+            <ul class="doviz-listesi">
+              <li><span class="doviz-listesi__kur">USD</span> <span class="doviz-listesi__deger">34,25</span></li>
+              <li><span class="doviz-listesi__kur">EUR</span> <span class="doviz-listesi__deger">36,80</span></li>
+              <li><span class="doviz-listesi__kur">GBP</span> <span class="doviz-listesi__deger">43,50</span></li>
+            </ul>
+          </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">Ahmetli Medya</a>
+          <p>Üzüm diyarından yerel haberler, güvenilir kaynak.</p>
+          <div class="footer-social">
+            <a href="#" class="footer-social__link" aria-label="Facebook">Facebook</a>
+            <a href="#" class="footer-social__link" aria-label="Twitter">Twitter</a>
+            <a href="#" class="footer-social__link" aria-label="Instagram">Instagram</a>
+            <a href="#" class="footer-social__link" aria-label="YouTube">YouTube</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Kurumsal</h4>
+          <ul>
+            <li><a href="#">Hakkımızda</a></li>
+            <li><a href="#">İletişim</a></li>
+            <li><a href="#">Gizlilik</a></li>
+            <li><a href="#">Kullanım Koşulları</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kategoriler</h4>
+          <ul>
+            <li><a href="#">Gündem</a></li>
+            <li><a href="#">Üzüm & Bağcılık</a></li>
+            <li><a href="#">Ekonomi</a></li>
+            <li><a href="#">Spor</a></li>
+            <li><a href="#">Magazin</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>İletişim</h4>
+          <p><a href="mailto:info@ahmetlimedya.com">info@ahmetlimedya.com</a></p>
+          <p><a href="tel:+902320000000">(232) 000 00 00</a></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="footer-year">2025</span> Ahmetli Medya. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </footer>
+
+  <button type="button" class="yukari-cik" id="yukari-cik" aria-label="Sayfanın başına çık">↑</button>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>

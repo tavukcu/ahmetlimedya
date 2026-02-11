@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // News collection - authenticated users can read/write
+    match /news/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Categories collection - authenticated users can read/write
+    match /categories/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Media library - authenticated users can read/write
+    match /media_library/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Auto-save drafts - users can only access their own drafts
+    match /drafts_autosave/{docId} {
+      allow read, write: if isAuthenticated()
+                        && request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated()
+                    && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}

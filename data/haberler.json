@@ -1,0 +1,93 @@
+[
+  {
+    "id": 1,
+    "slug": "belediyeler-stratejik-planlarini-acikladi",
+    "kategori": "Gündem",
+    "baslik": "Ahmetli'de yeni dönem başladı.",
+    "ozet": "Ahmetli ve çevre ilçelerde belediye başkanları, 2025 yılı stratejik hedeflerini ve yatırım planlarını vatandaşlarla paylaştı.",
+    "icerik": "<p>Ahmetli ve çevre ilçelerde belediye başkanları, 2025 yılı stratejik hedeflerini ve yatırım planlarını vatandaşlarla paylaştı. Altyapı, çevre ve sosyal projeler ön planda. Detaylı içerik burada yer alacak.</p>",
+    "gorsel": "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900&h=500&fit=crop",
+    "yazar": "Ahmet Yılmaz",
+    "yayinTarihi": "2025-02-09T10:00:00+03:00",
+    "okumaSuresi": 5,
+    "goruntulenme": 0
+  },
+  {
+    "id": 2,
+    "slug": "ihracat-rekoru-beklentisi",
+    "kategori": "Ekonomi",
+    "baslik": "Bölge Sanayisinde İhracat Rekoru Beklentisi",
+    "ozet": "Yerel sanayi temsilcileri, yıl sonu ihracat hedeflerinin aşılacağını ve yeni pazarlara açılımın süreceğini belirtti.",
+    "icerik": "Yerel sanayi temsilcileri, yıl sonu ihracat hedeflerinin aşılacağını ve yeni pazarlara açılımın süreceğini belirtti. İçerik detayı.",
+    "gorsel": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop",
+    "yazar": "Editör",
+    "yayinTarihi": "2025-02-09T12:00:00+03:00",
+    "okumaSuresi": 3,
+    "goruntulenme": 0
+  },
+  {
+    "id": 3,
+    "slug": "belediyespor-play-off-finalinde",
+    "kategori": "Spor",
+    "baslik": "İlçe Futbol Takımı Play-off Finaline Yükseldi",
+    "ozet": "Ahmetli Belediyespor, deplasmanda aldığı galibiyetle bölgesel lig play-off finaline adını yazdırdı.",
+    "icerik": "Ahmetli Belediyespor, deplasmanda aldığı galibiyetle bölgesel lig play-off finaline adını yazdırdı. Detaylı haber metni.",
+    "gorsel": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=250&fit=crop",
+    "yazar": "Spor Servisi",
+    "yayinTarihi": "2025-02-09T14:00:00+03:00",
+    "okumaSuresi": 2,
+    "goruntulenme": 0
+  },
+  {
+    "id": 4,
+    "slug": "el-sanatlari-festivali",
+    "kategori": "Kültür-Sanat",
+    "baslik": "Geleneksel El Sanatları Festivali Başlıyor",
+    "ozet": "Yöresel el sanatlarının sergileneceği festival, bu hafta sonu kapılarını ziyaretçilere açacak.",
+    "icerik": "Yöresel el sanatlarının sergileneceği festival, bu hafta sonu kapılarını ziyaretçilere açacak. Detaylar.",
+    "gorsel": "https://images.unsplash.com/photo-1516979187457-637ebb4ac834?w=400&h=250&fit=crop",
+    "yazar": "Kültür Servisi",
+    "yayinTarihi": "2025-02-09T16:00:00+03:00",
+    "okumaSuresi": 4,
+    "goruntulenme": 0
+  },
+  {
+    "id": 5,
+    "slug": "akilli-sehir-uygulamasi",
+    "kategori": "Teknoloji",
+    "baslik": "Belediye Akıllı Şehir Uygulamasını Devreye Aldı",
+    "ozet": "Toplu taşıma, çöp toplama ve park bilgileri artık mobil uygulama üzerinden takip edilebilecek.",
+    "icerik": "<p>Toplu taşıma, çöp toplama ve park bilgileri artık mobil uygulama üzerinden takip edilebilecek. Uygulama mağazalarında.</p>",
+    "gorsel": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=300&fit=crop",
+    "yazar": "Teknoloji",
+    "yayinTarihi": "2025-02-09T18:00:00+03:00",
+    "okumaSuresi": 2,
+    "goruntulenme": 0
+  },
+  {
+    "id": 6,
+    "slug": "deprem-tatbikati",
+    "kategori": "Yaşam",
+    "baslik": "Okullarda Deprem Tatbikatı Düzenlendi",
+    "ozet": "İlçe genelindeki okullarda deprem anı ve tahliye tatbikatı yapıldı, öğrenciler bilinçlendirildi.",
+    "icerik": "İlçe genelindeki okullarda deprem anı ve tahliye tatbikatı yapıldı, öğrenciler bilinçlendirildi. Haber detayı.",
+    "gorsel": "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=500&h=300&fit=crop",
+    "yazar": "Yaşam",
+    "yayinTarihi": "2025-02-08T09:00:00+03:00",
+    "okumaSuresi": 3,
+    "goruntulenme": 0
+  },
+  {
+    "id": 7,
+    "slug": "uzum-hasadi-rekor-beklentisi",
+    "kategori": "Üzüm & Bağcılık",
+    "baslik": "Bu Yıl Üzüm Hasadı Rekor Beklentisiyle Devam Ediyor",
+    "ozet": "Ahmetli bağlarında hasat devam ediyor. Kuru üzüm ve sofralık üzüm fiyatları üreticiyi memnun etti.",
+    "icerik": "Ahmetli bağlarında hasat devam ediyor. Kuru üzüm ve sofralık üzüm fiyatları üreticiyi memnun etti. Ana geçim kaynağımız üzüm.",
+    "gorsel": "https://images.unsplash.com/photo-1615485737364-2b525c57d93d?w=800&h=533&fit=crop&q=90",
+    "yazar": "Tarım",
+    "yayinTarihi": "2025-02-08T11:00:00+03:00",
+    "okumaSuresi": 4,
+    "goruntulenme": 0
+  }
+]

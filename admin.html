@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yönetim Paneli – Ahmetli Medya</title>
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ========== GİRİŞ EKRANI ========== -->
+    <section id="login-screen" class="screen">
+      <div class="login-card">
+        <h1 class="login-logo">Ahmetli Medya</h1>
+        <p class="login-subtitle">Yönetim paneline giriş yapın</p>
+        <form id="login-form">
+          <label for="login-password">Şifre</label>
+          <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
+          <p id="login-error" class="error-text" hidden></p>
+          <button type="submit" class="btn btn-primary btn-block" id="login-btn">Giriş yap</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== ANA PANEL ========== -->
+    <section id="panel-screen" class="screen" hidden>
+      <header class="topbar">
+        <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Menüyü aç/kapat"></button>
+        <h1 class="topbar-title">Ahmetli Medya Yönetim Paneli</h1>
+        <div class="topbar-actions">
+          <a href="/" target="_blank" class="btn btn-ghost">Siteyi aç</a>
+          <button type="button" class="btn btn-ghost" id="logout-btn">Çıkış</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar" id="sidebar">
+          <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+              <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
+              <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-page="news">
+              <span class="nav-icon"><i data-lucide="newspaper"></i></span>
+              <span>Haberler</span>
+            </a>
+            <a href="#" class="nav-item" data-page="categories">
+              <span class="nav-icon"><i data-lucide="folder"></i></span>
+              <span>Kategoriler</span>
+            </a>
+            <a href="#" class="nav-item" data-page="bulten">
+              <span class="nav-icon"><i data-lucide="mail"></i></span>
+              <span>Bülten</span>
+            </a>
+          </nav>
+        </aside>
+
+        <main class="main-content">
+          <!-- Dashboard -->
+          <div id="page-dashboard" class="page active">
+            <div class="dashboard-header">
+              <div>
+                <h2 class="page-title">Dashboard</h2>
+                <p class="dashboard-date" id="dashboard-date"></p>
+              </div>
+              <div class="dashboard-actions">
+                <button type="button" class="btn btn-primary" id="dash-add-news">+ Yeni Haber</button>
+                <button type="button" class="btn btn-ghost" id="dash-refresh" title="Yenile">Yenile</button>
+              </div>
+            </div>
+
+            <div id="dashboard-skeleton" class="skeleton-container">
+              <div class="stats-grid stats-grid-4">
+                <div class="stat-card skeleton-card"><div class="skeleton skeleton-text" style="width:60px;height:40px"></div><div class="skeleton skeleton-text" style="width:80px;height:14px"></div></div>
+                <div class="stat-card skeleton-card"><div class="skeleton skeleton-text" style="width:60px;height:40px"></div><div class="skeleton skeleton-text" style="width:80px;height:14px"></div></div>
+                <div class="stat-card skeleton-card"><div class="skeleton skeleton-text" style="width:60px;height:40px"></div><div class="skeleton skeleton-text" style="width:80px;height:14px"></div></div>
+                <div class="stat-card skeleton-card"><div class="skeleton skeleton-text" style="width:60px;height:40px"></div><div class="skeleton skeleton-text" style="width:80px;height:14px"></div></div>
+              </div>
+            </div>
+
+            <div id="dashboard-content" hidden>
+              <!-- Stat kartları -->
+              <div class="stats-grid stats-grid-4">
+                <div class="stat-card stat-card--accent">
+                  <div class="stat-card__icon stat-card__icon--blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                  </div>
+                  <span class="stat-value" id="stat-total">–</span>
+                  <span class="stat-label">Toplam Haber</span>
+                </div>
+                <div class="stat-card stat-card--accent">
+                  <div class="stat-card__icon stat-card__icon--green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                  <span class="stat-value" id="stat-bulten">–</span>
+                  <span class="stat-label">Bülten Abonesi</span>
+                </div>
+                <div class="stat-card stat-card--accent">
+                  <div class="stat-card__icon stat-card__icon--yellow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  </div>
+                  <span class="stat-value" id="stat-views">–</span>
+                  <span class="stat-label">Toplam Görüntülenme</span>
+                </div>
+                <div class="stat-card stat-card--accent">
+                  <div class="stat-card__icon stat-card__icon--purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                  </div>
+                  <span class="stat-value" id="stat-categories">–</span>
+                  <span class="stat-label">Aktif Kategori</span>
+                </div>
+              </div>
+
+              <!-- Kategori dağılımı bar -->
+              <div class="card" id="category-bars-card">
+                <h3 class="card-title">Kategori Dağılımı</h3>
+                <div id="category-bars"></div>
+              </div>
+
+              <!-- Grafikler -->
+              <div class="charts-grid">
+                <div class="card chart-card">
+                  <h3 class="card-title">Kategoriye Göre Haberler</h3>
+                  <canvas id="chart-categories"></canvas>
+                </div>
+                <div class="card chart-card">
+                  <h3 class="card-title">Yayın Zaman Çizelgesi</h3>
+                  <canvas id="chart-trend"></canvas>
+                </div>
+              </div>
+
+              <!-- Son haberler + Hızlı bilgi -->
+              <div class="dashboard-grid-2">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Son Eklenen Haberler</h3>
+                    <button type="button" class="btn btn-ghost btn-sm" id="dash-go-news">Tümünü gör</button>
+                  </div>
+                  <div id="dashboard-latest" class="latest-list"></div>
+                </div>
+                <div class="card">
+                  <h3 class="card-title">Hızlı Bilgi</h3>
+                  <div id="dashboard-info" class="dashboard-info"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Haberler -->
+          <div id="page-news" class="page">
+            <!-- Sayfa başlığı + mini istatistikler -->
+            <div class="news-header">
+              <div class="news-header__left">
+                <h2 class="page-title">Haberler</h2>
+                <div class="news-mini-stats">
+                  <span class="news-mini-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+                    Toplam: <strong id="news-stat-total">–</strong>
+                  </span>
+                  <span class="news-mini-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    Bugün: <strong id="news-stat-today">–</strong>
+                  </span>
+                  <span class="news-mini-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Kategori: <strong id="news-stat-categories">–</strong>
+                  </span>
+                </div>
+              </div>
+              <div class="news-header__right">
+                <button type="button" class="btn btn-primary" id="news-add-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                  Yeni haber
+                </button>
+              </div>
+            </div>
+
+            <!-- Araç çubuğu -->
+            <div class="news-toolbar">
+              <div class="search-wrap">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="search" id="news-search" class="search-input" placeholder="Başlığa göre ara…">
+              </div>
+              <select id="news-filter-category" class="filter-select"><option value="">Tüm kategoriler</option></select>
+              <select id="news-sort" class="filter-select">
+                <option value="dateDesc">En yeni önce</option>
+                <option value="dateAsc">En eski önce</option>
+                <option value="title">Başlık A–Z</option>
+                <option value="views">En çok okunan</option>
+              </select>
+              <div class="view-toggle">
+                <button type="button" class="view-toggle-btn active" id="view-table-btn" title="Tablo görünümü">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+                </button>
+                <button type="button" class="view-toggle-btn" id="view-card-btn" title="Kart görünümü">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Toplu işlem barı -->
+            <div id="news-bulk-bar" class="news-bulk-bar" hidden>
+              <span class="news-bulk-bar__count"><span id="bulk-count">0</span> haber seçildi</span>
+              <button type="button" class="btn btn-danger btn-sm" id="bulk-delete-btn">Seçilenleri sil</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="bulk-clear-btn">Seçimi kaldır</button>
+            </div>
+
+            <!-- Tablo görünümü -->
+            <div id="news-table-view">
+              <div class="table-wrap">
+                <table class="data-table" id="news-table">
+                  <thead>
+                    <tr>
+                      <th width="40"><input type="checkbox" id="select-all"></th>
+                      <th>Haber</th>
+                      <th>Kategori</th>
+                      <th>Yazar</th>
+                      <th>Tarih</th>
+                      <th>Durum</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="news-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Kart görünümü -->
+            <div id="news-card-view" class="news-grid" hidden></div>
+
+            <!-- Yükleniyor -->
+            <div id="news-loading" class="loading" hidden>Yükleniyor…</div>
+
+            <!-- Boş durum -->
+            <div id="news-empty" class="news-empty-state" hidden>
+              <div class="news-empty-state__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="72" height="72">
+                  <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                  <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+                </svg>
+              </div>
+              <h3 class="news-empty-state__title">Henüz haber eklenmemiş</h3>
+              <p class="news-empty-state__desc">İlk haberi ekleyerek başlayın. Haberleriniz burada listelenecek.</p>
+              <button type="button" class="btn btn-primary" id="news-empty-add-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                Yeni haber ekle
+              </button>
+            </div>
+
+            <!-- Sayfalama -->
+            <div id="news-pagination" class="news-pagination" hidden>
+              <button type="button" class="btn btn-ghost btn-sm" id="news-prev-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                Önceki
+              </button>
+              <span class="news-pagination__info" id="news-page-info">Sayfa 1 / 1</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="news-next-btn">
+                Sonraki
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Kategoriler -->
+          <div id="page-categories" class="page">
+            <h2 class="page-title">Kategoriler</h2>
+            <p class="muted">Haber eklerken kullanılan kategoriler.</p>
+            <ul id="categories-list" class="categories-list"></ul>
+          </div>
+
+          <!-- Bülten -->
+          <div id="page-bulten" class="page">
+            <h2 class="page-title">Bülten Aboneleri</h2>
+            <div id="bulten-loading" class="loading" hidden>Yükleniyor…</div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>E-posta</th><th>Kayıt Tarihi</th></tr></thead>
+                <tbody id="bulten-tbody"></tbody>
+              </table>
+            </div>
+            <div id="bulten-empty" class="empty-state" hidden>Henüz abone yok.</div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- ========== HABER MODAL ========== -->
+    <dialog id="news-modal" class="modal">
+      <form id="news-form" class="modal-form">
+        <div class="modal-header">
+          <h2 id="news-modal-title">Yeni haber</h2>
+          <button type="button" class="modal-close" id="news-modal-close" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="news-id">
+          <div class="form-row">
+            <label for="news-title">Başlık * <span class="char-counter" id="title-counter">0 / 70</span></label>
+            <input type="text" id="news-title" required placeholder="Haber başlığı" maxlength="100">
+          </div>
+          <div class="form-row">
+            <label for="news-slug">Slug (URL)</label>
+            <input type="text" id="news-slug" placeholder="otomatik üretilir">
+          </div>
+          <div class="form-row">
+            <label for="news-category">Kategori</label>
+            <select id="news-category"></select>
+          </div>
+          <div class="form-row">
+            <label>Kapak görseli</label>
+            <div class="image-upload-section">
+              <div id="news-image-preview" class="image-preview" hidden>
+                <img id="news-image-preview-img" src="" alt="Preview">
+                <div class="image-preview-info">
+                  <p id="news-image-preview-name" class="image-filename"></p>
+                  <p id="news-image-preview-meta" class="image-meta"></p>
+                </div>
+                <button type="button" id="news-image-remove" class="btn btn-sm btn-danger">Kaldır</button>
+              </div>
+              <div id="news-image-upload-options" class="image-upload-options">
+                <div class="image-drop-zone" id="news-image-dropzone">
+                  <input type="file" id="news-image-file" accept="image/*" hidden>
+                  <div class="drop-zone-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <p>Görseli sürükleyin veya tıklayın</p>
+                    <p class="drop-zone-hint">En fazla 5MB, JPG/PNG</p>
+                  </div>
+                </div>
+                <div class="upload-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" id="news-image-browse">Bilgisayardan Seç</button>
+                </div>
+                <details class="url-input-details">
+                  <summary>veya URL gir</summary>
+                  <input type="url" id="news-image-url" placeholder="https://example.com/image.jpg">
+                  <button type="button" class="btn btn-sm btn-ghost" id="news-image-url-apply">Uygula</button>
+                </details>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>İçerik</label>
+            <div class="editor-wrapper"><div id="news-content"></div></div>
+          </div>
+          <div class="form-row">
+            <label for="news-author">Yazar</label>
+            <input type="text" id="news-author" placeholder="Editör">
+          </div>
+          <div class="form-row">
+            <label for="news-excerpt">Özet <span class="char-counter" id="excerpt-counter">0 / 300</span></label>
+            <textarea id="news-excerpt" placeholder="Haber özeti (isteğe bağlı)" maxlength="300" rows="3"></textarea>
+          </div>
+          <div class="form-row form-row-inline">
+            <label class="checkbox-label"><input type="checkbox" id="news-published" checked><span>Yayında</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="news-breaking"><span>Son dakika</span></label>
+            <label class="checkbox-label"><input type="checkbox" id="news-featured"><span>Öne çıkan</span></label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="news-form-cancel">İptal</button>
+          <button type="button" class="btn btn-ghost" id="news-form-preview">Önizleme</button>
+          <button type="submit" class="btn btn-primary" id="news-form-submit">Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ========== SİLME ONAY MODAL ========== -->
+    <dialog id="delete-modal" class="modal modal-sm">
+      <div class="modal-body"><p id="delete-message">Bu haberi silmek istediğinize emin misiniz?</p></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="delete-cancel">Vazgeç</button>
+        <button type="button" class="btn btn-danger" id="delete-confirm">Sil</button>
+      </div>
+    </dialog>
+
+    <!-- ========== ÖNİZLEME MODAL ========== -->
+    <dialog id="preview-modal" class="modal modal-lg preview-modal">
+      <div class="modal-header">
+        <h2>Önizleme</h2>
+        <div class="preview-controls">
+          <button type="button" class="btn btn-ghost btn-sm" id="preview-toggle-mobile">Mobil</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="preview-toggle-desktop">Masaüstü</button>
+        </div>
+        <button type="button" class="modal-close" id="preview-close" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body preview-body"><div id="preview-content" class="preview-content"></div></div>
+    </dialog>
+
+    <!-- ========== TOAST ========== -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Kütüphaneler (defer - sayfa yüklenmesini bloklamaz) -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/tr.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+
+  <!-- Admin Panel -->
+  <script src="admin-panel.js"></script>
+</body>
+</html>
