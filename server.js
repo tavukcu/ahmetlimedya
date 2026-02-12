@@ -817,6 +817,7 @@ app.post('/api/admin/vefat', async (req, res) => {
     arr.unshift({
       id: Date.now(),
       ad: ad,
+      gorsel: (body.gorsel || '').trim(),
       detay: (body.detay || '').trim(),
       tarih: (body.tarih || '').trim() || new Date().toLocaleDateString('tr-TR'),
       olusturma: new Date().toISOString()

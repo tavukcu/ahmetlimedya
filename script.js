@@ -1192,10 +1192,14 @@ function initVefat() {
       if (items.length === 0) return;
       section.hidden = false;
       list.innerHTML = items.map(function(v) {
+        var img = v.gorsel ? '<img src="' + escapeHtmlFront(v.gorsel) + '" alt="' + escapeHtmlFront(v.ad) + '" class="vefat__gorsel">' : '';
         return '<div class="vefat__item">'
+          + img
+          + '<div class="vefat__bilgi">'
           + '<div class="vefat__ad">' + escapeHtmlFront(v.ad) + '</div>'
           + '<div class="vefat__detay">' + escapeHtmlFront(v.detay || '') + '</div>'
           + '<div class="vefat__tarih">' + escapeHtmlFront(v.tarih || '') + '</div>'
+          + '</div>'
           + '</div>';
       }).join('');
     })

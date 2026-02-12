@@ -2225,9 +2225,11 @@
           return;
         }
         list.innerHTML = data.map(function(v) {
-          return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee">'
-            + '<div><strong>' + escapeHtml(v.ad) + '</strong><br><small>' + escapeHtml(v.detay || '') + '</small><br><small style="color:#999">' + escapeHtml(v.tarih || '') + '</small></div>'
-            + '<button class="btn btn-sm btn-danger" data-vefat-sil="' + v.id + '">Sil</button>'
+          var img = v.gorsel ? '<img src="' + escapeHtml(v.gorsel) + '" style="width:48px;height:48px;object-fit:cover;border-radius:50%;margin-right:10px;flex-shrink:0">' : '';
+          return '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #eee">'
+            + img
+            + '<div style="flex:1"><strong>' + escapeHtml(v.ad) + '</strong><br><small>' + escapeHtml(v.detay || '') + '</small><br><small style="color:#999">' + escapeHtml(v.tarih || '') + '</small></div>'
+            + '<button class="btn btn-sm btn-danger" data-vefat-sil="' + v.id + '" style="margin-left:8px">Sil</button>'
             + '</div>';
         }).join('');
         list.querySelectorAll('[data-vefat-sil]').forEach(function(btn) {
@@ -2250,7 +2252,7 @@
       api('/api/admin/vefat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ad: $('vefat-ad').value, detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
+        body: JSON.stringify({ ad: $('vefat-ad').value, gorsel: ($('vefat-gorsel').value || '').trim(), detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
       }).then(function() {
         $('vefat-modal').close();
         vefatForm.reset();
