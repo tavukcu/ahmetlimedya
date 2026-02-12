@@ -1527,17 +1527,25 @@
       img.onload = function () {
         try {
           var w = img.width, h = img.height;
-          var MAX = 1200;
-          if (w > MAX || h > MAX) {
+          var MAX = 2000;
+          var needsResize = w > MAX || h > MAX;
+          if (needsResize) {
             var ratio = Math.min(MAX / w, MAX / h);
             w = Math.round(w * ratio);
             h = Math.round(h * ratio);
+          }
+          var isPng = file.type === 'image/png';
+          if (!needsResize && isPng) {
+            // PNG ve boyut uygun: orijinali olduğu gibi kullan
+            setReklamPreview(slot, originalDataUrl, file.name);
+            return;
           }
           var canvas = document.createElement('canvas');
           canvas.width = w;
           canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          var resized = canvas.toDataURL('image/jpeg', 0.82);
+          var outType = isPng ? 'image/png' : 'image/jpeg';
+          var resized = isPng ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.92);
           if (!resized || resized.length < 100) {
             setReklamPreview(slot, originalDataUrl, file.name);
           } else {
@@ -1878,23 +1886,28 @@
         img.onload = function () {
           try {
             var w = img.width, h = img.height;
-            var MAX = 1200;
-            if (w > MAX || h > MAX) {
+            var MAX = 2000;
+            var needsResize = w > MAX || h > MAX;
+            if (needsResize) {
               var ratio = Math.min(MAX / w, MAX / h);
               w = Math.round(w * ratio);
               h = Math.round(h * ratio);
+            }
+            var isPng = file.type === 'image/png';
+            if (!needsResize && isPng) {
+              showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
+              return;
             }
             var canvas = document.createElement('canvas');
             canvas.width = w;
             canvas.height = h;
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            var resized = canvas.toDataURL('image/jpeg', 0.82);
+            var resized = isPng ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.92);
             if (!resized || resized.length < 100) {
-              // Canvas başarısız olduysa orijinali kullan
               showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
             } else {
               var sizeKB = Math.round(resized.length * 3 / 4 / 1024);
-              showPreview(resized, file.name, sizeKB + ' KB (sıkıştırılmış)');
+              showPreview(resized, file.name, sizeKB + ' KB' + (isPng ? '' : ' (sıkıştırılmış)'));
             }
           } catch (err) {
             showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
