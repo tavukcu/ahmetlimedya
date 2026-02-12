@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d4d3d">
+  <meta name="description" content="Ahmetli Medya - Haber Detay">
+  <meta property="og:type" content="article">
+  <title>Haber - Ahmetli Medya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="reading-progress" role="presentation" aria-hidden="true">
+    <div class="reading-progress__bar" id="reading-progress-bar"></div>
+  </div>
+  <a href="#main-content" class="skip-link">İçeriğe atla</a>
+
+  <!-- Üst bar -->
+  <div class="top-bar">
+    <div class="top-bar__ticker-wrap" aria-label="Son dakika özeti">
+      <span class="top-bar__ticker-label">Son Dakika</span>
+      <div class="top-bar__ticker">
+        <div class="top-bar__ticker-inner" id="ticker-inner">
+          <span>Haberler yükleniyor…</span>
+        </div>
+      </div>
+    </div>
+    <div class="container top-bar__inner">
+      <span class="date" id="currentDate"></span>
+      <div class="top-bar__right">
+        <form class="search-form" role="search">
+          <input type="search" class="search-input" placeholder="Ara..." aria-label="Ara">
+          <button type="submit" class="search-btn" aria-label="Ara">Ara</button>
+        </form>
+        <nav class="top-nav">
+          <a href="#">Giriş</a>
+          <a href="#">Abone Ol</a>
+          <a href="index.html#newsletter">Bülten</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo + slogan -->
+  <header class="main-header">
+    <div class="main-header__pattern" aria-hidden="true"></div>
+    <div class="container main-header__inner">
+      <a href="index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">A</span>
+        <span class="logo__word logo__word--ahmetli">Ahmetli</span> <span class="logo__word logo__word--medya">Medya</span>
+      </a>
+      <p class="tagline">Güvenilir haber, doğru bilgi</p>
+      <p class="tagline tagline--uzum">Üzüm diyarı Ahmetli</p>
+    </div>
+  </header>
+
+  <!-- Ana menü -->
+  <nav class="main-nav">
+    <div class="container main-nav__inner">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
+        <li><a href="#" class="nav-link">Gündem</a></li>
+        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="#" class="nav-link">Ekonomi</a></li>
+        <li><a href="#" class="nav-link">Spor</a></li>
+        <li><a href="#" class="nav-link">Magazin</a></li>
+        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="#" class="nav-link">Teknoloji</a></li>
+        <li><a href="#" class="nav-link">Yaşam</a></li>
+      </ul>
+      <button type="button" class="nav-toggle" aria-label="Menü" aria-expanded="false" aria-controls="main-menu">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+    </div>
+    <div id="main-menu" class="nav-overlay" aria-hidden="true">
+      <ul class="nav-list nav-list--overlay">
+        <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
+        <li><a href="#" class="nav-link">Gündem</a></li>
+        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="#" class="nav-link">Ekonomi</a></li>
+        <li><a href="#" class="nav-link">Spor</a></li>
+        <li><a href="#" class="nav-link">Magazin</a></li>
+        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="#" class="nav-link">Teknoloji</a></li>
+        <li><a href="#" class="nav-link">Yaşam</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main-content" class="main-content">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav class="detay__breadcrumb" aria-label="Sayfa yolu">
+        <a href="index.html">Ana Sayfa</a>
+        <span aria-hidden="true">›</span>
+        <span id="detay-breadcrumb-kategori">Haber</span>
+      </nav>
+
+      <div class="detay__wrap">
+        <!-- Sol: Makale -->
+        <article class="detay" id="detay-article">
+          <div class="detay__yukleniyor" id="detay-loading">
+            <p>Haber yükleniyor…</p>
+          </div>
+          <div class="detay__404" id="detay-404" hidden>
+            <h1>Haber Bulunamadı</h1>
+            <p>Aradığınız haber mevcut değil veya kaldırılmış olabilir.</p>
+            <a href="index.html" class="detay__404-link">Ana Sayfaya Dön</a>
+          </div>
+          <div class="detay__content" id="detay-content" hidden>
+            <span class="detay__kategori" id="detay-kategori"></span>
+            <h1 class="detay__baslik" id="detay-baslik"></h1>
+            <div class="detay__meta" id="detay-meta">
+              <span class="detay__yazar" id="detay-yazar"></span>
+              <span class="detay__tarih" id="detay-tarih"></span>
+              <span class="detay__sure" id="detay-sure"></span>
+            </div>
+            <figure class="detay__gorsel">
+              <img id="detay-gorsel" src="" alt="" width="800" height="450">
+            </figure>
+            <div class="detay__ozet" id="detay-ozet"></div>
+            <div class="detay__icerik" id="detay-icerik"></div>
+          </div>
+        </article>
+
+        <!-- Sağ: Diğer haberler -->
+        <aside class="detay__sidebar">
+          <div class="detay__ilgili">
+            <h3 class="detay__ilgili-baslik">Diğer Haberler</h3>
+            <ul class="detay__ilgili-list" id="detay-ilgili-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">Ahmetli Medya</a>
+          <p>Üzüm diyarından yerel haberler, güvenilir kaynak.</p>
+          <div class="footer-social">
+            <a href="#" class="footer-social__link" aria-label="Facebook">Facebook</a>
+            <a href="#" class="footer-social__link" aria-label="Twitter">Twitter</a>
+            <a href="#" class="footer-social__link" aria-label="Instagram">Instagram</a>
+            <a href="#" class="footer-social__link" aria-label="YouTube">YouTube</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Kurumsal</h4>
+          <ul>
+            <li><a href="#">Hakkımızda</a></li>
+            <li><a href="#">İletişim</a></li>
+            <li><a href="#">Gizlilik</a></li>
+            <li><a href="#">Kullanım Koşulları</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kategoriler</h4>
+          <ul>
+            <li><a href="#">Gündem</a></li>
+            <li><a href="#">Üzüm & Bağcılık</a></li>
+            <li><a href="#">Ekonomi</a></li>
+            <li><a href="#">Spor</a></li>
+            <li><a href="#">Magazin</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>İletişim</h4>
+          <p><a href="mailto:info@ahmetlimedya.com">info@ahmetlimedya.com</a></p>
+          <p><a href="tel:+902320000000">(232) 000 00 00</a></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="footer-year">2025</span> Ahmetli Medya. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </footer>
+
+  <button type="button" class="yukari-cik" id="yukari-cik" aria-label="Sayfanın başına çık">↑</button>
+
+  <script>
+  (function() {
+    // ----- Yardımcılar -----
+    function escapeHtml(s) {
+      if (!s) return '';
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function zamanOnce(dateStr) {
+      if (!dateStr) return '';
+      try {
+        var now = new Date();
+        var d = new Date(dateStr);
+        var diff = now - d;
+        var dakika = Math.floor(diff / 60000);
+        if (dakika < 1) return 'Az önce';
+        if (dakika < 60) return dakika + ' dk önce';
+        var saat = Math.floor(dakika / 60);
+        if (saat < 24) return saat + ' saat önce';
+        var gun = Math.floor(saat / 24);
+        if (gun === 1) return 'Dün';
+        if (gun < 7) return gun + ' gün önce';
+        return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+      } catch (e) { return ''; }
+    }
+
+    function formatTarih(dateStr) {
+      if (!dateStr) return '';
+      try {
+        return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) { return ''; }
+    }
+
+    // ----- Tarih + Footer yılı -----
+    function setCurrentDate() {
+      var el = document.getElementById('currentDate');
+      if (el) el.textContent = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    function setFooterYear() {
+      var el = document.getElementById('footer-year');
+      if (el) el.textContent = new Date().getFullYear();
+    }
+
+    // ----- Okuma ilerleme çubuğu -----
+    function initReadingProgress() {
+      var bar = document.getElementById('reading-progress-bar');
+      if (!bar) return;
+      function update() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    }
+
+    // ----- Mobil menü -----
+    function initNavToggle() {
+      var toggle = document.querySelector('.nav-toggle');
+      var overlay = document.getElementById('main-menu');
+      if (!toggle || !overlay) return;
+      toggle.addEventListener('click', function() {
+        var open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', !open);
+        overlay.setAttribute('aria-hidden', open);
+        overlay.classList.toggle('is-open', !open);
+        document.body.classList.toggle('nav-open', !open);
+      });
+    }
+
+    // ----- Yukarı çık -----
+    function initYukariCik() {
+      var btn = document.getElementById('yukari-cik');
+      if (!btn) return;
+      function toggle() { btn.classList.toggle('is-visible', window.scrollY > 400); }
+      window.addEventListener('scroll', toggle, { passive: true });
+      toggle();
+      btn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    }
+
+    // ----- Slug'ı al -----
+    function getSlug() {
+      // Önce ?slug= parametresine bak
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('slug')) return params.get('slug');
+      // /haber/xxx formatını da destekle
+      var match = window.location.pathname.match(/\/haber\/([^/]+)/);
+      if (match) return decodeURIComponent(match[1]);
+      return null;
+    }
+
+    // ----- Son dakika ticker (üst bant) -----
+    function initSonDakikaTicker() {
+      fetch('/api/son-dakika')
+        .then(function(res) { return res.json(); })
+        .then(function(result) {
+          var items = result.data || [];
+          var tickerWrap = document.querySelector('.top-bar__ticker-wrap');
+          if (tickerWrap) tickerWrap.classList.toggle('top-bar__ticker-wrap--breaking', !!result.aktifSonDakika);
+          if (items.length === 0) return;
+          var tickerInner = document.getElementById('ticker-inner');
+          if (tickerInner) {
+            var spans = items.map(function(h) { return '<span>' + escapeHtml(h.baslik) + '</span>'; }).join('<span class="top-bar__ticker-sep">&bull;</span>');
+            tickerInner.innerHTML = spans + '<span class="top-bar__ticker-sep">&bull;</span>' + spans + '<span class="top-bar__ticker-sep">&bull;</span>';
+          }
+        })
+        .catch(function() {});
+    }
+
+    // ----- Haberi yükle -----
+    function loadHaber() {
+      var slug = getSlug();
+      var loadingEl = document.getElementById('detay-loading');
+      var notFoundEl = document.getElementById('detay-404');
+      var contentEl = document.getElementById('detay-content');
+
+      if (!slug) {
+        loadingEl.hidden = true;
+        notFoundEl.hidden = false;
+        return;
+      }
+
+      fetch('/api/haberler/' + encodeURIComponent(slug))
+        .then(function(res) {
+          if (!res.ok) throw new Error('404');
+          return res.json();
+        })
+        .then(function(haber) {
+          loadingEl.hidden = true;
+          contentEl.hidden = false;
+
+          // Sayfa başlığı
+          document.title = haber.baslik + ' - Ahmetli Medya';
+
+          // OG etiketleri
+          var ogTitle = document.querySelector('meta[property="og:title"]');
+          if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); document.head.appendChild(ogTitle); }
+          ogTitle.setAttribute('content', haber.baslik);
+
+          var desc = document.querySelector('meta[name="description"]');
+          if (desc) desc.setAttribute('content', haber.ozet || '');
+
+          // Breadcrumb
+          var bcKat = document.getElementById('detay-breadcrumb-kategori');
+          if (bcKat) bcKat.textContent = haber.kategori || 'Haber';
+
+          // Kategori
+          var katEl = document.getElementById('detay-kategori');
+          if (katEl) katEl.textContent = haber.kategori || '';
+
+          // Başlık
+          var baslikEl = document.getElementById('detay-baslik');
+          if (baslikEl) baslikEl.textContent = haber.baslik;
+
+          // Meta
+          var yazarEl = document.getElementById('detay-yazar');
+          if (yazarEl) yazarEl.textContent = haber.yazar || 'Editör';
+          var tarihEl = document.getElementById('detay-tarih');
+          if (tarihEl) tarihEl.textContent = formatTarih(haber.yayinTarihi);
+          var sureEl = document.getElementById('detay-sure');
+          if (sureEl) sureEl.textContent = (haber.okumaSuresi || 1) + ' dk okuma';
+
+          // Görsel
+          var gorselEl = document.getElementById('detay-gorsel');
+          if (gorselEl && haber.gorsel) {
+            gorselEl.src = haber.gorsel;
+            gorselEl.alt = haber.baslik;
+          }
+
+          // Özet
+          var ozetEl = document.getElementById('detay-ozet');
+          if (ozetEl && haber.ozet) ozetEl.textContent = haber.ozet;
+
+          // İçerik
+          var icerikEl = document.getElementById('detay-icerik');
+          if (icerikEl) icerikEl.innerHTML = haber.icerik || '';
+
+          // Diğer haberler
+          loadDigerHaberler(haber.id);
+        })
+        .catch(function() {
+          loadingEl.hidden = true;
+          notFoundEl.hidden = false;
+        });
+    }
+
+    // ----- Diğer haberler -----
+    function loadDigerHaberler(currentId) {
+      fetch('/api/haberler?limit=6')
+        .then(function(res) { return res.json(); })
+        .then(function(result) {
+          var haberler = (result.data || []).filter(function(h) { return h.id !== currentId; }).slice(0, 5);
+          var listEl = document.getElementById('detay-ilgili-list');
+          if (!listEl || haberler.length === 0) return;
+          listEl.innerHTML = haberler.map(function(h) {
+            var href = 'haber.html?slug=' + encodeURIComponent(h.slug);
+            return '<li class="detay__ilgili-item">'
+              + '<a href="' + href + '">'
+              + (h.gorsel ? '<img class="detay__ilgili-img" src="' + escapeHtml(h.gorsel) + '" alt="" width="80" height="54" loading="lazy">' : '')
+              + '<div class="detay__ilgili-text">'
+              + '<span class="detay__ilgili-title">' + escapeHtml(h.baslik) + '</span>'
+              + '<span class="detay__ilgili-meta">' + zamanOnce(h.yayinTarihi) + '</span>'
+              + '</div>'
+              + '</a></li>';
+          }).join('');
+        })
+        .catch(function() {});
+    }
+
+    // ----- Init -----
+    document.addEventListener('DOMContentLoaded', function() {
+      setCurrentDate();
+      setFooterYear();
+      initReadingProgress();
+      initNavToggle();
+      initYukariCik();
+      initSonDakikaTicker();
+      loadHaber();
+    });
+  })();
+  </script>
+</body>
+</html>

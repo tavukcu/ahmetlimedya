@@ -399,7 +399,7 @@ function initSonDakika() {
       const sdList = document.querySelector('.son-dakika-ticker__list');
       if (sdList) {
         sdList.innerHTML = items.map((h) =>
-          '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
+          '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a></li>'
         ).join('');
         const track = document.querySelector('.son-dakika-ticker__track');
         if (track) {
@@ -434,6 +434,8 @@ function initDynamicNews() {
         if (!h) break;
         const el = ucKartItems[i];
         el.dataset.haberId = h.id;
+        const aLink = el.querySelector('a');
+        if (aLink && h.slug) aLink.href = 'haber.html?slug=' + encodeURIComponent(h.slug);
         const img = el.querySelector('.uc-kart__img img');
         if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
         const kat = el.querySelector('.uc-kart__kategori');
@@ -451,6 +453,8 @@ function initDynamicNews() {
         if (!h) break;
         const el = ikiItems[i];
         el.dataset.haberId = h.id;
+        const aLink2 = el.querySelector('a');
+        if (aLink2 && h.slug) aLink2.href = 'haber.html?slug=' + encodeURIComponent(h.slug);
         const img = el.querySelector('.haber-iki__img img');
         if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
         const kat = el.querySelector('.haber-iki__kategori');
@@ -466,7 +470,7 @@ function initDynamicNews() {
       if (baslikList && haberler.length > 1) {
         const gundemHaberleri = haberler.slice(0, 6);
         baslikList.innerHTML = gundemHaberleri.map((h) =>
-          '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
+          '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a></li>'
         ).join('');
       }
 
@@ -474,7 +478,7 @@ function initDynamicNews() {
       const editorList = document.querySelector('.editor-secimi__list');
       if (editorList && haberler.length >= 4) {
         editorList.innerHTML = haberler.slice(0, 4).map((h) =>
-          '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
+          '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a></li>'
         ).join('');
       }
 
@@ -493,6 +497,8 @@ function mansetGoster(idx) {
   const article = document.querySelector('.manset__article');
   if (!article) return;
   article.dataset.haberId = h.id;
+  const link = article.querySelector('.manset__link');
+  if (link && h.slug) link.href = 'haber.html?slug=' + encodeURIComponent(h.slug);
   const img = article.querySelector('.manset__img-wrap img');
   if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
   const kat = article.querySelector('.manset__kategori');
@@ -604,7 +610,7 @@ function initSearchAPI() {
               ul.innerHTML = '<li>Sonuç bulunamadı.</li>';
             } else {
               ul.innerHTML = list.map((h) =>
-                '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a> <small>(' + (h.kategori || '') + ')</small></li>'
+                '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a> <small>(' + (h.kategori || '') + ')</small></li>'
               ).join('');
             }
           }
