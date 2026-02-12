@@ -92,16 +92,17 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   background: var(--primary);
-  padding: 6px 0;
+  padding: 10px 0;
   overflow: hidden;
   border-bottom: 1px solid rgba(255,255,255,0.12);
+  font-size: 15px;
 }
 .top-bar__ticker-label {
   flex-shrink: 0;
   font-weight: 700;
   padding: 0 var(--gutter);
   color: var(--accent-soft);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.04em;
 }
 .top-bar__ticker {
@@ -112,7 +113,7 @@ button { font-family: inherit; cursor: pointer; }
 .top-bar__ticker-inner {
   display: inline-block;
   padding-left: 100%;
-  animation: ust-ticker 40s linear infinite;
+  animation: ust-ticker 35s linear infinite;
 }
 .top-bar:hover .top-bar__ticker-inner { animation-play-state: paused; }
 @keyframes ust-ticker {
@@ -122,6 +123,18 @@ button { font-family: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .top-bar__ticker-inner { animation: none; }
   .top-bar__ticker { white-space: normal; }
+}
+.top-bar__ticker-wrap--breaking {
+  background: #c0392b;
+  animation: breakingPulse 2s ease-in-out infinite;
+}
+.top-bar__ticker-wrap--breaking .top-bar__ticker-label {
+  color: #fff;
+  font-weight: 800;
+}
+@keyframes breakingPulse {
+  0%, 100% { background: #c0392b; }
+  50% { background: #e74c3c; }
 }
 .top-bar__ticker-sep {
   margin: 0 12px;
@@ -915,7 +928,7 @@ a.haber-aksiyonlar__btn {
 .son-dakika-ticker__track {
   display: flex;
   flex-direction: column;
-  animation: son-dakika-kaydir 25s linear infinite;
+  animation: son-dakika-kaydir 40s linear infinite;
 }
 .son-dakika-ticker:hover .son-dakika-ticker__track {
   animation-play-state: paused;
