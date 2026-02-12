@@ -1160,6 +1160,20 @@ function initUzumFiyat() {
     });
 }
 
+// ----- KVKK / Çerez Banner -----
+function initCerezBanner() {
+  var banner = document.getElementById('cerez-banner');
+  var btn = document.getElementById('cerez-kabul');
+  if (!banner || !btn) return;
+  var accepted = localStorage.getItem('ahmetli-cerez-kabul');
+  if (accepted) return;
+  banner.hidden = false;
+  btn.addEventListener('click', function() {
+    localStorage.setItem('ahmetli-cerez-kabul', '1');
+    banner.hidden = true;
+  });
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
@@ -1185,6 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEczane();
   initVefat();
   initUzumFiyat();
+  initCerezBanner();
   // Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function() {});

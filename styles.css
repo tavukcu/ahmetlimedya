@@ -2455,3 +2455,89 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
 .manset:hover {
   box-shadow: var(--shadow-hover);
 }
+
+/* ============================================
+   Mobil Menü - Sosyal Medya İkonları
+   ============================================ */
+.nav-overlay__social {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 0 0;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.nav-overlay__social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--white);
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav-overlay__social a:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.5);
+}
+
+/* ============================================
+   KVKK / Çerez Uyarı Banner
+   ============================================ */
+.cerez-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--primary-dark);
+  color: var(--white);
+  z-index: 200;
+  padding: 16px var(--gutter);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+}
+.cerez-banner[hidden] { display: none !important; }
+.cerez-banner__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cerez-banner__inner p {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+.cerez-banner__inner a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.cerez-banner__btn {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cerez-banner__btn:hover {
+  background: var(--accent-hover);
+  color: var(--white);
+}
+@media (max-width: 600px) {
+  .cerez-banner__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .cerez-banner__btn {
+    width: 100%;
+  }
+}
