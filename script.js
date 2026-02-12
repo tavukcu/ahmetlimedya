@@ -962,7 +962,7 @@ function initTakvim() {
     takvimDoldur(cached);
   } else {
     var tarihStr = String(gun).padStart(2, '0') + '-' + String(ay + 1).padStart(2, '0') + '-' + yil;
-    fetch('https://api.aladhan.com/v1/timingsByCity/' + tarihStr + '?city=Manisa&country=Turkey&method=13')
+    fetch('https://api.aladhan.com/v1/timings/' + tarihStr + '?latitude=' + HAVA_KOORD.lat + '&longitude=' + HAVA_KOORD.lon + '&method=13')
       .then(function(res) { if (!res.ok) throw new Error('API'); return res.json(); })
       .then(function(json) {
         if (json.code === 200 && json.data) {
