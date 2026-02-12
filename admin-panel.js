@@ -2173,7 +2173,7 @@
     function loadEczane() {
       var list = $('eczane-admin-list');
       if (!list) return;
-      apiFetch('/api/admin/eczane').then(function(r) { return r.json(); }).then(function(result) {
+      api('/api/admin/eczane').then(function(r) { return r.json(); }).then(function(result) {
         var data = result.data || [];
         if (!Array.isArray(data) || data.length === 0) {
           list.innerHTML = '<p class="muted">Henüz eczane eklenmemiş.</p>';
@@ -2187,7 +2187,7 @@
         }).join('');
         list.querySelectorAll('[data-eczane-sil]').forEach(function(btn) {
           btn.addEventListener('click', function() {
-            apiFetch('/api/admin/eczane/' + btn.dataset.eczaneSil, { method: 'DELETE' }).then(function() { loadEczane(); });
+            api('/api/admin/eczane/' + btn.dataset.eczaneSil, { method: 'DELETE' }).then(function() { loadEczane(); });
           });
         });
       }).catch(function() { list.innerHTML = '<p class="muted">Yüklenemedi.</p>'; });
@@ -2202,7 +2202,7 @@
     var eczaneForm = $('eczane-form');
     if (eczaneForm) eczaneForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      apiFetch('/api/admin/eczane', {
+      api('/api/admin/eczane', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ad: $('eczane-ad').value, adres: $('eczane-adres').value, telefon: $('eczane-tel').value })
@@ -2218,7 +2218,7 @@
     function loadVefat() {
       var list = $('vefat-admin-list');
       if (!list) return;
-      apiFetch('/api/admin/vefat').then(function(r) { return r.json(); }).then(function(result) {
+      api('/api/admin/vefat').then(function(r) { return r.json(); }).then(function(result) {
         var data = result.data || [];
         if (!Array.isArray(data) || data.length === 0) {
           list.innerHTML = '<p class="muted">Henüz ilan eklenmemiş.</p>';
@@ -2232,7 +2232,7 @@
         }).join('');
         list.querySelectorAll('[data-vefat-sil]').forEach(function(btn) {
           btn.addEventListener('click', function() {
-            apiFetch('/api/admin/vefat/' + btn.dataset.vefatSil, { method: 'DELETE' }).then(function() { loadVefat(); });
+            api('/api/admin/vefat/' + btn.dataset.vefatSil, { method: 'DELETE' }).then(function() { loadVefat(); });
           });
         });
       }).catch(function() { list.innerHTML = '<p class="muted">Yüklenemedi.</p>'; });
@@ -2247,7 +2247,7 @@
     var vefatForm = $('vefat-form');
     if (vefatForm) vefatForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      apiFetch('/api/admin/vefat', {
+      api('/api/admin/vefat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ad: $('vefat-ad').value, detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
@@ -2263,7 +2263,7 @@
     function loadUzumFiyat() {
       var rows = $('uzum-fiyat-rows');
       if (!rows) return;
-      apiFetch('/api/admin/uzum-fiyat').then(function(r) { return r.json(); }).then(function(result) {
+      api('/api/admin/uzum-fiyat').then(function(r) { return r.json(); }).then(function(result) {
         var veri = result.data || {};
         var fiyatlar = veri.fiyatlar || [];
         if (fiyatlar.length === 0) {
@@ -2304,7 +2304,7 @@
         var fiyat = row.querySelector('.uzum-fyt').value.trim();
         if (tur) fiyatlar.push({ tur: tur, fiyat: fiyat });
       });
-      apiFetch('/api/admin/uzum-fiyat', {
+      api('/api/admin/uzum-fiyat', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fiyatlar: fiyatlar })
