@@ -90,6 +90,7 @@ async function yazBlob(blobAdi, liste) {
     await blob.put(blobAdi, JSON.stringify(liste, null, 2), {
       access: 'public',
       addRandomSuffix: false,
+      allowOverwrite: true,
       contentType: 'application/json',
     });
   } catch (e) {
