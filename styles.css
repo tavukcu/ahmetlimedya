@@ -379,13 +379,13 @@ button { font-family: inherit; cursor: pointer; }
 }
 .manset__link {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  height: 360px;
+  grid-template-columns: 1.5fr 1fr;
+  height: 400px;
 }
 .manset__img-wrap {
   position: relative;
   overflow: hidden;
-  height: 360px;
+  height: 400px;
 }
 .manset__img-wrap img {
   width: 100%;
