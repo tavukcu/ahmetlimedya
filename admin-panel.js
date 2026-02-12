@@ -908,6 +908,7 @@
     setQuillContent('');
     $('news-image-preview').hidden = true;
     $('news-image-upload-options').style.display = '';
+    clearVideoPreview();
     updateCounters();
     $('news-modal').showModal();
   }
@@ -940,6 +941,13 @@
         $('news-breaking-duration').value = String(h.sonDakikaSure || 6);
         $('breaking-duration-row').hidden = !h.sonDakika;
 
+        // Video
+        if (h.video && h.video.url) {
+          showVideoPreview(h.video);
+        } else {
+          clearVideoPreview();
+        }
+
         updateCounters();
         $('news-modal').showModal();
       })
@@ -971,6 +979,13 @@
       sonDakikaSure: parseInt($('news-breaking-duration').value, 10) || 6,
       oneCikan: $('news-featured').checked
     };
+
+    // Video
+    if (currentVideoData) {
+      data.video = currentVideoData;
+    } else {
+      data.video = null;
+    }
 
     var btn = $('news-form-submit');
     btn.disabled = true;
@@ -1406,6 +1421,217 @@
     if (input && counter) counter.textContent = input.value.length + ' / ' + max;
   }
 
+  // ===================== VİDEO =====================
+
+  var currentVideoData = null;
+
+  function parseVideoUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    url = url.trim();
+
+    // YouTube: youtube.com/watch?v=ID or youtu.be/ID or youtube.com/embed/ID
+    var ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) {
+      var vid = ytMatch[1];
+      return {
+        tip: 'youtube',
+        url: url,
+        embedUrl: 'https://www.youtube.com/embed/' + vid,
+        kapak: 'https://img.youtube.com/vi/' + vid + '/hqdefault.jpg'
+      };
+    }
+
+    // Instagram
+    if (url.indexOf('instagram.com') !== -1) {
+      var igMatch = url.match(/instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+      if (igMatch) {
+        return {
+          tip: 'instagram',
+          url: url,
+          embedUrl: 'https://www.instagram.com/p/' + igMatch[1] + '/embed/',
+          kapak: ''
+        };
+      }
+    }
+
+    // TikTok
+    if (url.indexOf('tiktok.com') !== -1) {
+      var ttMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+      if (ttMatch) {
+        return {
+          tip: 'tiktok',
+          url: url,
+          embedUrl: 'https://www.tiktok.com/embed/v2/' + ttMatch[1],
+          kapak: ''
+        };
+      }
+    }
+
+    // Twitter/X
+    if (url.indexOf('twitter.com') !== -1 || url.indexOf('x.com') !== -1) {
+      var twMatch = url.match(/(?:twitter\.com|x\.com)\/[^/]+\/status\/(\d+)/);
+      if (twMatch) {
+        return {
+          tip: 'twitter',
+          url: url,
+          embedUrl: 'https://platform.twitter.com/embed/Tweet.html?id=' + twMatch[1],
+          kapak: ''
+        };
+      }
+    }
+
+    return null;
+  }
+
+  function uploadVideo(file) {
+    return new Promise(function(resolve, reject) {
+      var formData = new FormData();
+      formData.append('video', file);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/admin/video-yukle');
+      if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+      var progressEl = $('video-upload-progress');
+      var fillEl = $('video-progress-fill');
+      var textEl = $('video-progress-text');
+      if (progressEl) progressEl.hidden = false;
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          var pct = Math.round((e.loaded / e.total) * 100);
+          if (fillEl) fillEl.style.width = pct + '%';
+          if (textEl) textEl.textContent = 'Yukleniyor... %' + pct;
+        }
+      };
+
+      xhr.onload = function() {
+        if (progressEl) progressEl.hidden = true;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            var data = JSON.parse(xhr.responseText);
+            resolve(data.url);
+          } catch (e) { reject(new Error('Yanit okunamadi')); }
+        } else {
+          reject(new Error('Yukleme basarisiz (' + xhr.status + ')'));
+        }
+      };
+
+      xhr.onerror = function() {
+        if (progressEl) progressEl.hidden = true;
+        reject(new Error('Ag hatasi'));
+      };
+
+      xhr.send(formData);
+    });
+  }
+
+  function showVideoPreview(videoData) {
+    currentVideoData = videoData;
+    var previewEl = $('news-video-preview');
+    var optionsEl = $('news-video-options');
+    var infoEl = $('news-video-info');
+    if (!previewEl || !optionsEl) return;
+
+    var label = videoData.tip || 'video';
+    if (videoData.tip === 'youtube') label = 'YouTube';
+    else if (videoData.tip === 'instagram') label = 'Instagram';
+    else if (videoData.tip === 'tiktok') label = 'TikTok';
+    else if (videoData.tip === 'twitter') label = 'Twitter/X';
+    else if (videoData.tip === 'dosya') label = 'Video dosyasi';
+
+    if (infoEl) infoEl.textContent = label + ': ' + (videoData.url || '').substring(0, 60) + (videoData.url && videoData.url.length > 60 ? '...' : '');
+    previewEl.hidden = false;
+    optionsEl.style.display = 'none';
+  }
+
+  function clearVideoPreview() {
+    currentVideoData = null;
+    var previewEl = $('news-video-preview');
+    var optionsEl = $('news-video-options');
+    if (previewEl) previewEl.hidden = true;
+    if (optionsEl) optionsEl.style.display = '';
+  }
+
+  function initVideoUpload() {
+    // Tab switching
+    var tabLink = $('video-tab-link');
+    var tabUpload = $('video-tab-upload');
+    var linkPanel = $('video-link-panel');
+    var uploadPanel = $('video-upload-panel');
+
+    if (tabLink && tabUpload) {
+      tabLink.addEventListener('click', function() {
+        tabLink.classList.add('active');
+        tabUpload.classList.remove('active');
+        if (linkPanel) linkPanel.hidden = false;
+        if (uploadPanel) uploadPanel.hidden = true;
+      });
+      tabUpload.addEventListener('click', function() {
+        tabUpload.classList.add('active');
+        tabLink.classList.remove('active');
+        if (uploadPanel) uploadPanel.hidden = false;
+        if (linkPanel) linkPanel.hidden = true;
+      });
+    }
+
+    // URL apply
+    var urlApplyBtn = $('news-video-url-apply');
+    if (urlApplyBtn) {
+      urlApplyBtn.addEventListener('click', function() {
+        var urlInput = $('news-video-url');
+        var url = urlInput ? urlInput.value.trim() : '';
+        if (!url) { showToast('URL girin', 'error'); return; }
+        var parsed = parseVideoUrl(url);
+        if (!parsed) { showToast('Desteklenmeyen video linki. YouTube, Instagram, TikTok veya Twitter linki girin.', 'error'); return; }
+        showVideoPreview(parsed);
+        if (urlInput) urlInput.value = '';
+      });
+    }
+
+    // File upload - dropzone
+    var dropzone = $('news-video-dropzone');
+    var fileInput = $('news-video-file');
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', function() { fileInput.click(); });
+      dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('drag-over'); });
+      dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('drag-over'); });
+      dropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) handleVideoFile(e.dataTransfer.files[0]);
+      });
+      fileInput.addEventListener('change', function() {
+        if (this.files[0]) handleVideoFile(this.files[0]);
+      });
+    }
+
+    function handleVideoFile(file) {
+      if (!file.type.startsWith('video/')) { showToast('Video dosyasi secin', 'error'); return; }
+      if (file.size > 50 * 1024 * 1024) { showToast('Dosya 50MB\'dan kucuk olmali', 'error'); return; }
+
+      uploadVideo(file)
+        .then(function(url) {
+          showVideoPreview({
+            tip: 'dosya',
+            url: url,
+            embedUrl: '',
+            kapak: ''
+          });
+          showToast('Video yuklendi');
+        })
+        .catch(function(err) {
+          showToast(err.message || 'Video yuklenemedi', 'error');
+        });
+    }
+
+    // Remove button
+    var removeBtn = $('news-video-remove');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', clearVideoPreview);
+    }
+  }
+
   // ===================== GÖRSEL YÜKLEME =====================
 
   function initImageUpload() {
@@ -1554,6 +1780,7 @@
   function init() {
     fillCategorySelects();
     initImageUpload();
+    initVideoUpload();
     initPreview();
     initQuill();
     waitForLibs();

@@ -2718,3 +2718,101 @@ kbd {
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ============================================
+   Video Upload Section
+   ============================================ */
+.video-upload-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.video-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+}
+
+.video-preview p {
+  flex: 1;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.video-upload-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.video-option-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.video-option-tabs .btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+#video-link-panel {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#video-link-panel input {
+  flex: 1;
+}
+
+.video-drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+.video-drop-zone:hover,
+.video-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(56, 139, 253, 0.05);
+}
+
+.video-drop-zone p {
+  margin: 4px 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  width: 0;
+  transition: width .3s;
+}
+
+#video-upload-progress p {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

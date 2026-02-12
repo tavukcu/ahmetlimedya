@@ -120,7 +120,8 @@
               <span class="detay__tarih" id="detay-tarih"></span>
               <span class="detay__sure" id="detay-sure"></span>
             </div>
-            <figure class="detay__gorsel">
+            <div class="detay__video" id="detay-video" hidden></div>
+            <figure class="detay__gorsel" id="detay-gorsel-wrap">
               <img id="detay-gorsel" src="" alt="" width="800" height="450">
             </figure>
             <div class="detay__ozet" id="detay-ozet"></div>
@@ -348,9 +349,32 @@
           var sureEl = document.getElementById('detay-sure');
           if (sureEl) sureEl.textContent = (haber.okumaSuresi || 1) + ' dk okuma';
 
+          // Video
+          var videoEl = document.getElementById('detay-video');
+          var gorselWrap = document.getElementById('detay-gorsel-wrap');
+          if (haber.video && haber.video.url && videoEl) {
+            videoEl.hidden = false;
+            if (gorselWrap) gorselWrap.hidden = true;
+            var tip = haber.video.tip || '';
+            if (tip === 'youtube' && haber.video.embedUrl) {
+              videoEl.innerHTML = '<iframe src="' + escapeHtml(haber.video.embedUrl) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            } else if (tip === 'dosya') {
+              videoEl.innerHTML = '<video controls preload="metadata"><source src="' + escapeHtml(haber.video.url) + '"></video>';
+            } else if (tip === 'instagram') {
+              videoEl.innerHTML = '<iframe src="' + escapeHtml(haber.video.embedUrl || haber.video.url) + '" allowfullscreen></iframe>';
+            } else if (tip === 'tiktok') {
+              videoEl.innerHTML = '<iframe src="' + escapeHtml(haber.video.embedUrl || haber.video.url) + '" allowfullscreen></iframe>';
+            } else if (tip === 'twitter') {
+              videoEl.innerHTML = '<iframe src="' + escapeHtml(haber.video.embedUrl || haber.video.url) + '" allowfullscreen></iframe>';
+            } else {
+              videoEl.hidden = true;
+              if (gorselWrap) gorselWrap.hidden = false;
+            }
+          }
+
           // Görsel
           var gorselEl = document.getElementById('detay-gorsel');
-          if (gorselEl && haber.gorsel) {
+          if (gorselEl && haber.gorsel && (!haber.video || !haber.video.url)) {
             gorselEl.src = haber.gorsel;
             gorselEl.alt = haber.baslik;
           }

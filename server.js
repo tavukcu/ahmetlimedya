@@ -9,6 +9,9 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const multer = require('multer');
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 // Vercel Blob: sadece BLOB_READ_WRITE_TOKEN varsa kullan
 let blob = null;
@@ -47,8 +50,8 @@ function verifyToken(token) {
 }
 
 app.use(cors());
-app.use(express.json({ limit: '4mb' }));
-app.use(express.urlencoded({ extended: true, limit: '4mb' }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(__dirname));
 
 // ----- Veri okuma/yazma (Blob veya lokal dosya) -----
@@ -321,6 +324,34 @@ app.post('/api/admin-login', (req, res) => {
 // ----- Admin: Auth gerekli -----
 app.use('/api/admin', adminAuth);
 
+// ----- Admin: Video yükleme -----
+app.post('/api/admin/video-yukle', upload.single('video'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ hata: 'Video dosyası gerekli' });
+    const timestamp = Date.now();
+    const safeName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const fileName = timestamp + '-' + safeName;
+
+    if (blob) {
+      // Vercel Blob Storage
+      const result = await blob.put('videos/' + fileName, req.file.buffer, {
+        access: 'public',
+        contentType: req.file.mimetype,
+      });
+      return res.json({ url: result.url });
+    }
+
+    // Lokal geliştirme: public/uploads klasörüne kaydet
+    const uploadsDir = path.join(__dirname, 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+    fs.writeFileSync(path.join(uploadsDir, fileName), req.file.buffer);
+    res.json({ url: '/public/uploads/' + fileName });
+  } catch (err) {
+    console.error('[POST /api/admin/video-yukle] Hata:', err.message);
+    res.status(500).json({ hata: 'Video yüklenemedi: ' + err.message });
+  }
+});
+
 app.get('/api/admin/bulten', async (req, res) => {
   try {
     res.json({ data: await okuBulten() });
@@ -363,6 +394,9 @@ app.post('/api/admin/haberler', async (req, res) => {
       sonDakikaBaslangic: body.sonDakika ? new Date().toISOString() : null,
       oneCikan: !!body.oneCikan,
     };
+    if (body.video && typeof body.video === 'object' && body.video.url) {
+      yeni.video = body.video;
+    }
     haberler.push(yeni);
     await yazHaberler(haberler);
     res.status(201).json(yeni);
@@ -405,6 +439,15 @@ app.put('/api/admin/haberler/:id', async (req, res) => {
       sonDakikaBaslangic: sonDakikaBaslangic,
       oneCikan: body.oneCikan !== undefined ? !!body.oneCikan : !!mevcut.oneCikan,
     };
+    if (body.video !== undefined) {
+      if (body.video && typeof body.video === 'object' && body.video.url) {
+        haberler[idx].video = body.video;
+      } else {
+        delete haberler[idx].video;
+      }
+    } else if (mevcut.video) {
+      haberler[idx].video = mevcut.video;
+    }
     await yazHaberler(haberler);
     res.json(haberler[idx]);
   } catch (err) {

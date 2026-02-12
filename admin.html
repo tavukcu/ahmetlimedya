@@ -410,7 +410,37 @@
             </div>
           </div>
           <div class="form-row">
-            <label>İçerik</label>
+            <label>Video (istege bagli)</label>
+            <div class="video-upload-section">
+              <div id="news-video-preview" class="video-preview" hidden>
+                <p id="news-video-info"></p>
+                <button type="button" id="news-video-remove" class="btn btn-sm btn-danger">Kaldir</button>
+              </div>
+              <div id="news-video-options" class="video-upload-options">
+                <div class="video-option-tabs">
+                  <button type="button" class="btn btn-sm btn-ghost active" id="video-tab-link">Link Ekle</button>
+                  <button type="button" class="btn btn-sm btn-ghost" id="video-tab-upload">Dosya Yukle</button>
+                </div>
+                <div id="video-link-panel">
+                  <input type="url" id="news-video-url" placeholder="YouTube, Instagram, TikTok veya Twitter linki">
+                  <button type="button" class="btn btn-sm btn-ghost" id="news-video-url-apply">Ekle</button>
+                </div>
+                <div id="video-upload-panel" hidden>
+                  <div class="video-drop-zone" id="news-video-dropzone">
+                    <input type="file" id="news-video-file" accept="video/*" hidden>
+                    <p>Videoyu surukleyin veya tiklayin</p>
+                    <p class="drop-zone-hint">En fazla 50MB, MP4/WebM</p>
+                  </div>
+                  <div id="video-upload-progress" hidden>
+                    <div class="progress-bar"><div class="progress-fill" id="video-progress-fill"></div></div>
+                    <p id="video-progress-text">Yukleniyor...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Icerik</label>
             <div class="editor-wrapper"><div id="news-content"></div></div>
           </div>
           <div class="form-row">
