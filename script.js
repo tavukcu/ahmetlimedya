@@ -398,46 +398,118 @@ function initHavaDurumu() {
 }
 
 // ----- Son dakika: üst bant ticker + sidebar -----
-function initSonDakika() {
-  fetch('/api/son-dakika')
-    .then((res) => res.json())
-    .then((result) => {
-      const items = result.data || [];
+// Ticker verilerini biriktiren obje
+var _tickerData = { haberler: [], doviz: '', uzum: '', hava: '' };
 
-      // Kırmızı bant: aktif son dakika varsa
-      const tickerWrap = document.querySelector('.top-bar__ticker-wrap');
+function tickerGuncelle() {
+  var tickerInner = document.getElementById('ticker-inner');
+  if (!tickerInner) return;
+
+  var parcalar = [];
+
+  // Haberler
+  _tickerData.haberler.forEach(function(baslik) {
+    parcalar.push('<span>' + baslik + '</span>');
+  });
+
+  // Hava durumu
+  if (_tickerData.hava) {
+    parcalar.push('<span class="ticker-bilgi ticker-bilgi--hava">' + _tickerData.hava + '</span>');
+  }
+
+  // Döviz
+  if (_tickerData.doviz) {
+    parcalar.push('<span class="ticker-bilgi ticker-bilgi--doviz">' + _tickerData.doviz + '</span>');
+  }
+
+  // Üzüm fiyatları
+  if (_tickerData.uzum) {
+    parcalar.push('<span class="ticker-bilgi ticker-bilgi--uzum">' + _tickerData.uzum + '</span>');
+  }
+
+  if (parcalar.length === 0) return;
+
+  var html = parcalar.join('<span class="top-bar__ticker-sep">•</span>');
+  tickerInner.innerHTML = html + '<span class="top-bar__ticker-sep">•</span>' + html + '<span class="top-bar__ticker-sep">•</span>';
+}
+
+function initSonDakika() {
+  // 1) Haberleri yükle
+  fetch('/api/son-dakika')
+    .then(function(res) { return res.json(); })
+    .then(function(result) {
+      var items = result.data || [];
+
+      var tickerWrap = document.querySelector('.top-bar__ticker-wrap');
       if (tickerWrap) {
         tickerWrap.classList.toggle('top-bar__ticker-wrap--breaking', !!result.aktifSonDakika);
       }
 
-      if (items.length === 0) return;
-
-      // Üst bant ticker
-      const tickerInner = document.getElementById('ticker-inner');
-      if (tickerInner) {
-        const spans = items.map((h) =>
-          '<span>' + escapeHtmlFront(h.baslik) + '</span>'
-        ).join('<span class="top-bar__ticker-sep">•</span>');
-        // Sonsuz kaydırma için iki kez tekrarla
-        tickerInner.innerHTML = spans + '<span class="top-bar__ticker-sep">•</span>' + spans + '<span class="top-bar__ticker-sep">•</span>';
-      }
+      _tickerData.haberler = items.map(function(h) { return escapeHtmlFront(h.baslik); });
+      tickerGuncelle();
 
       // Sidebar son dakika kayan liste
-      const sdList = document.querySelector('.son-dakika-ticker__list');
+      var sdList = document.querySelector('.son-dakika-ticker__list');
       if (sdList) {
-        sdList.innerHTML = items.map((h) =>
-          '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a></li>'
-        ).join('');
-        const track = document.querySelector('.son-dakika-ticker__track');
+        sdList.innerHTML = items.map(function(h) {
+          return '<li><a href="haber.html?slug=' + encodeURIComponent(h.slug) + '">' + escapeHtmlFront(h.baslik) + '</a></li>';
+        }).join('');
+        var track = document.querySelector('.son-dakika-ticker__track');
         if (track) {
-          const duplicate = track.querySelector('.son-dakika-ticker__list:nth-child(2)');
+          var duplicate = track.querySelector('.son-dakika-ticker__list:nth-child(2)');
           if (duplicate) duplicate.innerHTML = sdList.innerHTML;
         }
       }
     })
-    .catch(() => {
-      // API unavailable, keep static/loading content
-    });
+    .catch(function() {});
+
+  // 2) Döviz bilgisini ticker'a ekle
+  fetch('/api/doviz')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var parcalar = [];
+      var fmt = function(v) {
+        var n = parseFloat(String(v).replace(',', '.'));
+        return isNaN(n) ? '–' : n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      };
+      if (data.USD) parcalar.push('USD: ' + fmt(data.USD.Selling || data.USD.Buying) + ' TL');
+      if (data.EUR) parcalar.push('EUR: ' + fmt(data.EUR.Selling || data.EUR.Buying) + ' TL');
+      if (data.GRA) parcalar.push('Gram Altin: ' + fmt(data.GRA.Selling || data.GRA.Buying) + ' TL');
+      if (parcalar.length > 0) {
+        _tickerData.doviz = '💰 ' + parcalar.join(' | ');
+        tickerGuncelle();
+      }
+    })
+    .catch(function() {});
+
+  // 3) Üzüm fiyatlarını ticker'a ekle
+  fetch('/api/uzum-fiyat')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      var liste = result.data || [];
+      if (liste.length > 0) {
+        var parcalar = liste.slice(0, 3).map(function(f) {
+          return escapeHtmlFront(f.tur) + ': ' + escapeHtmlFront(f.fiyat) + ' TL/kg';
+        });
+        _tickerData.uzum = '🍇 ' + parcalar.join(' | ');
+        tickerGuncelle();
+      }
+    })
+    .catch(function() {});
+
+  // 4) Hava durumunu ticker'a ekle
+  var havaUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + HAVA_KOORD.lat + '&longitude=' + HAVA_KOORD.lon + '&current_weather=true&timezone=Europe/Istanbul';
+  fetch(havaUrl)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.current_weather) {
+        var sicaklik = Math.round(data.current_weather.temperature);
+        var aciklama = havaKodToAciklama(data.current_weather.weathercode);
+        _tickerData.hava = '☀ Ahmetli: ' + sicaklik + '°C ' + aciklama;
+        tickerGuncelle();
+      }
+    })
+    .catch(function() {});
 }
 
 // ----- API'den haberleri yükle -----
