@@ -621,6 +621,60 @@ function initSearchAPI() {
   }
 }
 
+// ----- Döviz & Altın (Truncgil Finans API) -----
+function initDovizAltin() {
+  var ITEMS = [
+    { key: 'USD', elDeger: 'doviz-usd', elDegisim: 'doviz-usd-degisim' },
+    { key: 'EUR', elDeger: 'doviz-eur', elDegisim: 'doviz-eur-degisim' },
+    { key: 'GBP', elDeger: 'doviz-gbp', elDegisim: 'doviz-gbp-degisim' },
+    { key: 'GRA', elDeger: 'altin-gram', elDegisim: 'altin-gram-degisim' },
+    { key: 'CEYREKALTIN', elDeger: 'altin-ceyrek', elDegisim: 'altin-ceyrek-degisim' },
+  ];
+
+  function formatFiyat(val) {
+    var n = parseFloat(String(val).replace(',', '.'));
+    if (isNaN(n)) return '–';
+    return n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function guncelle() {
+    fetch('https://finans.truncgil.com/v4/today.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        ITEMS.forEach(function(item) {
+          var d = data[item.key];
+          if (!d) return;
+          var degerEl = document.getElementById(item.elDeger);
+          var degisimEl = document.getElementById(item.elDegisim);
+          if (degerEl) degerEl.textContent = formatFiyat(d.Selling || d.Buying);
+          if (degisimEl) {
+            var change = parseFloat(String(d.Change).replace(',', '.'));
+            if (isNaN(change) || change === 0) {
+              degisimEl.textContent = '';
+              degisimEl.className = 'doviz-listesi__degisim';
+            } else {
+              var up = change > 0;
+              degisimEl.textContent = (up ? '▲' : '▼') + ' %' + Math.abs(change).toFixed(2);
+              degisimEl.className = 'doviz-listesi__degisim ' + (up ? 'doviz-listesi__degisim--up' : 'doviz-listesi__degisim--down');
+            }
+          }
+        });
+        var guncelEl = document.getElementById('doviz-guncelleme');
+        if (guncelEl) {
+          var saat = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+          guncelEl.textContent = 'Son güncelleme: ' + saat;
+        }
+      })
+      .catch(function() {
+        var guncelEl = document.getElementById('doviz-guncelleme');
+        if (guncelEl) guncelEl.textContent = 'Güncellenemedi';
+      });
+  }
+
+  guncelle();
+  setInterval(guncelle, 5 * 60 * 1000);
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   setCurrentDate();
@@ -635,5 +689,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initYukariCik();
   initHavaDurumu();
   initSonDakika();
+  initDovizAltin();
   initDynamicNews();
 });

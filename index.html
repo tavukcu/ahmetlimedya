@@ -356,12 +356,36 @@
             <p class="hava-durumu__kaynak">Kaynak: Open-Meteo</p>
           </div>
           <div class="sidebar__box sidebar__box--doviz">
-            <h3 class="sidebar__title">Döviz</h3>
-            <ul class="doviz-listesi">
-              <li><span class="doviz-listesi__kur">USD</span> <span class="doviz-listesi__deger">34,25</span></li>
-              <li><span class="doviz-listesi__kur">EUR</span> <span class="doviz-listesi__deger">36,80</span></li>
-              <li><span class="doviz-listesi__kur">GBP</span> <span class="doviz-listesi__deger">43,50</span></li>
+            <h3 class="sidebar__title">Döviz & Altın</h3>
+            <ul class="doviz-listesi" id="doviz-altin-list">
+              <li>
+                <span class="doviz-listesi__kur">USD</span>
+                <span class="doviz-listesi__deger" id="doviz-usd">–</span>
+                <span class="doviz-listesi__degisim" id="doviz-usd-degisim"></span>
+              </li>
+              <li>
+                <span class="doviz-listesi__kur">EUR</span>
+                <span class="doviz-listesi__deger" id="doviz-eur">–</span>
+                <span class="doviz-listesi__degisim" id="doviz-eur-degisim"></span>
+              </li>
+              <li>
+                <span class="doviz-listesi__kur">GBP</span>
+                <span class="doviz-listesi__deger" id="doviz-gbp">–</span>
+                <span class="doviz-listesi__degisim" id="doviz-gbp-degisim"></span>
+              </li>
+              <li class="doviz-listesi__ayrac"></li>
+              <li>
+                <span class="doviz-listesi__kur">Gram Altın</span>
+                <span class="doviz-listesi__deger" id="altin-gram">–</span>
+                <span class="doviz-listesi__degisim" id="altin-gram-degisim"></span>
+              </li>
+              <li>
+                <span class="doviz-listesi__kur">Çeyrek Altın</span>
+                <span class="doviz-listesi__deger" id="altin-ceyrek">–</span>
+                <span class="doviz-listesi__degisim" id="altin-ceyrek-degisim"></span>
+              </li>
             </ul>
+            <p class="doviz-listesi__guncelleme" id="doviz-guncelleme">Yükleniyor…</p>
           </div>
           </div>
         </aside>
