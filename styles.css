@@ -1822,3 +1822,75 @@ a.haber-aksiyonlar__btn {
 .detay__video video {
   background: #000;
 }
+
+/* ============================================
+   WhatsApp Haber Hattı
+   ============================================ */
+.whatsapp-hatti {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: var(--radius);
+  margin: 24px 0;
+  padding: 24px 28px;
+}
+
+.whatsapp-hatti__inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.whatsapp-hatti__icon svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.whatsapp-hatti__content {
+  flex: 1;
+}
+
+.whatsapp-hatti__content h2 {
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.whatsapp-hatti__content p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.whatsapp-hatti__btn {
+  flex-shrink: 0;
+  display: inline-block;
+  background: #fff;
+  color: #128C7E;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.whatsapp-hatti__btn:hover {
+  background: #e6e6e6;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .whatsapp-hatti__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .whatsapp-hatti__btn {
+    width: 100%;
+    text-align: center;
+  }
+}
