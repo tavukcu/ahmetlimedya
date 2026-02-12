@@ -1,6 +1,7 @@
 /**
  * Ahmetli Medya - Backend API
  * Express: statik dosya + haberler, arama, bülten + admin panel API
+ * Vercel Blob Storage desteği (Vercel'de dosya sistemi read-only)
  */
 
 const express = require('express');
@@ -8,6 +9,12 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+
+// Vercel Blob: sadece BLOB_READ_WRITE_TOKEN varsa kullan
+let blob = null;
+if (process.env.BLOB_READ_WRITE_TOKEN) {
+  blob = require('@vercel/blob');
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,31 +50,71 @@ app.use(express.json({ limit: '4mb' }));
 app.use(express.urlencoded({ extended: true, limit: '4mb' }));
 app.use(express.static(__dirname));
 
-function okuHaberler() {
+// ----- Veri okuma/yazma (Blob veya lokal dosya) -----
+
+function okuLokal(dosyaYolu) {
   try {
-    const raw = fs.readFileSync(HABERLER_PATH, 'utf8');
-    return JSON.parse(raw);
+    return JSON.parse(fs.readFileSync(dosyaYolu, 'utf8'));
   } catch (e) {
     return [];
   }
 }
 
-function yazHaberler(liste) {
-  fs.writeFileSync(HABERLER_PATH, JSON.stringify(liste, null, 2), 'utf8');
+function yazLokal(dosyaYolu, liste) {
+  fs.writeFileSync(dosyaYolu, JSON.stringify(liste, null, 2), 'utf8');
 }
 
-function okuBulten() {
+async function okuBlob(blobAdi, lokalYol) {
+  if (!blob) return okuLokal(lokalYol);
   try {
-    const raw = fs.readFileSync(BULTEN_PATH, 'utf8');
-    return JSON.parse(raw);
+    const { blobs } = await blob.list({ prefix: blobAdi, limit: 1 });
+    if (blobs.length > 0) {
+      const res = await fetch(blobs[0].url);
+      if (res.ok) return await res.json();
+    }
+    // Blob yoksa lokal dosyadan seed'le
+    const lokal = okuLokal(lokalYol);
+    if (lokal.length > 0) {
+      await yazBlob(blobAdi, lokal);
+    }
+    return lokal;
   } catch (e) {
-    return [];
+    console.error('[Blob okuma hatası]', blobAdi, e.message);
+    return okuLokal(lokalYol);
   }
 }
 
-function yazBulten(liste) {
-  fs.writeFileSync(BULTEN_PATH, JSON.stringify(liste, null, 2), 'utf8');
+async function yazBlob(blobAdi, liste) {
+  if (!blob) return yazLokal(blobAdi === 'haberler.json' ? HABERLER_PATH : BULTEN_PATH, liste);
+  try {
+    await blob.put(blobAdi, JSON.stringify(liste, null, 2), {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: 'application/json',
+    });
+  } catch (e) {
+    console.error('[Blob yazma hatası]', blobAdi, e.message);
+    throw e;
+  }
 }
+
+async function okuHaberler() {
+  return okuBlob('haberler.json', HABERLER_PATH);
+}
+
+async function yazHaberler(liste) {
+  return yazBlob('haberler.json', liste);
+}
+
+async function okuBulten() {
+  return okuBlob('bulten.json', BULTEN_PATH);
+}
+
+async function yazBulten(liste) {
+  return yazBlob('bulten.json', liste);
+}
+
+// ----- Yardımcılar -----
 
 function slugify(str) {
   if (!str || typeof str !== 'string') return '';
@@ -93,125 +140,136 @@ function adminAuth(req, res, next) {
 }
 
 // ----- API: Haber listesi -----
-// GET /api/haberler?kategori=Gündem&sayfa=1&limit=10
-app.get('/api/haberler', (req, res) => {
-  let haberler = okuHaberler();
-  const kategori = req.query.kategori;
-  const sayfa = Math.max(1, parseInt(req.query.sayfa, 10) || 1);
-  const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
-  const offset = (sayfa - 1) * limit;
+app.get('/api/haberler', async (req, res) => {
+  try {
+    let haberler = await okuHaberler();
+    const kategori = req.query.kategori;
+    const sayfa = Math.max(1, parseInt(req.query.sayfa, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const offset = (sayfa - 1) * limit;
 
-  if (kategori) {
-    haberler = haberler.filter((h) => h.kategori === kategori);
+    if (kategori) {
+      haberler = haberler.filter((h) => h.kategori === kategori);
+    }
+    const toplam = haberler.length;
+    const sayfalani = haberler.slice(offset, offset + limit);
+
+    res.json({ data: sayfalani, sayfa, limit, toplam, toplamSayfa: Math.ceil(toplam / limit) });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
-  const toplam = haberler.length;
-  const sayfalani = haberler.slice(offset, offset + limit);
-
-  res.json({
-    data: sayfalani,
-    sayfa,
-    limit,
-    toplam,
-    toplamSayfa: Math.ceil(toplam / limit),
-  });
 });
 
 // ----- API: Tekil haber (id veya slug) -----
-// GET /api/haberler/1  veya  GET /api/haberler/belediyeler-stratejik-planlarini-acikladi
-app.get('/api/haberler/:idOrSlug', (req, res) => {
-  const haberler = okuHaberler();
-  const idOrSlug = req.params.idOrSlug;
-  const id = parseInt(idOrSlug, 10);
-  const haber = haberler.find(
-    (h) => h.id === id || h.slug === idOrSlug
-  );
-  if (!haber) {
-    return res.status(404).json({ hata: 'Haber bulunamadı' });
+app.get('/api/haberler/:idOrSlug', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
+    const idOrSlug = req.params.idOrSlug;
+    const id = parseInt(idOrSlug, 10);
+    const haber = haberler.find((h) => h.id === id || h.slug === idOrSlug);
+    if (!haber) return res.status(404).json({ hata: 'Haber bulunamadı' });
+    res.json(haber);
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
-  res.json(haber);
 });
 
 // ----- API: Arama -----
-// GET /api/ara?q=üzüm
-app.get('/api/ara', (req, res) => {
-  const q = (req.query.q || '').trim().toLowerCase();
-  if (!q) {
-    return res.json({ data: [] });
+app.get('/api/ara', async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim().toLowerCase();
+    if (!q) return res.json({ data: [] });
+    const haberler = await okuHaberler();
+    const sonuc = haberler.filter(
+      (h) =>
+        (h.baslik && h.baslik.toLowerCase().includes(q)) ||
+        (h.ozet && h.ozet.toLowerCase().includes(q)) ||
+        (h.kategori && h.kategori.toLowerCase().includes(q))
+    );
+    res.json({ data: sonuc });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
-  const haberler = okuHaberler();
-  const sonuc = haberler.filter(
-    (h) =>
-      (h.baslik && h.baslik.toLowerCase().includes(q)) ||
-      (h.ozet && h.ozet.toLowerCase().includes(q)) ||
-      (h.kategori && h.kategori.toLowerCase().includes(q))
-  );
-  res.json({ data: sonuc });
 });
 
 // ----- API: Bülten aboneliği -----
-// POST /api/bulten  body: { "email": "test@example.com" }
-app.post('/api/bulten', (req, res) => {
-  const email = (req.body && req.body.email && req.body.email.trim()) || '';
-  if (!email) {
-    return res.status(400).json({ hata: 'E-posta gerekli' });
+app.post('/api/bulten', async (req, res) => {
+  try {
+    const email = (req.body && req.body.email && req.body.email.trim()) || '';
+    if (!email) return res.status(400).json({ hata: 'E-posta gerekli' });
+    const list = await okuBulten();
+    if (list.some((e) => e.email.toLowerCase() === email.toLowerCase())) {
+      return res.json({ mesaj: 'Bu e-posta zaten kayıtlı.' });
+    }
+    list.push({ email: email.toLowerCase(), tarih: new Date().toISOString() });
+    await yazBulten(list);
+    res.status(201).json({ mesaj: 'Bültenimize abone oldunuz. Teşekkürler!' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
-  const list = okuBulten();
-  if (list.some((e) => e.email.toLowerCase() === email.toLowerCase())) {
-    return res.json({ mesaj: 'Bu e-posta zaten kayıtlı.' });
+});
+
+// ----- API: Son dakika / çok okunan -----
+app.get('/api/son-dakika', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
+    const now = new Date();
+    let son = haberler.filter((h) => {
+      if (!h.sonDakika || !h.sonDakikaBaslangic) return false;
+      const sure = (h.sonDakikaSure || 6) * 3600000;
+      return (now - new Date(h.sonDakikaBaslangic)) < sure;
+    });
+    const aktifSonDakika = son.length > 0;
+    if (son.length === 0) son = haberler.slice(0, 10);
+    res.json({ data: son.map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug })), aktifSonDakika });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
-  list.push({ email: email.toLowerCase(), tarih: new Date().toISOString() });
-  yazBulten(list);
-  res.status(201).json({ mesaj: 'Bültenimize abone oldunuz. Teşekkürler!' });
 });
 
-// ----- API: Son dakika / çok okunan (özet) -----
-app.get('/api/son-dakika', (req, res) => {
-  const haberler = okuHaberler();
-  const now = new Date();
-  let son = haberler.filter((h) => {
-    if (!h.sonDakika || !h.sonDakikaBaslangic) return false;
-    const sure = (h.sonDakikaSure || 6) * 3600000; // saat → ms
-    return (now - new Date(h.sonDakikaBaslangic)) < sure;
-  });
-  const aktifSonDakika = son.length > 0;
-  if (son.length === 0) son = haberler.slice(0, 10);
-  res.json({ data: son.map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug })), aktifSonDakika });
+app.get('/api/cok-okunan', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
+    const siralanmis = [...haberler].sort((a, b) => (b.goruntulenme || 0) - (a.goruntulenme || 0));
+    const ilk5 = siralanmis.slice(0, 5).map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug }));
+    res.json({ data: ilk5 });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
 });
 
-app.get('/api/cok-okunan', (req, res) => {
-  const haberler = okuHaberler();
-  const siralanmis = [...haberler].sort((a, b) => (b.goruntulenme || 0) - (a.goruntulenme || 0));
-  const ilk5 = siralanmis.slice(0, 5).map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug }));
-  res.json({ data: ilk5 });
-});
-
-// ----- Admin: Giriş (auth middleware'den önce, ayrı path) -----
+// ----- Admin: Giriş -----
 app.post('/api/admin-login', (req, res) => {
   const raw = (req.body && req.body.password != null ? req.body.password : '');
   const password = String(raw).trim();
-  const expected = ADMIN_PASSWORD;
-  if (password !== expected) {
-    console.log('[Admin] Giriş reddedildi. Gelen şifre uzunluğu:', password.length, 'Beklenen uzunluk:', expected.length);
-    return res.status(401).json({ hata: 'Şifre hatalı. Varsayılan: admin123' });
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ hata: 'Şifre hatalı' });
   }
-  const token = createToken();
-  res.json({ token });
+  res.json({ token: createToken() });
 });
 
-// ----- Admin: Tüm /api/admin/* route'ları auth gerekli -----
+// ----- Admin: Auth gerekli -----
 app.use('/api/admin', adminAuth);
 
-app.get('/api/admin/bulten', (req, res) => {
-  res.json({ data: okuBulten() });
-});
-
-app.get('/api/admin/haberler', (req, res) => {
-  res.json({ data: okuHaberler() });
-});
-
-app.post('/api/admin/haberler', (req, res) => {
+app.get('/api/admin/bulten', async (req, res) => {
   try {
-    const haberler = okuHaberler();
+    res.json({ data: await okuBulten() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.get('/api/admin/haberler', async (req, res) => {
+  try {
+    res.json({ data: await okuHaberler() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/admin/haberler', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
     const body = req.body || {};
     const maxId = haberler.length ? Math.max(...haberler.map((h) => h.id)) : 0;
     const baslik = (body.baslik || '').trim();
@@ -236,7 +294,7 @@ app.post('/api/admin/haberler', (req, res) => {
       oneCikan: !!body.oneCikan,
     };
     haberler.push(yeni);
-    yazHaberler(haberler);
+    await yazHaberler(haberler);
     res.status(201).json(yeni);
   } catch (err) {
     console.error('[POST /api/admin/haberler] Hata:', err.message);
@@ -244,9 +302,9 @@ app.post('/api/admin/haberler', (req, res) => {
   }
 });
 
-app.put('/api/admin/haberler/:id', (req, res) => {
+app.put('/api/admin/haberler/:id', async (req, res) => {
   try {
-    const haberler = okuHaberler();
+    const haberler = await okuHaberler();
     const id = parseInt(req.params.id, 10);
     const idx = haberler.findIndex((h) => h.id === id);
     if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
@@ -277,7 +335,7 @@ app.put('/api/admin/haberler/:id', (req, res) => {
       sonDakikaBaslangic: sonDakikaBaslangic,
       oneCikan: body.oneCikan !== undefined ? !!body.oneCikan : !!mevcut.oneCikan,
     };
-    yazHaberler(haberler);
+    await yazHaberler(haberler);
     res.json(haberler[idx]);
   } catch (err) {
     console.error('[PUT /api/admin/haberler/:id] Hata:', err.message);
@@ -285,14 +343,18 @@ app.put('/api/admin/haberler/:id', (req, res) => {
   }
 });
 
-app.delete('/api/admin/haberler/:id', (req, res) => {
-  const haberler = okuHaberler();
-  const id = parseInt(req.params.id, 10);
-  const idx = haberler.findIndex((h) => h.id === id);
-  if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
-  haberler.splice(idx, 1);
-  yazHaberler(haberler);
-  res.json({ mesaj: 'Silindi' });
+app.delete('/api/admin/haberler/:id', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
+    const id = parseInt(req.params.id, 10);
+    const idx = haberler.findIndex((h) => h.id === id);
+    if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
+    haberler.splice(idx, 1);
+    await yazHaberler(haberler);
+    res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
 });
 
 // Ana sayfa
