@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0d4d3d"/>
+  <rect x="40" y="40" width="1120" height="550" rx="20" fill="none" stroke="#c9a227" stroke-width="3" opacity="0.4"/>
+  <rect x="480" y="160" width="90" height="90" rx="18" fill="#fff"/>
+  <text x="525" y="232" text-anchor="middle" font-family="Georgia,serif" font-size="60" font-weight="700" fill="#0d4d3d">A</text>
+  <text x="600" y="340" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="700" fill="#fff">Ahmetli Medya</text>
+  <text x="600" y="390" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#c9a227" letter-spacing="4">GÜVENİLİR HABER, DOĞRU BİLGİ</text>
+  <text x="600" y="450" text-anchor="middle" font-family="sans-serif" font-size="18" fill="rgba(255,255,255,0.7)">ahmetlisosyal.com.tr</text>
+</svg>

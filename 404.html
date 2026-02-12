@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d4d3d">
+  <title>Sayfa Bulunamadı - Ahmetli Medya</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d4d3d'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Georgia,serif' font-size='22' font-weight='700' fill='white'%3EA%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="main-header">
+    <div class="main-header__pattern" aria-hidden="true"></div>
+    <div class="container main-header__inner">
+      <a href="index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">A</span>
+        <span class="logo__word logo__word--ahmetli">Ahmetli</span> <span class="logo__word logo__word--medya">Medya</span>
+      </a>
+    </div>
+  </header>
+
+  <nav class="main-nav">
+    <div class="container main-nav__inner">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
+        <li><a href="dolmus.html" class="nav-link">Dolmus Saatleri</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <div class="container" style="padding:60px 0;text-align:center;">
+      <div style="font-family:var(--font-head);font-size:96px;font-weight:700;color:var(--primary);line-height:1;">404</div>
+      <h1 style="font-family:var(--font-head);font-size:28px;color:var(--black);margin:16px 0 12px;">Sayfa Bulunamadi</h1>
+      <p style="color:var(--gray-2);font-size:16px;margin:0 0 32px;max-width:460px;margin-left:auto;margin-right:auto;">Aradiginiz sayfa tasinmis, kaldirilmis veya hic var olmamis olabilir.</p>
+      <a href="index.html" style="display:inline-block;padding:12px 32px;background:var(--primary);color:#fff;border-radius:var(--radius);font-weight:600;font-size:15px;transition:background 0.2s;">Ana Sayfaya Don</a>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; <span id="footer-year">2025</span> Ahmetli Medya. Tum haklari saklidir.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode
+    var saved = localStorage.getItem('ahmetli-theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    var yrEl = document.getElementById('footer-year');
+    if (yrEl) yrEl.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
