@@ -58,8 +58,6 @@
 [data-theme="dark"] .reklam-alani__icerik { background: #252525; border-color: #3a3a3a; }
 [data-theme="dark"] img { opacity: 0.92; }
 [data-theme="dark"] img:hover { opacity: 1; }
-[data-theme="dark"] .manset { background: var(--bg-card); border-color: #333; }
-[data-theme="dark"] .manset__nav { border-color: #333; }
 
 /* Dark mode toggle */
 .theme-toggle {
@@ -417,78 +415,78 @@ button { font-family: inherit; cursor: pointer; }
   min-width: 0;
 }
 
-/* ----- Manşet (Anadolu Ajansı tarzı: büyük fotoğraf + altta başlık) ----- */
+/* ----- Manşet ----- */
 .manset {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   background: var(--bg-card);
+  box-shadow: var(--shadow);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border-color, #e5e5e5);
+  border-left: 4px solid var(--accent);
 }
 .manset__article {
   position: relative;
 }
 .manset__link {
-  display: block;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  height: 400px;
 }
 .manset__img-wrap {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
+  height: 400px;
 }
 .manset__img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
-}
-.manset__link:hover .manset__img-wrap img {
-  transform: scale(1.02);
 }
 .manset__kategori {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 12px;
+  left: 12px;
   background: var(--primary);
   color: var(--white);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 5px 14px;
-  border-radius: 3px;
-  z-index: 2;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 4px;
 }
 .manset__body {
-  padding: 24px 28px 20px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .manset__title {
   font-family: var(--font-head);
-  font-size: 28px;
-  line-height: 1.25;
-  margin: 0 0 10px;
+  font-size: 24px;
+  line-height: 1.3;
+  margin: 0 0 12px;
   font-weight: 700;
   color: var(--black);
 }
 .manset__link:hover .manset__title { color: var(--primary); }
 .manset__ozet {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--gray-2);
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   line-height: 1.55;
 }
 .manset__meta {
   font-size: 13px;
-  color: var(--gray-4);
-  letter-spacing: 0.01em;
+  color: var(--gray-3);
 }
 
 .manset__nav {
   display: flex;
   gap: 6px;
-  padding: 10px 28px 14px;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-color, #e5e5e5);
+  padding: 10px 14px;
+  background: var(--dark);
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 .manset__nav-btn {
@@ -1879,8 +1877,15 @@ a.haber-aksiyonlar__btn {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
   }
+  .manset__link {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .manset__img-wrap {
+    height: 220px;
+  }
   .manset__body { padding: 20px; }
-  .manset__title { font-size: 24px; }
+  .manset__title { font-size: 22px; }
   .uc-kart { grid-template-columns: repeat(2, 1fr); }
   .detay__wrap { grid-template-columns: 1fr; }
   .detay__sidebar { position: static; }
@@ -1909,9 +1914,8 @@ a.haber-aksiyonlar__btn {
 
 @media (max-width: 480px) {
   .logo { font-size: 22px; }
-  .manset__title { font-size: 20px; }
+  .manset__title { font-size: 19px; }
   .manset__body { padding: 16px; }
-  .manset__ozet { font-size: 14px; }
 }
 
 /* ============================================
