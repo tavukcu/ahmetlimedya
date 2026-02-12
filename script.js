@@ -370,6 +370,49 @@ function initHavaDurumu() {
     });
 }
 
+// ----- Son dakika: üst bant ticker + sidebar -----
+function initSonDakika() {
+  fetch('/api/son-dakika')
+    .then((res) => res.json())
+    .then((result) => {
+      const items = result.data || [];
+
+      // Kırmızı bant: aktif son dakika varsa
+      const tickerWrap = document.querySelector('.top-bar__ticker-wrap');
+      if (tickerWrap) {
+        tickerWrap.classList.toggle('top-bar__ticker-wrap--breaking', !!result.aktifSonDakika);
+      }
+
+      if (items.length === 0) return;
+
+      // Üst bant ticker
+      const tickerInner = document.getElementById('ticker-inner');
+      if (tickerInner) {
+        const spans = items.map((h) =>
+          '<span>' + escapeHtmlFront(h.baslik) + '</span>'
+        ).join('<span class="top-bar__ticker-sep">•</span>');
+        // Sonsuz kaydırma için iki kez tekrarla
+        tickerInner.innerHTML = spans + '<span class="top-bar__ticker-sep">•</span>' + spans + '<span class="top-bar__ticker-sep">•</span>';
+      }
+
+      // Sidebar son dakika kayan liste
+      const sdList = document.querySelector('.son-dakika-ticker__list');
+      if (sdList) {
+        sdList.innerHTML = items.map((h) =>
+          '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
+        ).join('');
+        const track = document.querySelector('.son-dakika-ticker__track');
+        if (track) {
+          const duplicate = track.querySelector('.son-dakika-ticker__list:nth-child(2)');
+          if (duplicate) duplicate.innerHTML = sdList.innerHTML;
+        }
+      }
+    })
+    .catch(() => {
+      // API unavailable, keep static/loading content
+    });
+}
+
 // ----- API'den haberleri yükle -----
 function initDynamicNews() {
   fetch('/api/haberler?limit=20')
@@ -436,20 +479,6 @@ function initDynamicNews() {
         baslikList.innerHTML = gundemHaberleri.map((h) =>
           '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
         ).join('');
-      }
-
-      // Sidebar son dakika
-      const sdList = document.querySelector('.son-dakika-ticker__list');
-      if (sdList) {
-        sdList.innerHTML = haberler.slice(0, 8).map((h) =>
-          '<li><a href="#">' + escapeHtmlFront(h.baslik) + '</a></li>'
-        ).join('');
-        // Duplicate for infinite scroll
-        const track = document.querySelector('.son-dakika-ticker__track');
-        if (track) {
-          const duplicate = track.querySelector('.son-dakika-ticker__list:nth-child(2)');
-          if (duplicate) duplicate.innerHTML = sdList.innerHTML;
-        }
       }
 
       // Editörün Seçimi
@@ -553,5 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavToggle();
   initYukariCik();
   initHavaDurumu();
+  initSonDakika();
   initDynamicNews();
 });

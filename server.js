@@ -148,8 +148,15 @@ app.post('/api/bulten', (req, res) => {
 // ----- API: Son dakika / çok okunan (özet) -----
 app.get('/api/son-dakika', (req, res) => {
   const haberler = okuHaberler();
-  const son = haberler.slice(0, 10).map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug }));
-  res.json({ data: son });
+  const now = new Date();
+  let son = haberler.filter((h) => {
+    if (!h.sonDakika || !h.sonDakikaBaslangic) return false;
+    const sure = (h.sonDakikaSure || 6) * 3600000; // saat → ms
+    return (now - new Date(h.sonDakikaBaslangic)) < sure;
+  });
+  const aktifSonDakika = son.length > 0;
+  if (son.length === 0) son = haberler.slice(0, 10);
+  res.json({ data: son.map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug })), aktifSonDakika });
 });
 
 app.get('/api/cok-okunan', (req, res) => {
@@ -204,6 +211,10 @@ app.post('/api/admin/haberler', (req, res) => {
     yayinTarihi: body.yayinTarihi || new Date().toISOString().slice(0, 19) + '+03:00',
     okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : okumaSuresiHesapla(icerik),
     goruntulenme: parseInt(body.goruntulenme, 10) || 0,
+    sonDakika: !!body.sonDakika,
+    sonDakikaSure: body.sonDakika ? (parseInt(body.sonDakikaSure, 10) || 6) : 0,
+    sonDakikaBaslangic: body.sonDakika ? new Date().toISOString() : null,
+    oneCikan: !!body.oneCikan,
   };
   haberler.push(yeni);
   yazHaberler(haberler);
@@ -220,6 +231,12 @@ app.put('/api/admin/haberler/:id', (req, res) => {
   const baslik = (body.baslik !== undefined ? body.baslik : mevcut.baslik).trim();
   const slug = body.slug !== undefined && body.slug.trim() ? slugify(body.slug) : (body.baslik !== undefined ? slugify(baslik) : mevcut.slug);
   const icerik = body.icerik !== undefined ? body.icerik : mevcut.icerik;
+  const yeniSonDakika = body.sonDakika !== undefined ? !!body.sonDakika : !!mevcut.sonDakika;
+  const eskiSonDakika = !!mevcut.sonDakika;
+  // sonDakika false→true: yeni başlangıç zamanı, true→true: mevcut zamanı koru
+  const sonDakikaBaslangic = yeniSonDakika
+    ? (!eskiSonDakika ? new Date().toISOString() : (mevcut.sonDakikaBaslangic || new Date().toISOString()))
+    : null;
   haberler[idx] = {
     id: mevcut.id,
     slug: slug || mevcut.slug,
@@ -232,6 +249,10 @@ app.put('/api/admin/haberler/:id', (req, res) => {
     yayinTarihi: body.yayinTarihi !== undefined ? body.yayinTarihi : mevcut.yayinTarihi,
     okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : (mevcut.okumaSuresi != null ? mevcut.okumaSuresi : okumaSuresiHesapla(icerik)),
     goruntulenme: body.goruntulenme != null ? parseInt(body.goruntulenme, 10) : (mevcut.goruntulenme || 0),
+    sonDakika: yeniSonDakika,
+    sonDakikaSure: body.sonDakikaSure != null ? (parseInt(body.sonDakikaSure, 10) || 6) : (mevcut.sonDakikaSure || 6),
+    sonDakikaBaslangic: sonDakikaBaslangic,
+    oneCikan: body.oneCikan !== undefined ? !!body.oneCikan : !!mevcut.oneCikan,
   };
   yazHaberler(haberler);
   res.json(haberler[idx]);
@@ -252,6 +273,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Ahmetli Medya backend: http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Ahmetli Medya backend: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
