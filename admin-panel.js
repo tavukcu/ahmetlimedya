@@ -2245,17 +2245,68 @@
     var vefatModalClose = $('vefat-modal-close');
     if (vefatModalClose) vefatModalClose.addEventListener('click', function() { $('vefat-modal').close(); });
     var vefatFormCancel = $('vefat-form-cancel');
-    if (vefatFormCancel) vefatFormCancel.addEventListener('click', function() { $('vefat-modal').close(); });
+    if (vefatFormCancel) vefatFormCancel.addEventListener('click', function() { $('vefat-modal').close(); vefatGorselUrl = ''; });
+
+    // Vefat görsel yükleme
+    var vefatGorselUrl = '';
+    var vefatDosya = $('vefat-dosya');
+    var vefatOnizleme = $('vefat-gorsel-onizleme');
+    var vefatOnizlemeImg = $('vefat-gorsel-img');
+    var vefatKaldir = $('vefat-gorsel-kaldir');
+
+    if (vefatDosya) vefatDosya.addEventListener('change', function() {
+      var file = vefatDosya.files[0];
+      if (!file) return;
+      var formData = new FormData();
+      formData.append('gorsel', file);
+      showToast('Fotoğraf yükleniyor...', 'info');
+      fetch('/api/admin/gorsel-yukle', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.url) {
+          vefatGorselUrl = data.url;
+          $('vefat-gorsel').value = data.url;
+          if (vefatOnizlemeImg) vefatOnizlemeImg.src = data.url;
+          if (vefatOnizleme) vefatOnizleme.hidden = false;
+          showToast('Fotoğraf yüklendi', 'success');
+        }
+      }).catch(function() { showToast('Yükleme başarısız', 'error'); });
+      vefatDosya.value = '';
+    });
+
+    if (vefatKaldir) vefatKaldir.addEventListener('click', function() {
+      vefatGorselUrl = '';
+      $('vefat-gorsel').value = '';
+      if (vefatOnizleme) vefatOnizleme.hidden = true;
+    });
+
+    // URL yapıştırınca önizleme
+    var vefatGorselInput = $('vefat-gorsel');
+    if (vefatGorselInput) vefatGorselInput.addEventListener('input', function() {
+      var url = vefatGorselInput.value.trim();
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        if (vefatOnizlemeImg) vefatOnizlemeImg.src = url;
+        if (vefatOnizleme) vefatOnizleme.hidden = false;
+      } else {
+        if (vefatOnizleme) vefatOnizleme.hidden = true;
+      }
+    });
+
     var vefatForm = $('vefat-form');
     if (vefatForm) vefatForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      var gorsel = ($('vefat-gorsel').value || '').trim();
       api('/api/admin/vefat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ad: $('vefat-ad').value, gorsel: ($('vefat-gorsel').value || '').trim(), detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
+        body: JSON.stringify({ ad: $('vefat-ad').value, gorsel: gorsel, detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
       }).then(function() {
         $('vefat-modal').close();
         vefatForm.reset();
+        vefatGorselUrl = '';
+        if (vefatOnizleme) vefatOnizleme.hidden = true;
         loadVefat();
         showToast('Vefat ilanı eklendi', 'success');
       }).catch(function() { showToast('Eklenemedi', 'error'); });

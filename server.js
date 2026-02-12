@@ -399,6 +399,32 @@ app.post('/api/admin/video-yukle', upload.single('video'), async (req, res) => {
   }
 });
 
+// ----- Admin: Görsel yükleme -----
+app.post('/api/admin/gorsel-yukle', upload.single('gorsel'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ hata: 'Görsel dosyası gerekli' });
+    const timestamp = Date.now();
+    const safeName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const fileName = timestamp + '-' + safeName;
+
+    if (blob) {
+      const result = await blob.put('images/' + fileName, req.file.buffer, {
+        access: 'public',
+        contentType: req.file.mimetype,
+      });
+      return res.json({ url: result.url });
+    }
+
+    const uploadsDir = path.join(__dirname, 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+    fs.writeFileSync(path.join(uploadsDir, fileName), req.file.buffer);
+    res.json({ url: '/public/uploads/' + fileName });
+  } catch (err) {
+    console.error('[POST /api/admin/gorsel-yukle] Hata:', err.message);
+    res.status(500).json({ hata: 'Görsel yüklenemedi: ' + err.message });
+  }
+});
+
 app.get('/api/admin/bulten', async (req, res) => {
   try {
     res.json({ data: await okuBulten() });

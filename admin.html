@@ -415,7 +415,15 @@
                 <div class="modal-header"><h2>Vefat İlanı Ekle</h2><button type="button" class="modal-close" id="vefat-modal-close" aria-label="Kapat"></button></div>
                 <div class="modal-body">
                   <div class="form-row"><label for="vefat-ad">Vefat Eden *</label><input type="text" id="vefat-ad" required placeholder="Ad Soyad"></div>
-                  <div class="form-row"><label for="vefat-gorsel">Fotoğraf URL</label><input type="url" id="vefat-gorsel" placeholder="https://... (opsiyonel)"></div>
+                  <div class="form-row">
+                    <label>Fotoğraf (opsiyonel)</label>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <label class="btn btn-ghost btn-sm" style="cursor:pointer"><input type="file" id="vefat-dosya" accept="image/*" hidden>Dosyadan Yükle</label>
+                      <span style="color:var(--gray-3);font-size:13px">veya</span>
+                      <input type="url" id="vefat-gorsel" placeholder="URL yapıştır" style="flex:1;min-width:140px">
+                    </div>
+                    <div id="vefat-gorsel-onizleme" style="margin-top:8px" hidden><img id="vefat-gorsel-img" style="width:80px;height:80px;object-fit:cover;border-radius:50%;border:2px solid #eee"><button type="button" id="vefat-gorsel-kaldir" class="btn btn-sm btn-ghost" style="margin-left:8px">Kaldır</button></div>
+                  </div>
                   <div class="form-row"><label for="vefat-detay">Detay</label><textarea id="vefat-detay" rows="3" placeholder="Cenaze bilgileri, taziye yeri vb."></textarea></div>
                   <div class="form-row"><label for="vefat-tarih">Tarih</label><input type="text" id="vefat-tarih" placeholder="Örn: 12 Şubat 2026"></div>
                 </div>
