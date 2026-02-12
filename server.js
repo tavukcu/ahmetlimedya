@@ -145,36 +145,20 @@ const https = require('https');
 
 function truncgilFetch() {
   return new Promise((resolve, reject) => {
-    const options = {
-      hostname: 'finans.truncgil.com',
-      path: '/v4/today.json',
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AhmetliMedya/1.0)',
-        'Accept': 'application/json'
-      }
-    };
-    const req = https.request(options, (resp) => {
-      // Redirect takibi
-      if (resp.statusCode >= 300 && resp.statusCode < 400 && resp.headers.location) {
-        https.get(resp.headers.location, { headers: options.headers }, (resp2) => {
-          let data = '';
-          resp2.on('data', (chunk) => { data += chunk; });
-          resp2.on('end', () => {
-            try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
-          });
-        }).on('error', reject);
-        return;
-      }
+    https.get('https://finans.truncgil.com/today.json', (resp) => {
       let data = '';
       resp.on('data', (chunk) => { data += chunk; });
       resp.on('end', () => {
         try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('JSON parse hatası: ' + data.substring(0, 200))); }
       });
-    });
-    req.on('error', reject);
-    req.end();
+    }).on('error', reject);
   });
+}
+
+// Türkçe formatlı sayıyı parse et: "7.102,68" -> 7102.68
+function parseTR(val) {
+  if (!val || typeof val !== 'string') return 0;
+  return parseFloat(val.replace(/\./g, '').replace(',', '.')) || 0;
 }
 
 let dovizCache = { data: null, ts: 0 };
@@ -186,8 +170,17 @@ app.get('/api/doviz', async (req, res) => {
     }
     const raw = await truncgilFetch();
     const sonuc = {};
-    ['USD', 'EUR', 'GBP', 'GRA', 'CEYREKALTIN'].forEach((k) => {
-      if (raw[k]) sonuc[k] = { Buying: raw[k].Buying, Selling: raw[k].Selling, Change: raw[k].Change, Name: raw[k].Name };
+    const kurlar = { USD: 'USD', EUR: 'EUR', GBP: 'GBP', 'gram-altin': 'GRA', 'ceyrek-altin': 'CEYREKALTIN' };
+    Object.entries(kurlar).forEach(([apiKey, ourKey]) => {
+      if (raw[apiKey]) {
+        const r = raw[apiKey];
+        sonuc[ourKey] = {
+          Buying: parseTR(r['Alış']),
+          Selling: parseTR(r['Satış']),
+          Change: parseTR((r['Değişim'] || '0').replace('%', '')),
+          Name: r['Tür'] === 'Altın' ? apiKey.replace(/-/g, ' ') : apiKey
+        };
+      }
     });
     if (raw.Update_Date) sonuc.Update_Date = raw.Update_Date;
     dovizCache = { data: sonuc, ts: now };
