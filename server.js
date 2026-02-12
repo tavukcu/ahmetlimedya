@@ -871,6 +871,45 @@ app.put('/api/admin/uzum-fiyat', async (req, res) => {
   }
 });
 
+// ----- RSS Feed -----
+app.get('/api/rss', async (req, res) => {
+  try {
+    const haberler = await okuHaberler();
+    const son20 = haberler.slice(0, 20);
+    const baseUrl = 'https://ahmetlisosyal.com.tr';
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n';
+    xml += '<channel>\n';
+    xml += '<title>Ahmetli Medya</title>\n';
+    xml += '<link>' + baseUrl + '</link>\n';
+    xml += '<description>Üzüm diyarı Ahmetli\'den güncel haberler. Gündem, ekonomi, spor, magazin.</description>\n';
+    xml += '<language>tr</language>\n';
+    xml += '<atom:link href="' + baseUrl + '/api/rss" rel="self" type="application/rss+xml"/>\n';
+    xml += '<lastBuildDate>' + new Date().toUTCString() + '</lastBuildDate>\n';
+
+    son20.forEach(function(h) {
+      xml += '<item>\n';
+      xml += '<title><![CDATA[' + (h.baslik || '') + ']]></title>\n';
+      xml += '<link>' + baseUrl + '/haber.html?slug=' + encodeURIComponent(h.slug) + '</link>\n';
+      xml += '<description><![CDATA[' + (h.ozet || '') + ']]></description>\n';
+      if (h.kategori) xml += '<category>' + h.kategori + '</category>\n';
+      if (h.yayinTarihi) xml += '<pubDate>' + new Date(h.yayinTarihi).toUTCString() + '</pubDate>\n';
+      xml += '<guid isPermaLink="true">' + baseUrl + '/haber.html?slug=' + encodeURIComponent(h.slug) + '</guid>\n';
+      if (h.gorsel) xml += '<enclosure url="' + h.gorsel + '" type="image/jpeg" length="0"/>\n';
+      xml += '</item>\n';
+    });
+
+    xml += '</channel>\n</rss>';
+
+    res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=600');
+    res.send(xml);
+  } catch (err) {
+    res.status(500).send('RSS oluşturma hatası');
+  }
+});
+
 // Ana sayfa
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

@@ -10,6 +10,7 @@
   <meta property="og:locale" content="tr_TR">
   <meta name="twitter:card" content="summary_large_image">
   <title>Haber - Ahmetli Medya</title>
+  <link rel="alternate" type="application/rss+xml" title="Ahmetli Medya RSS" href="/api/rss">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d4d3d'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Georgia,serif' font-size='22' font-weight='700' fill='white'%3EA%3C/text%3E%3C/svg%3E">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -70,14 +71,14 @@
     <div class="container main-nav__inner">
       <ul class="nav-list">
         <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
-        <li><a href="#" class="nav-link">Gündem</a></li>
-        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
-        <li><a href="#" class="nav-link">Ekonomi</a></li>
-        <li><a href="#" class="nav-link">Spor</a></li>
-        <li><a href="#" class="nav-link">Magazin</a></li>
-        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
-        <li><a href="#" class="nav-link">Teknoloji</a></li>
-        <li><a href="#" class="nav-link">Yaşam</a></li>
+        <li><a href="arsiv.html?kategori=Gündem" class="nav-link">Gündem</a></li>
+        <li><a href="arsiv.html?kategori=Üzüm %26 Bağcılık" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="arsiv.html?kategori=Ekonomi" class="nav-link">Ekonomi</a></li>
+        <li><a href="arsiv.html?kategori=Spor" class="nav-link">Spor</a></li>
+        <li><a href="arsiv.html?kategori=Magazin" class="nav-link">Magazin</a></li>
+        <li><a href="arsiv.html?kategori=Kültür-Sanat" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="arsiv.html?kategori=Teknoloji" class="nav-link">Teknoloji</a></li>
+        <li><a href="arsiv.html?kategori=Yaşam" class="nav-link">Yaşam</a></li>
       </ul>
       <button type="button" class="nav-toggle" aria-label="Menü" aria-expanded="false" aria-controls="main-menu">
         <span class="nav-toggle__bar"></span>
@@ -88,14 +89,14 @@
     <div id="main-menu" class="nav-overlay" aria-hidden="true">
       <ul class="nav-list nav-list--overlay">
         <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
-        <li><a href="#" class="nav-link">Gündem</a></li>
-        <li><a href="#" class="nav-link">Üzüm & Bağcılık</a></li>
-        <li><a href="#" class="nav-link">Ekonomi</a></li>
-        <li><a href="#" class="nav-link">Spor</a></li>
-        <li><a href="#" class="nav-link">Magazin</a></li>
-        <li><a href="#" class="nav-link">Kültür-Sanat</a></li>
-        <li><a href="#" class="nav-link">Teknoloji</a></li>
-        <li><a href="#" class="nav-link">Yaşam</a></li>
+        <li><a href="arsiv.html?kategori=Gündem" class="nav-link">Gündem</a></li>
+        <li><a href="arsiv.html?kategori=Üzüm %26 Bağcılık" class="nav-link">Üzüm & Bağcılık</a></li>
+        <li><a href="arsiv.html?kategori=Ekonomi" class="nav-link">Ekonomi</a></li>
+        <li><a href="arsiv.html?kategori=Spor" class="nav-link">Spor</a></li>
+        <li><a href="arsiv.html?kategori=Magazin" class="nav-link">Magazin</a></li>
+        <li><a href="arsiv.html?kategori=Kültür-Sanat" class="nav-link">Kültür-Sanat</a></li>
+        <li><a href="arsiv.html?kategori=Teknoloji" class="nav-link">Teknoloji</a></li>
+        <li><a href="arsiv.html?kategori=Yaşam" class="nav-link">Yaşam</a></li>
       </ul>
     </div>
   </nav>
@@ -195,11 +196,11 @@
         <div class="footer-col">
           <h4>Kategoriler</h4>
           <ul>
-            <li><a href="#">Gündem</a></li>
-            <li><a href="#">Üzüm & Bağcılık</a></li>
-            <li><a href="#">Ekonomi</a></li>
-            <li><a href="#">Spor</a></li>
-            <li><a href="#">Magazin</a></li>
+            <li><a href="arsiv.html?kategori=Gündem">Gündem</a></li>
+            <li><a href="arsiv.html?kategori=Üzüm %26 Bağcılık">Üzüm & Bağcılık</a></li>
+            <li><a href="arsiv.html?kategori=Ekonomi">Ekonomi</a></li>
+            <li><a href="arsiv.html?kategori=Spor">Spor</a></li>
+            <li><a href="arsiv.html?kategori=Magazin">Magazin</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -469,6 +470,21 @@
           ldScript.type = 'application/ld+json';
           ldScript.textContent = JSON.stringify(jsonLd);
           document.head.appendChild(ldScript);
+
+          // Breadcrumb JSON-LD
+          var breadcrumbLd = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://ahmetlisosyal.com.tr/" },
+              { "@type": "ListItem", "position": 2, "name": haber.kategori || "Haber", "item": "https://ahmetlisosyal.com.tr/arsiv.html?kategori=" + encodeURIComponent(haber.kategori || 'Haber') },
+              { "@type": "ListItem", "position": 3, "name": haber.baslik }
+            ]
+          };
+          var bcScript = document.createElement('script');
+          bcScript.type = 'application/ld+json';
+          bcScript.textContent = JSON.stringify(breadcrumbLd);
+          document.head.appendChild(bcScript);
 
           // Paylaş butonları
           var paylasWrap = document.getElementById('detay-paylas');
