@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /api/
 
-Sitemap: https://ahmetlisosyal.com.tr/sitemap.xml
+Sitemap: https://ahmetlisosyal.com/sitemap.xml

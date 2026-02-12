@@ -876,7 +876,7 @@ app.get('/api/rss', async (req, res) => {
   try {
     const haberler = await okuHaberler();
     const son20 = haberler.slice(0, 20);
-    const baseUrl = 'https://ahmetlisosyal.com.tr';
+    const baseUrl = 'https://ahmetlisosyal.com';
 
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n';
