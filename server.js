@@ -145,13 +145,35 @@ const https = require('https');
 
 function truncgilFetch() {
   return new Promise((resolve, reject) => {
-    https.get('https://finans.truncgil.com/v4/today.json', (resp) => {
+    const options = {
+      hostname: 'finans.truncgil.com',
+      path: '/v4/today.json',
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AhmetliMedya/1.0)',
+        'Accept': 'application/json'
+      }
+    };
+    const req = https.request(options, (resp) => {
+      // Redirect takibi
+      if (resp.statusCode >= 300 && resp.statusCode < 400 && resp.headers.location) {
+        https.get(resp.headers.location, { headers: options.headers }, (resp2) => {
+          let data = '';
+          resp2.on('data', (chunk) => { data += chunk; });
+          resp2.on('end', () => {
+            try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+          });
+        }).on('error', reject);
+        return;
+      }
       let data = '';
       resp.on('data', (chunk) => { data += chunk; });
       resp.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('JSON parse hatası: ' + data.substring(0, 200))); }
       });
-    }).on('error', reject);
+    });
+    req.on('error', reject);
+    req.end();
   });
 }
 
