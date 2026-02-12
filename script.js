@@ -455,12 +455,13 @@ function initDynamicNews() {
         if (meta) meta.textContent = zamanOnce(h.yayinTarihi) + ' · ' + (h.okumaSuresi || 2) + ' dk';
       }
 
-      // 2 sütun haber kartları (5., 6. haber)
+      // 2 sütun haber kartları (5.–10. haber)
       const ikiItems = document.querySelectorAll('.haber-iki__item');
-      for (let i = 0; i < Math.min(2, ikiItems.length); i++) {
+      for (let i = 0; i < Math.min(6, ikiItems.length); i++) {
         const h = haberler[i + 4];
-        if (!h) break;
         const el = ikiItems[i];
+        if (!h) { el.style.display = 'none'; continue; }
+        el.style.display = '';
         el.dataset.haberId = h.id;
         const img = el.querySelector('.haber-iki__img img');
         if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
