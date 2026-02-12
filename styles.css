@@ -82,9 +82,11 @@ body {
   margin: 0;
   font-family: var(--font-body);
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--black);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img { max-width: 100%; height: auto; display: block; object-fit: cover; }
@@ -425,17 +427,21 @@ button { font-family: inherit; cursor: pointer; }
 .manset__link {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  height: 400px;
+  height: 420px;
 }
 .manset__img-wrap {
   position: relative;
   overflow: hidden;
-  height: 400px;
+  height: 420px;
 }
 .manset__img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.manset__link:hover .manset__img-wrap img {
+  transform: scale(1.03);
 }
 .manset__kategori {
   position: absolute;
@@ -458,8 +464,8 @@ button { font-family: inherit; cursor: pointer; }
 }
 .manset__title {
   font-family: var(--font-head);
-  font-size: 24px;
-  line-height: 1.3;
+  font-size: 26px;
+  line-height: 1.25;
   margin: 0 0 12px;
   font-weight: 700;
   color: var(--black);
@@ -615,11 +621,12 @@ a.haber-aksiyonlar__btn {
   background: var(--bg-card);
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.3s, transform 0.3s;
   border-radius: var(--radius);
 }
 .uc-kart__item a:hover {
   box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
 }
 .uc-kart__item a:hover .uc-kart__title { color: var(--primary); }
 .uc-kart__kategori {
@@ -644,9 +651,9 @@ a.haber-aksiyonlar__btn {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
-.uc-kart__item a:hover .uc-kart__img img { transform: scale(1.05); }
+.uc-kart__item a:hover .uc-kart__img img { transform: scale(1.04); }
 .uc-kart__title {
   font-family: var(--font-head);
   font-size: 16px;
@@ -830,6 +837,11 @@ a.haber-aksiyonlar__btn {
   box-shadow: var(--shadow);
   overflow: hidden;
   border-radius: var(--radius);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.haber-iki__item a:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
 }
 .haber-iki__item:hover .haber-aksiyonlar--kart,
 .haber-iki__item .haber-aksiyonlar--kart:focus-within {
@@ -844,9 +856,9 @@ a.haber-aksiyonlar__btn {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
-.haber-iki__item a:hover .haber-iki__img img { transform: scale(1.05); }
+.haber-iki__item a:hover .haber-iki__img img { transform: scale(1.04); }
 .haber-iki__kategori {
   display: inline-block;
   margin: 12px 14px 0;
@@ -1543,8 +1555,8 @@ a.haber-aksiyonlar__btn {
 .main-footer {
   background: var(--primary-dark);
   color: var(--white);
-  padding: 28px 0 20px;
-  margin-top: 24px;
+  padding: 36px 0 24px;
+  margin-top: 32px;
 }
 .footer-grid {
   display: grid;
@@ -2414,4 +2426,32 @@ body.okuma-modu .okuma-modu-btn { background: var(--accent); color: var(--black)
   border-radius: var(--radius);
   font-size: 13px;
   color: var(--gray-1);
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
+
+/* ============================================
+   Genel ince dokunuşlar
+   ============================================ */
+.manset__link:hover .manset__title,
+.uc-kart__item a:hover .uc-kart__title,
+.haber-iki__item a:hover .haber-iki__title {
+  color: var(--primary);
+}
+.baslik-listesi a,
+.sidebar-list a {
+  transition: color 0.2s;
+}
+.manset {
+  transition: box-shadow 0.3s;
+}
+.manset:hover {
+  box-shadow: var(--shadow-hover);
 }
