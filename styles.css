@@ -431,6 +431,49 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--gray-3);
 }
 
+.manset__nav {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--dark);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.manset__nav-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gray-5);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gray-3);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.manset__nav-btn:hover,
+.manset__nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .manset__nav-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  .manset__nav {
+    gap: 4px;
+    padding: 8px 10px;
+  }
+}
+
 /* Haber kartı Beğen / Paylaş */
 .haber-aksiyonlar {
   position: absolute;

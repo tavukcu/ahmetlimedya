@@ -421,22 +421,11 @@ function initDynamicNews() {
       const haberler = result.data || [];
       if (haberler.length === 0) return;
 
-      // Manşet (ilk haber)
-      const manset = haberler[0];
-      const mansetArticle = document.querySelector('.manset__article');
-      if (mansetArticle && manset) {
-        mansetArticle.dataset.haberId = manset.id;
-        const img = mansetArticle.querySelector('.manset__img-wrap img');
-        if (img && manset.gorsel) { img.src = manset.gorsel; img.alt = manset.baslik; }
-        const kat = mansetArticle.querySelector('.manset__kategori');
-        if (kat) kat.textContent = manset.kategori || 'Gündem';
-        const title = mansetArticle.querySelector('.manset__title');
-        if (title) title.textContent = manset.baslik;
-        const ozet = mansetArticle.querySelector('.manset__ozet');
-        if (ozet) ozet.textContent = manset.ozet || '';
-        const meta = mansetArticle.querySelector('.manset__meta');
-        if (meta) meta.textContent = (manset.yazar || 'Editör') + ' · ' + zamanOnce(manset.yayinTarihi) + ' · ' + (manset.okumaSuresi || 3) + ' dk okuma';
-      }
+      // Manşet (10 haber, numaralı navigasyon)
+      const mansetHaberler = haberler.slice(0, 10);
+      window._mansetHaberler = mansetHaberler;
+      mansetGoster(0);
+      initMansetNav();
 
       // 3'lü kartlar (2., 3., 4. haber)
       const ucKartItems = document.querySelectorAll('.uc-kart__item');
@@ -455,13 +444,12 @@ function initDynamicNews() {
         if (meta) meta.textContent = zamanOnce(h.yayinTarihi) + ' · ' + (h.okumaSuresi || 2) + ' dk';
       }
 
-      // 2 sütun haber kartları (5.–10. haber)
+      // 2 sütun haber kartları (5., 6. haber)
       const ikiItems = document.querySelectorAll('.haber-iki__item');
-      for (let i = 0; i < Math.min(6, ikiItems.length); i++) {
+      for (let i = 0; i < Math.min(2, ikiItems.length); i++) {
         const h = haberler[i + 4];
+        if (!h) break;
         const el = ikiItems[i];
-        if (!h) { el.style.display = 'none'; continue; }
-        el.style.display = '';
         el.dataset.haberId = h.id;
         const img = el.querySelector('.haber-iki__img img');
         if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
@@ -496,6 +484,63 @@ function initDynamicNews() {
     .catch(() => {
       // API unavailable, keep static content
     });
+}
+
+function mansetGoster(idx) {
+  const haberler = window._mansetHaberler;
+  if (!haberler || !haberler[idx]) return;
+  const h = haberler[idx];
+  const article = document.querySelector('.manset__article');
+  if (!article) return;
+  article.dataset.haberId = h.id;
+  const img = article.querySelector('.manset__img-wrap img');
+  if (img && h.gorsel) { img.src = h.gorsel; img.alt = h.baslik; }
+  const kat = article.querySelector('.manset__kategori');
+  if (kat) kat.textContent = h.kategori || 'Gündem';
+  const title = article.querySelector('.manset__title');
+  if (title) title.textContent = h.baslik;
+  const ozet = article.querySelector('.manset__ozet');
+  if (ozet) ozet.textContent = h.ozet || '';
+  const meta = article.querySelector('.manset__meta');
+  if (meta) meta.textContent = (h.yazar || 'Editör') + ' · ' + zamanOnce(h.yayinTarihi) + ' · ' + (h.okumaSuresi || 3) + ' dk okuma';
+  // Aktif numara güncelle
+  document.querySelectorAll('.manset__nav-btn').forEach(function(btn) {
+    btn.classList.toggle('active', parseInt(btn.dataset.mansetIdx, 10) === idx);
+  });
+}
+
+var _mansetAutoTimer = null;
+
+function initMansetNav() {
+  var nav = document.getElementById('manset-nav');
+  if (!nav) return;
+  var btns = nav.querySelectorAll('.manset__nav-btn');
+  // Mevcut haber sayısına göre butonları göster/gizle
+  var count = (window._mansetHaberler || []).length;
+  btns.forEach(function(btn) {
+    var idx = parseInt(btn.dataset.mansetIdx, 10);
+    if (idx >= count) { btn.style.display = 'none'; }
+    btn.addEventListener('mouseenter', function() {
+      mansetGoster(idx);
+      clearInterval(_mansetAutoTimer);
+    });
+    btn.addEventListener('mouseleave', function() {
+      mansetAutoPlay();
+    });
+  });
+  // Otomatik geçiş
+  mansetAutoPlay();
+}
+
+function mansetAutoPlay() {
+  clearInterval(_mansetAutoTimer);
+  var count = (window._mansetHaberler || []).length;
+  if (count <= 1) return;
+  var current = 0;
+  _mansetAutoTimer = setInterval(function() {
+    current = (current + 1) % count;
+    mansetGoster(current);
+  }, 5000);
 }
 
 function escapeHtmlFront(s) {
