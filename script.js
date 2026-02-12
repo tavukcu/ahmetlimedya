@@ -638,7 +638,7 @@ function initDovizAltin() {
   }
 
   function guncelle() {
-    fetch('https://finans.truncgil.com/v4/today.json')
+    fetch('/api/doviz')
       .then(function(r) { return r.json(); })
       .then(function(data) {
         ITEMS.forEach(function(item) {

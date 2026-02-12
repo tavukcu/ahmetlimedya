@@ -140,6 +140,29 @@ function adminAuth(req, res, next) {
   next();
 }
 
+// ----- API: Döviz & Altın (proxy) -----
+let dovizCache = { data: null, ts: 0 };
+app.get('/api/doviz', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (dovizCache.data && (now - dovizCache.ts) < 3 * 60 * 1000) {
+      return res.json(dovizCache.data);
+    }
+    const r = await fetch('https://finans.truncgil.com/v4/today.json');
+    if (!r.ok) throw new Error('API yanıt vermedi');
+    const raw = await r.json();
+    const sonuc = {};
+    ['USD', 'EUR', 'GBP', 'GRA', 'CEYREKALTIN'].forEach((k) => {
+      if (raw[k]) sonuc[k] = { Buying: raw[k].Buying, Selling: raw[k].Selling, Change: raw[k].Change, Name: raw[k].Name };
+    });
+    if (raw.Update_Date) sonuc.Update_Date = raw.Update_Date;
+    dovizCache = { data: sonuc, ts: now };
+    res.json(sonuc);
+  } catch (err) {
+    res.status(502).json({ hata: 'Döviz verileri alınamadı' });
+  }
+});
+
 // ----- API: Haber listesi -----
 app.get('/api/haberler', async (req, res) => {
   try {
