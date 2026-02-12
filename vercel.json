@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/**": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/haber/:slug", "destination": "/haber.html" }
