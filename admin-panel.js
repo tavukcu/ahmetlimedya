@@ -1192,20 +1192,41 @@
 
     if (!dropzone || !fileInput) return;
 
-    function handleFile(file) {
-      if (!file || !file.type.startsWith('image/')) { showToast('Görsel dosyası seçin', 'error'); return; }
-      if (file.size > 5 * 1024 * 1024) { showToast('Dosya 5MB\'dan küçük olmalı', 'error'); return; }
+    function resizeImage(file, maxW, maxH, quality, cb) {
       var reader = new FileReader();
       reader.onload = function (e) {
-        $('news-image-preview-img').src = e.target.result;
+        var img = new Image();
+        img.onload = function () {
+          var w = img.width, h = img.height;
+          if (w > maxW || h > maxH) {
+            var ratio = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          cb(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) { showToast('Görsel dosyası seçin', 'error'); return; }
+      if (file.size > 10 * 1024 * 1024) { showToast('Dosya 10MB\'dan küçük olmalı', 'error'); return; }
+      resizeImage(file, 1200, 1200, 0.82, function (dataUrl) {
+        $('news-image-preview-img').src = dataUrl;
         var nameEl = $('news-image-preview-name');
         var metaEl = $('news-image-preview-meta');
         if (nameEl) nameEl.textContent = file.name;
-        if (metaEl) metaEl.textContent = (file.size / 1024).toFixed(1) + ' KB';
+        var sizeKB = Math.round(dataUrl.length * 3 / 4 / 1024);
+        if (metaEl) metaEl.textContent = sizeKB + ' KB (sıkıştırılmış)';
         $('news-image-preview').hidden = false;
         $('news-image-upload-options').style.display = 'none';
-      };
-      reader.readAsDataURL(file);
+      });
     }
 
     dropzone.addEventListener('click', function () { fileInput.click(); });
