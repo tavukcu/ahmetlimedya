@@ -509,8 +509,11 @@ function initDynamicNews() {
         ).join('');
       }
 
-      // Re-init like/share buttons after DOM update
+      // Re-init after DOM update
       initHaberAksiyonlar();
+      initKategoriRenk();
+      initTarihBadge();
+      initImageBlurLoad();
     })
     .catch(() => {
       // API unavailable, keep static content
@@ -1067,6 +1070,112 @@ function takvimDoldur(data) {
   }
 }
 
+// ----- Splash Screen -----
+function initSplash() {
+  var splash = document.getElementById('splash-screen');
+  if (!splash) return;
+  // Daha önce bu oturumda gösterildiyse atla
+  if (sessionStorage.getItem('ahmetli-splash-shown')) {
+    splash.classList.add('is-hidden');
+    splash.remove();
+    return;
+  }
+  sessionStorage.setItem('ahmetli-splash-shown', '1');
+  setTimeout(function() {
+    splash.classList.add('is-hidden');
+    setTimeout(function() { splash.remove(); }, 600);
+  }, 1800);
+}
+
+// ----- Fotoğraf Blur Yükleme -----
+function initImageBlurLoad() {
+  var images = document.querySelectorAll('.uc-kart__img img, .haber-iki__img img, .manset__img-wrap img');
+  images.forEach(function(img) {
+    if (img.complete) return;
+    img.classList.add('img-blur-load');
+    img.addEventListener('load', function() {
+      img.classList.add('is-loaded');
+    });
+    img.addEventListener('error', function() {
+      img.classList.add('is-loaded');
+    });
+  });
+}
+
+// ----- Kategori Renk Sistemi -----
+function initKategoriRenk() {
+  var renkMap = {
+    'gündem': 'kategori--gundem',
+    'spor': 'kategori--spor',
+    'ekonomi': 'kategori--ekonomi',
+    'magazin': 'kategori--magazin',
+    'kültür-sanat': 'kategori--kultur-sanat',
+    'kültür sanat': 'kategori--kultur-sanat',
+    'teknoloji': 'kategori--teknoloji',
+    'yaşam': 'kategori--yasam'
+  };
+  var etiketler = document.querySelectorAll('.manset__kategori, .uc-kart__kategori, .haber-iki__kategori');
+  etiketler.forEach(function(el) {
+    var text = (el.textContent || '').trim().toLowerCase();
+    var cls = renkMap[text];
+    if (cls) el.classList.add(cls);
+  });
+}
+
+// ----- Tarih Badge'leri -----
+function initTarihBadge() {
+  var metaEls = document.querySelectorAll('.uc-kart__meta, .haber-iki__meta, .manset__meta');
+  metaEls.forEach(function(el) {
+    var text = el.textContent || '';
+    var badge = '';
+    if (text.match(/az önce|dk önce|1 saat önce|2 saat önce|3 saat önce/i)) {
+      badge = '<span class="tarih-badge tarih-badge--bugun">Bugün</span>';
+    } else if (text.match(/\d+ saat önce/i)) {
+      badge = '<span class="tarih-badge tarih-badge--bugun">Bugün</span>';
+    } else if (text.match(/dün/i)) {
+      badge = '<span class="tarih-badge tarih-badge--dun">Dün</span>';
+    }
+    if (badge) el.innerHTML = badge + el.innerHTML;
+  });
+}
+
+// ----- Parallax Header -----
+function initParallax() {
+  var pattern = document.querySelector('.main-header__pattern');
+  if (!pattern) return;
+  function update() {
+    var scrollY = window.scrollY;
+    if (scrollY < 400) {
+      pattern.style.transform = 'translateY(' + (scrollY * 0.3) + 'px)';
+    }
+  }
+  window.addEventListener('scroll', update, { passive: true });
+}
+
+// ----- Sayfa Geçiş Animasyonu -----
+function initPageTransitions() {
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    // Sadece aynı site linkleri
+    if (!href || href.startsWith('#') || href.startsWith('javascript') || href.startsWith('mailto') || href.startsWith('tel') || href.startsWith('http') || link.target === '_blank') return;
+    e.preventDefault();
+    document.body.classList.add('is-leaving');
+    setTimeout(function() {
+      window.location.href = href;
+    }, 250);
+  });
+}
+
+// ----- Ripple Efekti -----
+function initRipple() {
+  var buttons = document.querySelectorAll('.nav-link, .search-btn, .newsletter-form__btn, .anket__btn, .whatsapp-hatti__btn');
+  buttons.forEach(function(btn) {
+    btn.classList.add('btn-ripple');
+  });
+}
+
 // ----- Scroll Reveal Animasyonları -----
 function initScrollReveal() {
   var items = document.querySelectorAll('.uc-kart__item, .haber-iki__item, .sidebar__box, .uzum-bolumu, .whatsapp-hatti, .vefat-bolumu, .newsletter');
@@ -1162,10 +1271,12 @@ function initUzumFiyat() {
 
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
+  initSplash();
   initDarkMode();
   setCurrentDate();
   setFooterYear();
   initReadingProgress();
+  initImageBlurLoad();
   initHaberAksiyonlar();
   initNewsletter();
   initSearch();
@@ -1185,6 +1296,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initEczane();
   initVefat();
   initUzumFiyat();
+  initKategoriRenk();
+  initTarihBadge();
+  initParallax();
+  initPageTransitions();
+  initRipple();
   // Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function() {});

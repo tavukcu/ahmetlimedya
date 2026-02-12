@@ -249,7 +249,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ----- Header (logo) - Ahmetli Medya kimliği ----- */
 .main-header {
   position: relative;
-  background: var(--white);
+  background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
   border-bottom: 3px solid var(--primary);
   padding: 32px 0;
   overflow: hidden;
@@ -1002,12 +1002,19 @@ a.haber-aksiyonlar__btn {
 .sidebar__tab-panel[hidden] { display: none !important; }
 
 .sidebar__box {
-  background: var(--bg-card);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   margin-bottom: 20px;
-  border: 1px solid var(--border-color, #e5e5e5);
+  border: 1px solid rgba(255,255,255,0.5);
   padding: 20px;
   border-radius: var(--radius);
   border-top: 3px solid var(--primary);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+[data-theme="dark"] .sidebar__box {
+  background: rgba(30,30,30,0.7);
+  border-color: rgba(255,255,255,0.08);
 }
 .sidebar__tabs .sidebar__box {
   margin-bottom: 0;
@@ -2446,4 +2453,240 @@ body.okuma-modu .okuma-modu-btn { background: var(--accent); color: var(--black)
   border-radius: var(--radius);
   font-size: 13px;
   color: var(--gray-1);
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
+
+/* ============================================
+   Kategori Renk Sistemi
+   ============================================ */
+.kategori--gundem { background: #2563eb !important; }
+.kategori--spor { background: #16a34a !important; }
+.kategori--ekonomi { background: #ea580c !important; }
+.kategori--magazin { background: #db2777 !important; }
+.kategori--kultur-sanat { background: #7c3aed !important; }
+.kategori--teknoloji { background: #0891b2 !important; }
+.kategori--yasam { background: #65a30d !important; }
+
+/* ============================================
+   Splash Screen (Sayfa Açılış Animasyonu)
+   ============================================ */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--primary-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.splash-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.splash-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: splashLogoIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.splash-logo__mark {
+  width: 64px;
+  height: 64px;
+  background: var(--accent);
+  color: var(--primary-dark);
+  font-family: var(--font-head);
+  font-size: 36px;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: splashMarkPulse 1.5s ease-in-out infinite 0.8s;
+}
+.splash-logo__text {
+  font-family: var(--font-head);
+  font-size: 38px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.splash-logo__text span { color: var(--accent); }
+.splash-bar {
+  width: 120px;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin-top: 28px;
+  overflow: hidden;
+  opacity: 0;
+  animation: splashFadeIn 0.4s 0.5s forwards;
+}
+.splash-bar__fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: splashBarFill 1.2s 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes splashLogoIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashMarkPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes splashFadeIn {
+  to { opacity: 1; }
+}
+@keyframes splashBarFill {
+  to { width: 100%; }
+}
+
+/* ============================================
+   Fotoğraf Blur Yükleme Efekti
+   ============================================ */
+.img-blur-load {
+  filter: blur(15px);
+  transform: scale(1.05);
+  transition: filter 0.6s ease, transform 0.6s ease;
+}
+.img-blur-load.is-loaded {
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* ============================================
+   Tarih Badge'leri
+   ============================================ */
+.tarih-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.tarih-badge--bugun {
+  background: #dc2626;
+  color: #fff;
+}
+.tarih-badge--dun {
+  background: #ea580c;
+  color: #fff;
+}
+.tarih-badge--yeni {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ============================================
+   Hover Micro-animasyonlar
+   ============================================ */
+.uc-kart__item a:hover .uc-kart__title,
+.haber-iki__item a:hover .haber-iki__title {
+  transform: translateX(4px);
+}
+.uc-kart__title,
+.haber-iki__title {
+  transition: color 0.2s, transform 0.3s ease;
+}
+
+/* Ripple efekti */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+.btn-ripple:active::after {
+  width: 200px;
+  height: 200px;
+  opacity: 1;
+  transition: 0s;
+}
+
+/* Kart fotoğraf parlama efekti */
+.uc-kart__img::after,
+.haber-iki__img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.15) 55%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: 1;
+}
+.uc-kart__img,
+.haber-iki__img {
+  position: relative;
+}
+.uc-kart__item a:hover .uc-kart__img::after,
+.haber-iki__item a:hover .haber-iki__img::after {
+  transform: translateX(100%);
+}
+
+/* ============================================
+   Parallax Header
+   ============================================ */
+.main-header__pattern {
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+/* ============================================
+   Sayfa Geçiş Animasyonu
+   ============================================ */
+.page-transition {
+  animation: pageFadeIn 0.4s ease-out;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Link tıklanınca sayfa çıkış efekti */
+body.is-leaving {
+  animation: pageFadeOut 0.25s ease-in forwards;
+}
+@keyframes pageFadeOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen { display: none !important; }
+  .img-blur-load { filter: none; transform: none; transition: none; }
+  .page-transition { animation: none; }
+  body.is-leaving { animation: none; }
+  .uc-kart__img::after, .haber-iki__img::after { display: none; }
 }
