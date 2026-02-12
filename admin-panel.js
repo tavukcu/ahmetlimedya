@@ -1192,41 +1192,57 @@
 
     if (!dropzone || !fileInput) return;
 
-    function resizeImage(file, maxW, maxH, quality, cb) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var img = new Image();
-        img.onload = function () {
-          var w = img.width, h = img.height;
-          if (w > maxW || h > maxH) {
-            var ratio = Math.min(maxW / w, maxH / h);
-            w = Math.round(w * ratio);
-            h = Math.round(h * ratio);
-          }
-          var canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          cb(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+    function showPreview(dataUrl, fileName, metaText) {
+      $('news-image-preview-img').src = dataUrl;
+      var nameEl = $('news-image-preview-name');
+      var metaEl = $('news-image-preview-meta');
+      if (nameEl) nameEl.textContent = fileName || '';
+      if (metaEl) metaEl.textContent = metaText || '';
+      $('news-image-preview').hidden = false;
+      $('news-image-upload-options').style.display = 'none';
     }
 
     function handleFile(file) {
       if (!file || !file.type.startsWith('image/')) { showToast('Görsel dosyası seçin', 'error'); return; }
       if (file.size > 10 * 1024 * 1024) { showToast('Dosya 10MB\'dan küçük olmalı', 'error'); return; }
-      resizeImage(file, 1200, 1200, 0.82, function (dataUrl) {
-        $('news-image-preview-img').src = dataUrl;
-        var nameEl = $('news-image-preview-name');
-        var metaEl = $('news-image-preview-meta');
-        if (nameEl) nameEl.textContent = file.name;
-        var sizeKB = Math.round(dataUrl.length * 3 / 4 / 1024);
-        if (metaEl) metaEl.textContent = sizeKB + ' KB (sıkıştırılmış)';
-        $('news-image-preview').hidden = false;
-        $('news-image-upload-options').style.display = 'none';
-      });
+
+      var reader = new FileReader();
+      reader.onerror = function () { showToast('Dosya okunamadı', 'error'); };
+      reader.onload = function (e) {
+        var originalDataUrl = e.target.result;
+        var img = new Image();
+        img.onerror = function () {
+          // Görsel decode edilemezse ham data URL'yi kullan
+          showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
+        };
+        img.onload = function () {
+          try {
+            var w = img.width, h = img.height;
+            var MAX = 1200;
+            if (w > MAX || h > MAX) {
+              var ratio = Math.min(MAX / w, MAX / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            var resized = canvas.toDataURL('image/jpeg', 0.82);
+            if (!resized || resized.length < 100) {
+              // Canvas başarısız olduysa orijinali kullan
+              showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
+            } else {
+              var sizeKB = Math.round(resized.length * 3 / 4 / 1024);
+              showPreview(resized, file.name, sizeKB + ' KB (sıkıştırılmış)');
+            }
+          } catch (err) {
+            showPreview(originalDataUrl, file.name, (file.size / 1024).toFixed(1) + ' KB');
+          }
+        };
+        img.src = originalDataUrl;
+      };
+      reader.readAsDataURL(file);
     }
 
     dropzone.addEventListener('click', function () { fileInput.click(); });
