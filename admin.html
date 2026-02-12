@@ -113,6 +113,22 @@
                 </div>
               </div>
 
+              <!-- Son Dakika Yönetimi -->
+              <div class="card card--breaking" id="breaking-card">
+                <div class="card-header">
+                  <h3 class="card-title card-title--breaking">Son Dakika Yönetimi</h3>
+                  <div class="breaking-add-wrap">
+                    <button type="button" class="btn btn-sm btn-danger" id="breaking-add-btn">+ Son Dakika Ekle</button>
+                    <div class="breaking-add-menu" id="breaking-add-menu" hidden>
+                      <button type="button" class="breaking-add-menu__item" id="breaking-pick-existing">Mevcut haberden seç</button>
+                      <button type="button" class="breaking-add-menu__item" id="breaking-add-new">Yeni haber gir</button>
+                    </div>
+                  </div>
+                </div>
+                <div id="breaking-empty" class="muted" hidden>Aktif son dakika haberi yok.</div>
+                <div id="breaking-list" class="breaking-list"></div>
+              </div>
+
               <!-- Kategori dağılımı bar -->
               <div class="card" id="category-bars-card">
                 <h3 class="card-title">Kategori Dağılımı</h3>
@@ -265,9 +281,46 @@
 
           <!-- Kategoriler -->
           <div id="page-categories" class="page">
-            <h2 class="page-title">Kategoriler</h2>
-            <p class="muted">Haber eklerken kullanılan kategoriler.</p>
-            <ul id="categories-list" class="categories-list"></ul>
+            <div class="categories-header">
+              <div class="categories-header__left">
+                <h2 class="page-title">Kategoriler</h2>
+                <div class="categories-mini-stats">
+                  <span class="categories-mini-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Toplam: <strong id="cat-stat-total">–</strong>
+                  </span>
+                  <span class="categories-mini-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+                    Haber: <strong id="cat-stat-news">–</strong>
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" id="cat-go-news">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                Haberlere git
+              </button>
+            </div>
+
+            <div id="categories-loading" class="loading" hidden>Yükleniyor…</div>
+
+            <div id="categories-content" hidden>
+              <div id="categories-grid" class="categories-grid"></div>
+
+              <div class="card" id="categories-bars-card">
+                <h3 class="card-title">Kategori Dağılımı</h3>
+                <div id="categories-bars"></div>
+              </div>
+            </div>
+
+            <div id="categories-empty" class="categories-empty" hidden>
+              <div class="categories-empty__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="72" height="72">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <h3 class="categories-empty__title">Henüz haber eklenmemiş</h3>
+              <p class="categories-empty__desc">Haber ekledikçe kategorilere ait istatistikler burada görünecek.</p>
+            </div>
           </div>
 
           <!-- Bülten -->
@@ -355,6 +408,17 @@
             <label class="checkbox-label"><input type="checkbox" id="news-breaking"><span>Son dakika</span></label>
             <label class="checkbox-label"><input type="checkbox" id="news-featured"><span>Öne çıkan</span></label>
           </div>
+          <div class="form-row" id="breaking-duration-row" hidden>
+            <label for="news-breaking-duration">Son dakika süresi</label>
+            <select id="news-breaking-duration">
+              <option value="1">1 saat</option>
+              <option value="3">3 saat</option>
+              <option value="6" selected>6 saat</option>
+              <option value="12">12 saat</option>
+              <option value="24">24 saat</option>
+              <option value="48">48 saat</option>
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-ghost" id="news-form-cancel">İptal</button>
@@ -384,6 +448,18 @@
         <button type="button" class="modal-close" id="preview-close" aria-label="Kapat"></button>
       </div>
       <div class="modal-body preview-body"><div id="preview-content" class="preview-content"></div></div>
+    </dialog>
+
+    <!-- ========== SON DAKİKA SEÇİM MODAL ========== -->
+    <dialog id="breaking-pick-modal" class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Son Dakika Haberi Seç</h2>
+        <button type="button" class="modal-close" id="breaking-pick-close" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <div id="breaking-pick-list" class="breaking-pick-list"></div>
+        <div id="breaking-pick-empty" class="muted" hidden>Uygun haber bulunamadı.</div>
+      </div>
     </dialog>
 
     <!-- ========== TOAST ========== -->

@@ -203,6 +203,10 @@
     ]).then(function (results) {
       var haberler = results[0].data || [];
       var bulten = results[1].data || [];
+      dashboardHaberler = haberler;
+
+      // Son Dakika widget
+      renderBreakingWidget(haberler);
 
       // Toplam görüntülenme
       var toplamGoruntulenme = 0;
@@ -428,6 +432,156 @@
 
     return { labels: labels, data: data };
   }
+
+  // ===================== SON DAKİKA WİDGET =====================
+
+  function renderBreakingWidget(haberler) {
+    var listEl = $('breaking-list');
+    var emptyEl = $('breaking-empty');
+    if (!listEl || !emptyEl) return;
+
+    var breakingNews = haberler.filter(function (h) { return h.sonDakika === true; });
+
+    if (breakingNews.length === 0) {
+      emptyEl.hidden = false;
+      listEl.innerHTML = '';
+      return;
+    }
+
+    emptyEl.hidden = true;
+    var now = Date.now();
+
+    listEl.innerHTML = breakingNews.map(function (n) {
+      var sure = n.sonDakikaSure || 6;
+      var baslangic = n.sonDakikaBaslangic ? new Date(n.sonDakikaBaslangic).getTime() : (n.yayinTarihi ? new Date(n.yayinTarihi).getTime() : now);
+      var bitis = baslangic + sure * 3600000;
+      var kalan = bitis - now;
+
+      var timeLabel, timeClass;
+      if (kalan <= 0) {
+        timeLabel = 'Süresi doldu';
+        timeClass = 'breaking-item__time--expired';
+      } else if (kalan < 3600000) {
+        var dk = Math.ceil(kalan / 60000);
+        timeLabel = dk + ' dk kaldı';
+        timeClass = 'breaking-item__time--warning';
+      } else {
+        var saat = Math.floor(kalan / 3600000);
+        var kalanDk = Math.ceil((kalan % 3600000) / 60000);
+        timeLabel = saat + 's ' + kalanDk + 'dk kaldı';
+        timeClass = 'breaking-item__time--active';
+      }
+
+      return '<div class="breaking-item" data-breaking-id="' + n.id + '">' +
+        '<span class="breaking-item__title" data-breaking-edit="' + n.id + '">' + escapeHtml(n.baslik || '(Başlıksız)') + '</span>' +
+        '<span class="breaking-item__time ' + timeClass + '">' + timeLabel + '</span>' +
+        '<select class="breaking-item__select" data-breaking-sure="' + n.id + '">' +
+        '<option value="1"' + (sure === 1 ? ' selected' : '') + '>1 saat</option>' +
+        '<option value="3"' + (sure === 3 ? ' selected' : '') + '>3 saat</option>' +
+        '<option value="6"' + (sure === 6 ? ' selected' : '') + '>6 saat</option>' +
+        '<option value="12"' + (sure === 12 ? ' selected' : '') + '>12 saat</option>' +
+        '<option value="24"' + (sure === 24 ? ' selected' : '') + '>24 saat</option>' +
+        '<option value="48"' + (sure === 48 ? ' selected' : '') + '>48 saat</option>' +
+        '</select>' +
+        '<button type="button" class="btn btn-sm btn-danger" data-breaking-remove="' + n.id + '">Çıkar</button>' +
+        '</div>';
+    }).join('');
+
+    // Event: süre değiştir
+    listEl.querySelectorAll('[data-breaking-sure]').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        breakingUpdateSure(sel.dataset.breakingSure, parseInt(sel.value, 10));
+      });
+    });
+
+    // Event: çıkar
+    listEl.querySelectorAll('[data-breaking-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        breakingRemove(btn.dataset.breakingRemove);
+      });
+    });
+
+    // Event: başlık tıkla → düzenle
+    listEl.querySelectorAll('[data-breaking-edit]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        showPage('news');
+        openEditModal(el.dataset.breakingEdit);
+      });
+    });
+  }
+
+  function breakingUpdateSure(id, sure) {
+    api('/api/admin/haberler/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sonDakikaSure: sure })
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('Güncellenemedi');
+      showToast('Son dakika süresi güncellendi.');
+      loadDashboard();
+    })
+    .catch(function () { showToast('Süre güncellenemedi', 'error'); });
+  }
+
+  function breakingRemove(id) {
+    api('/api/admin/haberler/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sonDakika: false })
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('Güncellenemedi');
+      showToast('Haber son dakikadan çıkarıldı.');
+      loadDashboard();
+    })
+    .catch(function () { showToast('İşlem başarısız', 'error'); });
+  }
+
+  function breakingPickExisting(haberler) {
+    var modal = $('breaking-pick-modal');
+    var listEl = $('breaking-pick-list');
+    var emptyEl = $('breaking-pick-empty');
+    if (!modal || !listEl) return;
+
+    var nonBreaking = haberler.filter(function (h) { return !h.sonDakika; }).slice(0, 20);
+
+    if (nonBreaking.length === 0) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.hidden = false;
+    } else {
+      if (emptyEl) emptyEl.hidden = true;
+      listEl.innerHTML = nonBreaking.map(function (n) {
+        return '<div class="breaking-pick-item" data-pick-id="' + n.id + '">' +
+          '<span class="breaking-pick-item__title">' + escapeHtml(n.baslik || '(Başlıksız)') + '</span>' +
+          '<span class="breaking-pick-item__meta">' + zamanOnce(n.yayinTarihi) + '</span>' +
+          '</div>';
+      }).join('');
+
+      listEl.querySelectorAll('[data-pick-id]').forEach(function (item) {
+        item.addEventListener('click', function () {
+          modal.close();
+          var pickId = item.dataset.pickId;
+          api('/api/admin/haberler/' + pickId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sonDakika: true, sonDakikaSure: 6 })
+          })
+          .then(function (r) {
+            if (!r.ok) throw new Error('Güncellenemedi');
+            showToast('Haber son dakika olarak ayarlandı.');
+            loadDashboard();
+          })
+          .catch(function () { showToast('İşlem başarısız', 'error'); });
+        });
+      });
+    }
+
+    modal.showModal();
+  }
+
+  // Store latest haberler for breaking pick
+  var dashboardHaberler = [];
 
   // ===================== HABERLER =====================
 
@@ -748,6 +902,8 @@
     $('news-published').checked = true;
     $('news-breaking').checked = false;
     $('news-featured').checked = false;
+    $('news-breaking-duration').value = '6';
+    $('breaking-duration-row').hidden = true;
     setQuillContent('');
     $('news-image-preview').hidden = true;
     $('news-image-upload-options').style.display = '';
@@ -778,6 +934,11 @@
           $('news-image-upload-options').style.display = '';
         }
 
+        $('news-breaking').checked = !!h.sonDakika;
+        $('news-featured').checked = !!h.oneCikan;
+        $('news-breaking-duration').value = String(h.sonDakikaSure || 6);
+        $('breaking-duration-row').hidden = !h.sonDakika;
+
         updateCounters();
         $('news-modal').showModal();
       })
@@ -804,7 +965,10 @@
       ozet: $('news-excerpt').value.trim(),
       icerik: content,
       yazar: $('news-author').value.trim() || 'Editör',
-      gorsel: gorsel
+      gorsel: gorsel,
+      sonDakika: $('news-breaking').checked,
+      sonDakikaSure: parseInt($('news-breaking-duration').value, 10) || 6,
+      oneCikan: $('news-featured').checked
     };
 
     var btn = $('news-form-submit');
@@ -864,8 +1028,113 @@
   // ===================== KATEGORİLER =====================
 
   function renderCategories() {
-    var list = $('categories-list');
-    if (list) list.innerHTML = CATEGORIES.map(function (c) { return '<li>' + escapeHtml(c) + '</li>'; }).join('');
+    var loadingEl = $('categories-loading');
+    var contentEl = $('categories-content');
+    var emptyEl = $('categories-empty');
+    if (loadingEl) loadingEl.hidden = false;
+    if (contentEl) contentEl.hidden = true;
+    if (emptyEl) emptyEl.hidden = true;
+
+    // Mini stats
+    var catStatTotal = $('cat-stat-total');
+    if (catStatTotal) catStatTotal.textContent = CATEGORIES.length;
+
+    apiJson('/api/haberler?limit=50')
+      .then(function (result) {
+        var haberler = result.data || [];
+        var catStatNews = $('cat-stat-news');
+        if (catStatNews) catStatNews.textContent = haberler.length;
+
+        if (haberler.length === 0) {
+          if (loadingEl) loadingEl.hidden = true;
+          if (emptyEl) emptyEl.hidden = false;
+          return;
+        }
+
+        // Kategori bazlı istatistik hesapla
+        var byCat = {};
+        var lastDateByCat = {};
+        haberler.forEach(function (h) {
+          var c = h.kategori || 'Diğer';
+          byCat[c] = (byCat[c] || 0) + 1;
+          if (h.yayinTarihi) {
+            if (!lastDateByCat[c] || h.yayinTarihi > lastDateByCat[c]) {
+              lastDateByCat[c] = h.yayinTarihi;
+            }
+          }
+        });
+
+        var colors = ['#388bfd', '#238636', '#d29922', '#da3633', '#8957e5', '#f778ba', '#3fb950', '#79c0ff'];
+
+        // Kart grid render
+        var gridEl = $('categories-grid');
+        if (gridEl) {
+          gridEl.innerHTML = CATEGORIES.map(function (cat, i) {
+            var count = byCat[cat] || 0;
+            var lastDate = lastDateByCat[cat] ? zamanOnce(lastDateByCat[cat]) : '–';
+            var color = colors[i % colors.length];
+            return '<div class="category-card" data-cat="' + escapeHtml(cat) + '">' +
+              '<div class="category-card__stripe" style="background:' + color + '"></div>' +
+              '<div class="category-card__body">' +
+              '<h3 class="category-card__name">' + escapeHtml(cat) + '</h3>' +
+              '<div class="category-card__stats">' +
+              '<span><strong>' + count + '</strong> haber</span>' +
+              '<span>Son eklenen: ' + lastDate + '</span>' +
+              '</div>' +
+              '<button type="button" class="category-card__btn" data-filter-cat="' + escapeHtml(cat) + '">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>' +
+              'Haberleri gör' +
+              '</button>' +
+              '</div>' +
+              '</div>';
+          }).join('');
+
+          // Kart buton tıklama
+          gridEl.querySelectorAll('[data-filter-cat]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              e.stopPropagation();
+              var cat = btn.dataset.filterCat;
+              showPage('news');
+              var filterEl = $('news-filter-category');
+              if (filterEl) filterEl.value = cat;
+              renderNewsView();
+            });
+          });
+        }
+
+        // Dağılım barları render
+        renderCategoryBarsPage(byCat, haberler.length);
+
+        if (loadingEl) loadingEl.hidden = true;
+        if (contentEl) contentEl.hidden = false;
+      })
+      .catch(function () {
+        if (loadingEl) loadingEl.hidden = true;
+        if (emptyEl) emptyEl.hidden = false;
+        var catStatNews = $('cat-stat-news');
+        if (catStatNews) catStatNews.textContent = '0';
+      });
+  }
+
+  function renderCategoryBarsPage(byCat, total) {
+    var container = $('categories-bars');
+    if (!container) return;
+    var colors = ['#388bfd', '#238636', '#d29922', '#da3633', '#8957e5', '#f778ba', '#3fb950', '#79c0ff'];
+    var sorted = Object.entries(byCat).sort(function (a, b) { return b[1] - a[1]; });
+    var maxVal = sorted.length ? sorted[0][1] : 1;
+
+    container.innerHTML = sorted.map(function (entry, i) {
+      var name = entry[0];
+      var count = entry[1];
+      var pct = Math.round((count / total) * 100);
+      var barWidth = Math.max(4, Math.round((count / maxVal) * 100));
+      var color = colors[i % colors.length];
+      return '<div class="cat-bar-row">' +
+        '<span class="cat-bar-label">' + escapeHtml(name) + '</span>' +
+        '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + barWidth + '%;background:' + color + '" title="' + pct + '%"></div></div>' +
+        '<span class="cat-bar-count">' + count + '</span>' +
+        '</div>';
+    }).join('');
   }
 
   function fillCategorySelects() {
@@ -1057,6 +1326,45 @@
     var dashGoNewsBtn = $('dash-go-news');
     if (dashGoNewsBtn) dashGoNewsBtn.addEventListener('click', function () { showPage('news'); });
 
+    // Son Dakika widget butonları
+    var breakingAddBtn = $('breaking-add-btn');
+    var breakingAddMenu = $('breaking-add-menu');
+    if (breakingAddBtn && breakingAddMenu) {
+      breakingAddBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        breakingAddMenu.hidden = !breakingAddMenu.hidden;
+      });
+      document.addEventListener('click', function () {
+        breakingAddMenu.hidden = true;
+      });
+    }
+    var breakingPickExistingBtn = $('breaking-pick-existing');
+    if (breakingPickExistingBtn) {
+      breakingPickExistingBtn.addEventListener('click', function () {
+        breakingAddMenu.hidden = true;
+        breakingPickExisting(dashboardHaberler);
+      });
+    }
+    var breakingAddNewBtn = $('breaking-add-new');
+    if (breakingAddNewBtn) {
+      breakingAddNewBtn.addEventListener('click', function () {
+        breakingAddMenu.hidden = true;
+        openNewModal();
+        $('news-breaking').checked = true;
+        $('breaking-duration-row').hidden = false;
+      });
+    }
+    var breakingPickCloseBtn = $('breaking-pick-close');
+    if (breakingPickCloseBtn) {
+      breakingPickCloseBtn.addEventListener('click', function () {
+        $('breaking-pick-modal').close();
+      });
+    }
+
+    // Kategoriler sayfası
+    var catGoNewsBtn = $('cat-go-news');
+    if (catGoNewsBtn) catGoNewsBtn.addEventListener('click', function () { showPage('news'); });
+
     // Haber ekleme
     $('news-add-btn').addEventListener('click', openNewModal);
     $('news-form').addEventListener('submit', saveNews);
@@ -1102,6 +1410,11 @@
     // Boş durum CTA
     var emptyAddBtn = $('news-empty-add-btn');
     if (emptyAddBtn) emptyAddBtn.addEventListener('click', openNewModal);
+
+    // Son dakika checkbox → süre seçici göster/gizle
+    $('news-breaking').addEventListener('change', function () {
+      $('breaking-duration-row').hidden = !this.checked;
+    });
 
     // Slug otomatik
     $('news-title').addEventListener('input', function () {
