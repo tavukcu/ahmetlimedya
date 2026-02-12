@@ -2845,6 +2845,21 @@ kbd {
   font-weight: 600;
 }
 
+.reklam-slot-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reklam-slot-card__boyut {
+  font-size: 0.75rem;
+  color: #388bfd;
+  background: rgba(56,139,253,0.1);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
 .reklam-slot-card__slot {
   font-size: 0.75rem;
   color: var(--text-muted);

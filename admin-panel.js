@@ -1412,9 +1412,9 @@
   // ===================== REKLAMLAR =====================
 
   var REKLAM_SLOTS = [
-    { slot: 'ana-1', label: 'Ana Sayfa - Üst Reklam' },
-    { slot: 'ana-2', label: 'Ana Sayfa - Alt Reklam' },
-    { slot: 'sidebar-1', label: 'Sidebar Reklam' }
+    { slot: 'ana-1', label: 'Ana Sayfa - Üst Reklam', boyut: '728 x 90 px' },
+    { slot: 'ana-2', label: 'Ana Sayfa - Alt Reklam', boyut: '728 x 90 px' },
+    { slot: 'sidebar-1', label: 'Sidebar Reklam', boyut: '300 x 250 px' }
   ];
   var reklamCache = [];
 
@@ -1452,7 +1452,7 @@
       return '<div class="reklam-slot-card" data-slot="' + s.slot + '">' +
         '<div class="reklam-slot-card__header">' +
         '<h3 class="reklam-slot-card__title">' + escapeHtml(s.label) + '</h3>' +
-        '<span class="reklam-slot-card__slot">' + escapeHtml(s.slot) + '</span>' +
+        '<div class="reklam-slot-card__meta"><span class="reklam-slot-card__boyut">' + escapeHtml(s.boyut) + '</span><span class="reklam-slot-card__slot">' + escapeHtml(s.slot) + '</span></div>' +
         '</div>' +
         '<div class="reklam-slot-card__preview" id="reklam-preview-' + s.slot + '">' +
         (gorsel ? '<img src="' + escapeHtml(gorsel) + '" alt="Reklam önizleme">' : '<span class="reklam-slot-card__empty">Görsel yüklenmemiş</span>') +
