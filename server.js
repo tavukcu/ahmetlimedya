@@ -210,70 +210,79 @@ app.get('/api/admin/haberler', (req, res) => {
 });
 
 app.post('/api/admin/haberler', (req, res) => {
-  const haberler = okuHaberler();
-  const body = req.body || {};
-  const maxId = haberler.length ? Math.max(...haberler.map((h) => h.id)) : 0;
-  const baslik = (body.baslik || '').trim();
-  const slug = body.slug && body.slug.trim() ? slugify(body.slug) : slugify(baslik);
-  if (!baslik) return res.status(400).json({ hata: 'Başlık gerekli' });
-  const icerik = (body.icerik || '').trim();
-  const yeni = {
-    id: maxId + 1,
-    slug: slug || `haber-${maxId + 1}`,
-    kategori: (body.kategori || 'Gündem').trim(),
-    baslik,
-    ozet: (body.ozet || icerik.slice(0, 200)).trim(),
-    icerik: icerik || body.ozet || '',
-    gorsel: (body.gorsel || '').trim() || 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900&h=500&fit=crop',
-    yazar: (body.yazar || 'Editör').trim(),
-    yayinTarihi: body.yayinTarihi || new Date().toISOString().slice(0, 19) + '+03:00',
-    okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : okumaSuresiHesapla(icerik),
-    goruntulenme: parseInt(body.goruntulenme, 10) || 0,
-    sonDakika: !!body.sonDakika,
-    sonDakikaSure: body.sonDakika ? (parseInt(body.sonDakikaSure, 10) || 6) : 0,
-    sonDakikaBaslangic: body.sonDakika ? new Date().toISOString() : null,
-    oneCikan: !!body.oneCikan,
-  };
-  haberler.push(yeni);
-  yazHaberler(haberler);
-  res.status(201).json(yeni);
+  try {
+    const haberler = okuHaberler();
+    const body = req.body || {};
+    const maxId = haberler.length ? Math.max(...haberler.map((h) => h.id)) : 0;
+    const baslik = (body.baslik || '').trim();
+    const slug = body.slug && body.slug.trim() ? slugify(body.slug) : slugify(baslik);
+    if (!baslik) return res.status(400).json({ hata: 'Başlık gerekli' });
+    const icerik = (body.icerik || '').trim();
+    const yeni = {
+      id: maxId + 1,
+      slug: slug || `haber-${maxId + 1}`,
+      kategori: (body.kategori || 'Gündem').trim(),
+      baslik,
+      ozet: (body.ozet || icerik.slice(0, 200)).trim(),
+      icerik: icerik || body.ozet || '',
+      gorsel: (body.gorsel || '').trim() || 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=900&h=500&fit=crop',
+      yazar: (body.yazar || 'Editör').trim(),
+      yayinTarihi: body.yayinTarihi || new Date().toISOString().slice(0, 19) + '+03:00',
+      okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : okumaSuresiHesapla(icerik),
+      goruntulenme: parseInt(body.goruntulenme, 10) || 0,
+      sonDakika: !!body.sonDakika,
+      sonDakikaSure: body.sonDakika ? (parseInt(body.sonDakikaSure, 10) || 6) : 0,
+      sonDakikaBaslangic: body.sonDakika ? new Date().toISOString() : null,
+      oneCikan: !!body.oneCikan,
+    };
+    haberler.push(yeni);
+    yazHaberler(haberler);
+    res.status(201).json(yeni);
+  } catch (err) {
+    console.error('[POST /api/admin/haberler] Hata:', err.message);
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
 });
 
 app.put('/api/admin/haberler/:id', (req, res) => {
-  const haberler = okuHaberler();
-  const id = parseInt(req.params.id, 10);
-  const idx = haberler.findIndex((h) => h.id === id);
-  if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
-  const body = req.body || {};
-  const mevcut = haberler[idx];
-  const baslik = (body.baslik !== undefined ? body.baslik : mevcut.baslik).trim();
-  const slug = body.slug !== undefined && body.slug.trim() ? slugify(body.slug) : (body.baslik !== undefined ? slugify(baslik) : mevcut.slug);
-  const icerik = body.icerik !== undefined ? body.icerik : mevcut.icerik;
-  const yeniSonDakika = body.sonDakika !== undefined ? !!body.sonDakika : !!mevcut.sonDakika;
-  const eskiSonDakika = !!mevcut.sonDakika;
-  // sonDakika false→true: yeni başlangıç zamanı, true→true: mevcut zamanı koru
-  const sonDakikaBaslangic = yeniSonDakika
-    ? (!eskiSonDakika ? new Date().toISOString() : (mevcut.sonDakikaBaslangic || new Date().toISOString()))
-    : null;
-  haberler[idx] = {
-    id: mevcut.id,
-    slug: slug || mevcut.slug,
-    kategori: (body.kategori !== undefined ? body.kategori : mevcut.kategori).trim(),
-    baslik,
-    ozet: (body.ozet !== undefined ? body.ozet : mevcut.ozet).trim(),
-    icerik: (typeof icerik === 'string' ? icerik : mevcut.icerik).trim(),
-    gorsel: (body.gorsel !== undefined ? body.gorsel : mevcut.gorsel).trim() || mevcut.gorsel,
-    yazar: (body.yazar !== undefined ? body.yazar : mevcut.yazar).trim(),
-    yayinTarihi: body.yayinTarihi !== undefined ? body.yayinTarihi : mevcut.yayinTarihi,
-    okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : (mevcut.okumaSuresi != null ? mevcut.okumaSuresi : okumaSuresiHesapla(icerik)),
-    goruntulenme: body.goruntulenme != null ? parseInt(body.goruntulenme, 10) : (mevcut.goruntulenme || 0),
-    sonDakika: yeniSonDakika,
-    sonDakikaSure: body.sonDakikaSure != null ? (parseInt(body.sonDakikaSure, 10) || 6) : (mevcut.sonDakikaSure || 6),
-    sonDakikaBaslangic: sonDakikaBaslangic,
-    oneCikan: body.oneCikan !== undefined ? !!body.oneCikan : !!mevcut.oneCikan,
-  };
-  yazHaberler(haberler);
-  res.json(haberler[idx]);
+  try {
+    const haberler = okuHaberler();
+    const id = parseInt(req.params.id, 10);
+    const idx = haberler.findIndex((h) => h.id === id);
+    if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
+    const body = req.body || {};
+    const mevcut = haberler[idx];
+    const baslik = String(body.baslik !== undefined ? body.baslik : mevcut.baslik || '').trim();
+    const slug = body.slug !== undefined && String(body.slug).trim() ? slugify(body.slug) : (body.baslik !== undefined ? slugify(baslik) : mevcut.slug);
+    const icerik = body.icerik !== undefined ? body.icerik : mevcut.icerik;
+    const yeniSonDakika = body.sonDakika !== undefined ? !!body.sonDakika : !!mevcut.sonDakika;
+    const eskiSonDakika = !!mevcut.sonDakika;
+    const sonDakikaBaslangic = yeniSonDakika
+      ? (!eskiSonDakika ? new Date().toISOString() : (mevcut.sonDakikaBaslangic || new Date().toISOString()))
+      : null;
+    haberler[idx] = {
+      id: mevcut.id,
+      slug: slug || mevcut.slug,
+      kategori: String(body.kategori !== undefined ? body.kategori : mevcut.kategori || '').trim(),
+      baslik,
+      ozet: String(body.ozet !== undefined ? body.ozet : mevcut.ozet || '').trim(),
+      icerik: String(typeof icerik === 'string' ? icerik : mevcut.icerik || '').trim(),
+      gorsel: String(body.gorsel !== undefined ? body.gorsel : mevcut.gorsel || '').trim() || mevcut.gorsel || '',
+      yazar: String(body.yazar !== undefined ? body.yazar : mevcut.yazar || '').trim(),
+      yayinTarihi: body.yayinTarihi !== undefined ? body.yayinTarihi : mevcut.yayinTarihi,
+      okumaSuresi: body.okumaSuresi != null ? parseInt(body.okumaSuresi, 10) : (mevcut.okumaSuresi != null ? mevcut.okumaSuresi : okumaSuresiHesapla(icerik)),
+      goruntulenme: body.goruntulenme != null ? parseInt(body.goruntulenme, 10) : (mevcut.goruntulenme || 0),
+      sonDakika: yeniSonDakika,
+      sonDakikaSure: body.sonDakikaSure != null ? (parseInt(body.sonDakikaSure, 10) || 6) : (mevcut.sonDakikaSure || 6),
+      sonDakikaBaslangic: sonDakikaBaslangic,
+      oneCikan: body.oneCikan !== undefined ? !!body.oneCikan : !!mevcut.oneCikan,
+    };
+    yazHaberler(haberler);
+    res.json(haberler[idx]);
+  } catch (err) {
+    console.error('[PUT /api/admin/haberler/:id] Hata:', err.message);
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
 });
 
 app.delete('/api/admin/haberler/:id', (req, res) => {

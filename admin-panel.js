@@ -980,7 +980,7 @@
       body: JSON.stringify(data)
     })
     .then(function (r) {
-      if (!r.ok) throw new Error('Kayıt başarısız');
+      if (!r.ok) return r.json().then(function (d) { throw new Error(d.hata || 'Kayıt başarısız (' + r.status + ')'); });
       return r.json();
     })
     .then(function () {
