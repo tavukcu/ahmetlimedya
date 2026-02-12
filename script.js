@@ -847,6 +847,168 @@ function loadReklamlar() {
     .catch(function () {});
 }
 
+// ----- Günün Takvimi (Namaz + Hicri + Söz + Önemli Gün) -----
+var HICRI_AYLAR = [
+  'Muharrem', 'Safer', 'Rebiülevvel', 'Rebiülahir',
+  'Cemaziyelevvel', 'Cemaziyelahir', 'Recep', 'Şaban',
+  'Ramazan', 'Şevval', 'Zilkade', 'Zilhicce'
+];
+
+var GUNUN_SOZLERI = [
+  'Sabrın sonu selamettir.',
+  'Damlaya damlaya göl olur.',
+  'Bir elin nesi var, iki elin sesi var.',
+  'Ak akçe kara gün içindir.',
+  'Ağaç yaşken eğilir.',
+  'Her işte bir hayır vardır.',
+  'İlim ilim bilmektir, ilim kendin bilmektir.',
+  'Komşu komşunun külüne muhtaçtır.',
+  'Güneş balçıkla sıvanmaz.',
+  'Emek olmadan yemek olmaz.',
+  'Yuvarlanan taş yosun tutmaz.',
+  'Bugünün işini yarına bırakma.',
+  'Ağacı kurt, insanı dert yer.',
+  'Bilmemek ayıp değil, sormamak ayıptır.',
+  'Birlikten kuvvet doğar.',
+  'Dost kara günde belli olur.',
+  'Hayırlı komşu, hayırsız akrabadan iyidir.',
+  'İşleyen demir pas tutmaz.',
+  'Sakla samanı gelir zamanı.',
+  'Taşıma su ile değirmen dönmez.',
+  'Üzüm üzüme baka baka kararır.',
+  'Tatlı dil yılanı deliğinden çıkarır.',
+  'Çalışmak ibadetin yarısıdır.',
+  'El elden üstündür.',
+  'Gülme komşuna gelir başına.',
+  'Nerede birlik orada dirlik.',
+  'Söz gümüşse sükut altındır.',
+  'Güzel söz can azığıdır.',
+  'Her yokuşun bir inişi vardır.',
+  'İyilik eden iyilik bulur.',
+  'Küçük adımlar büyük yolculuklar başlatır.',
+  'Dağ dağa kavuşmaz, insan insana kavuşur.',
+  'Korkak bezirgan ne kâr eder ne zarar.',
+  'Rüzgar eken fırtına biçer.',
+  'İnsan yedisiyle yetmişinde birdir.',
+  'Ağlamayan çocuğa meme vermezler.',
+  'Atalarımızın sözü aklımızın süzgeci.',
+  'Bıçak yarası geçer, dil yarası geçmez.',
+  'Çok yaşayan değil, çok gezen bilir.',
+  'Dervişin fikri neyse zikri odur.',
+  'Gönül ne kahve ister ne kahvehane, gönül muhabbet ister.',
+  'Her kuşun eti yenmez.',
+  'İğneyi kendine batır, çuvaldızı başkasına.',
+  'Kırk yıllık Kani, olur mu Yani.',
+  'Meyveli ağacı taşlarlar.',
+  'Nasihat isteyen çok, tutanı az.',
+  'Olmaz olmaz deme, olmaz olmaz.',
+  'Bakmakla öğrenilse kediler kasap olurdu.',
+  'Yer demir, gök bakır olsa da ümidini kaybetme.',
+  'Zaman her şeyin ilacıdır.'
+];
+
+var ONEMLI_GUNLER = {
+  '01-01': 'Yılbaşı',
+  '03-18': 'Çanakkale Zaferi',
+  '04-23': 'Ulusal Egemenlik ve Çocuk Bayramı',
+  '05-01': 'Emek ve Dayanışma Günü',
+  '05-19': 'Atatürk\'ü Anma, Gençlik ve Spor Bayramı',
+  '07-15': '15 Temmuz Demokrasi ve Millî Birlik Günü',
+  '08-30': 'Zafer Bayramı',
+  '09-09': 'İzmir\'in Kurtuluşu',
+  '10-29': 'Cumhuriyet Bayramı',
+  '11-10': 'Atatürk\'ü Anma Günü',
+  '11-24': 'Öğretmenler Günü'
+};
+
+function initTakvim() {
+  var now = new Date();
+  var gun = now.getDate();
+  var ay = now.getMonth();
+  var yil = now.getFullYear();
+  var gunAdilar = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+  var ayAdlar = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+  // Miladi tarih
+  var gunNoEl = document.getElementById('takvim-gun-no');
+  var ayYilEl = document.getElementById('takvim-ay-yil');
+  var gunAdiEl = document.getElementById('takvim-gun-adi');
+  if (gunNoEl) gunNoEl.textContent = gun;
+  if (ayYilEl) ayYilEl.textContent = ayAdlar[ay] + ' ' + yil;
+  if (gunAdiEl) gunAdiEl.textContent = gunAdilar[now.getDay()];
+
+  // Günün sözü (günün sırasına göre)
+  var yilGunu = Math.floor((now - new Date(yil, 0, 1)) / 86400000);
+  var sozIdx = yilGunu % GUNUN_SOZLERI.length;
+  var sozEl = document.getElementById('takvim-soz');
+  if (sozEl) sozEl.textContent = GUNUN_SOZLERI[sozIdx];
+
+  // Önemli gün kontrolü
+  var mmdd = String(ay + 1).padStart(2, '0') + '-' + String(gun).padStart(2, '0');
+  var onemliEl = document.getElementById('takvim-onemli-gun');
+  var onemliTextEl = document.getElementById('takvim-onemli-gun-text');
+  if (ONEMLI_GUNLER[mmdd] && onemliEl && onemliTextEl) {
+    onemliTextEl.textContent = ONEMLI_GUNLER[mmdd];
+    onemliEl.hidden = false;
+  }
+
+  // API çağrısı (sessionStorage cache)
+  var cacheKey = 'takvim-cache-' + gun + '-' + (ay + 1) + '-' + yil;
+  var cached = null;
+  try { cached = JSON.parse(sessionStorage.getItem(cacheKey)); } catch (_) {}
+
+  if (cached) {
+    takvimDoldur(cached);
+  } else {
+    var tarihStr = String(gun).padStart(2, '0') + '-' + String(ay + 1).padStart(2, '0') + '-' + yil;
+    fetch('https://api.aladhan.com/v1/timingsByCity/' + tarihStr + '?city=Manisa&country=Turkey&method=13')
+      .then(function(res) { if (!res.ok) throw new Error('API'); return res.json(); })
+      .then(function(json) {
+        if (json.code === 200 && json.data) {
+          try { sessionStorage.setItem(cacheKey, JSON.stringify(json.data)); } catch (_) {}
+          takvimDoldur(json.data);
+        }
+      })
+      .catch(function() {
+        // API hatası: miladi tarih + söz + önemli gün zaten çalışıyor
+      });
+  }
+}
+
+function takvimDoldur(data) {
+  // Namaz vakitleri
+  var timings = data.timings;
+  if (timings) {
+    var map = {
+      'namaz-imsak': timings.Fajr,
+      'namaz-gunes': timings.Sunrise,
+      'namaz-ogle': timings.Dhuhr,
+      'namaz-ikindi': timings.Asr,
+      'namaz-aksam': timings.Maghrib,
+      'namaz-yatsi': timings.Isha
+    };
+    Object.keys(map).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && map[id]) {
+        // Saat değerinden timezone kısmını temizle (ör: "05:43 (EET)" → "05:43")
+        el.textContent = map[id].replace(/\s*\(.*\)/, '');
+      }
+    });
+  }
+
+  // Hicri tarih
+  var hijri = data.date && data.date.hijri;
+  if (hijri) {
+    var hicriEl = document.getElementById('takvim-hicri');
+    if (hicriEl) {
+      var hicriAyIdx = parseInt(hijri.month.number, 10) - 1;
+      var hicriAyAd = HICRI_AYLAR[hicriAyIdx] || hijri.month.en;
+      hicriEl.textContent = hijri.day + ' ' + hicriAyAd + ' ' + hijri.year;
+    }
+  }
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   setCurrentDate();
@@ -859,6 +1021,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSidebarTabs();
   initNavToggle();
   initYukariCik();
+  initTakvim();
   initHavaDurumu();
   initSonDakika();
   initDovizAltin();

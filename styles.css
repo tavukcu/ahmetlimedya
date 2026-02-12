@@ -1202,6 +1202,139 @@ a.haber-aksiyonlar__btn {
   margin: 8px 0 0;
 }
 
+/* ----- Günün Takvimi ----- */
+.sidebar__box--takvim {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-soft) 100%);
+  border-top-color: var(--accent);
+}
+.sidebar__title--takvim {
+  text-align: center;
+  border-bottom-color: var(--accent);
+}
+.takvim__tarih {
+  text-align: center;
+  padding: 8px 0 12px;
+}
+.takvim__gun-no {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+.takvim__ay-yil {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  margin-top: 2px;
+}
+.takvim__gun-adi {
+  display: block;
+  font-size: 13px;
+  color: var(--gray-2);
+  margin-top: 2px;
+}
+.takvim__hicri {
+  display: block;
+  font-size: 12px;
+  color: var(--accent-hover);
+  font-weight: 600;
+  margin-top: 6px;
+}
+.takvim__onemli-gun {
+  background: var(--accent);
+  color: var(--white);
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.takvim__onemli-gun[hidden] { display: none !important; }
+.takvim__namaz-baslik {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.takvim__namaz-baslik small {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--gray-3);
+}
+.takvim__namaz-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.takvim__namaz-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(13, 77, 61, 0.1);
+  font-size: 13px;
+}
+.takvim__namaz-list li:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+.takvim__namaz-ad {
+  color: var(--gray-2);
+  font-weight: 500;
+}
+.takvim__namaz-saat {
+  font-weight: 700;
+  color: var(--black);
+  font-variant-numeric: tabular-nums;
+}
+.takvim__soz {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(13, 77, 61, 0.12);
+}
+.takvim__soz p {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--gray-2);
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+.takvim__soz p::before { content: "\201C"; }
+.takvim__soz p::after { content: "\201D"; }
+
+@media (max-width: 992px) {
+  .takvim__namaz-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .takvim__namaz-list li:nth-last-child(-n+2) {
+    border-bottom: 1px solid rgba(13, 77, 61, 0.1);
+  }
+  .takvim__namaz-list li:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+}
+@media (max-width: 768px) {
+  .takvim__namaz-list {
+    grid-template-columns: 1fr 1fr;
+  }
+  .takvim__namaz-list li:nth-last-child(-n+3) {
+    border-bottom: 1px solid rgba(13, 77, 61, 0.1);
+  }
+  .takvim__namaz-list li:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+}
+
 /* ----- Anket ----- */
 .sidebar__box--anket {
   background: var(--bg-card);
