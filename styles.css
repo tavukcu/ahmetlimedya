@@ -1254,6 +1254,38 @@ a.haber-aksiyonlar__btn {
   margin-bottom: 12px;
 }
 .takvim__onemli-gun[hidden] { display: none !important; }
+/* Ay durumu */
+.takvim__ay-durumu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(13, 77, 61, 0.06);
+  border: 1px solid rgba(13, 77, 61, 0.1);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+.takvim__ay-ikon {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.takvim__ay-bilgi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.takvim__ay-faz {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.takvim__ay-tarim {
+  font-size: 11px;
+  color: var(--gray-2);
+  line-height: 1.4;
+}
 .takvim__namaz-baslik {
   font-size: 13px;
   font-weight: 700;

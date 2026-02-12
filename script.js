@@ -921,6 +921,27 @@ var ONEMLI_GUNLER = {
   '11-24': 'Öğretmenler Günü'
 };
 
+// Ay fazı hesaplama (sinodik ay = ~29.53 gün, referans yeni ay: 6 Ocak 2000)
+var AY_FAZLARI = [
+  { ad: 'Yeni Ay',           ikon: '\uD83C\uDF11', tarim: 'Ekim ve dikim için uygun. Toprak üstü ürünlerde verimli dönem başlangıcı.' },
+  { ad: 'Hilal (Büyüyen)',   ikon: '\uD83C\uDF12', tarim: 'Yapraklı sebzeler, tahıllar ve çiçek ekimi için ideal dönem.' },
+  { ad: 'İlk Dördün',        ikon: '\uD83C\uDF13', tarim: 'Meyveli bitkiler, domates, biber, fasulye ekimi için en verimli dönem.' },
+  { ad: 'Dolunaya Giden Ay', ikon: '\uD83C\uDF14', tarim: 'Meyve toplama, hasat ve aşılama için uygun. Bitki suyu yukarı çıkar.' },
+  { ad: 'Dolunay',           ikon: '\uD83C\uDF15', tarim: 'Hasat, budama ve kök bitkiler ekimi için ideal. Aşılama yapılabilir.' },
+  { ad: 'Küçülen Ay',        ikon: '\uD83C\uDF16', tarim: 'Kök sebzeler (soğan, patates, havuç) ekimi için uygun dönem.' },
+  { ad: 'Son Dördün',        ikon: '\uD83C\uDF17', tarim: 'Budama, ot biçme ve zararlı ilaçlama için en uygun dönem.' },
+  { ad: 'Hilal (Küçülen)',   ikon: '\uD83C\uDF18', tarim: 'Dinlenme dönemi. Toprak hazırlığı ve kompost çalışması yapılabilir.' }
+];
+
+function ayFaziHesapla(tarih) {
+  var sinodikAy = 29.53058770576;
+  var referans = new Date(2000, 0, 6, 18, 14, 0); // 6 Ocak 2000 18:14 UTC - bilinen yeni ay
+  var farkGun = (tarih.getTime() - referans.getTime()) / 86400000;
+  var faz = ((farkGun % sinodikAy) + sinodikAy) % sinodikAy;
+  var idx = Math.round(faz / (sinodikAy / 8)) % 8;
+  return { idx: idx, gun: Math.round(faz), toplam: Math.round(sinodikAy) };
+}
+
 function initTakvim() {
   var now = new Date();
   var gun = now.getDate();
@@ -937,6 +958,16 @@ function initTakvim() {
   if (gunNoEl) gunNoEl.textContent = gun;
   if (ayYilEl) ayYilEl.textContent = ayAdlar[ay] + ' ' + yil;
   if (gunAdiEl) gunAdiEl.textContent = gunAdilar[now.getDay()];
+
+  // Ay durumu
+  var ayFazi = ayFaziHesapla(now);
+  var fazBilgi = AY_FAZLARI[ayFazi.idx];
+  var ayIkonEl = document.getElementById('takvim-ay-ikon');
+  var ayFazEl = document.getElementById('takvim-ay-faz');
+  var ayTarimEl = document.getElementById('takvim-ay-tarim');
+  if (ayIkonEl) ayIkonEl.textContent = fazBilgi.ikon;
+  if (ayFazEl) ayFazEl.textContent = fazBilgi.ad;
+  if (ayTarimEl) ayTarimEl.textContent = fazBilgi.tarim;
 
   // Günün sözü (günün sırasına göre)
   var yilGunu = Math.floor((now - new Date(yil, 0, 1)) / 86400000);
