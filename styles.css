@@ -380,16 +380,16 @@ button { font-family: inherit; cursor: pointer; }
 .manset__link {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
-  min-height: 320px;
+  height: 360px;
 }
 .manset__img-wrap {
   position: relative;
   overflow: hidden;
+  height: 360px;
 }
 .manset__img-wrap img {
   width: 100%;
   height: 100%;
-  min-height: 280px;
   object-fit: cover;
 }
 .manset__kategori {
@@ -1287,7 +1287,10 @@ a.haber-aksiyonlar__btn {
   }
   .manset__link {
     grid-template-columns: 1fr;
-    min-height: auto;
+    height: auto;
+  }
+  .manset__img-wrap {
+    height: 220px;
   }
   .manset__body { padding: 20px; }
   .manset__title { font-size: 22px; }
