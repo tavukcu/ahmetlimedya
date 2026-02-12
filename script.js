@@ -1232,6 +1232,59 @@ function initUzumFiyat() {
     });
 }
 
+// ----- Kırık Görsel Yedekleme -----
+function initBrokenImageFallback() {
+  document.addEventListener('error', function(e) {
+    if (e.target.tagName === 'IMG' && !e.target.dataset.fallback) {
+      e.target.dataset.fallback = '1';
+      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"%3E%3Crect fill="%23e8e8e8" width="400" height="250"/%3E%3Ctext x="200" y="125" text-anchor="middle" fill="%23999" font-family="sans-serif" font-size="16"%3EGörsel yüklenemedi%3C/text%3E%3C/svg%3E';
+      e.target.alt = 'Görsel yüklenemedi';
+    }
+  }, true);
+}
+
+// ----- Sekme Başlığı Bildirimi (Son Dakika) -----
+function initTabBildirimi() {
+  var origTitle = document.title;
+  var sdTimer = null;
+
+  function basla(metin) {
+    if (sdTimer) return;
+    var toggle = false;
+    sdTimer = setInterval(function() {
+      document.title = toggle ? origTitle : '\uD83D\uDD34 ' + metin;
+      toggle = !toggle;
+    }, 1500);
+  }
+
+  function durdur() {
+    if (sdTimer) {
+      clearInterval(sdTimer);
+      sdTimer = null;
+      document.title = origTitle;
+    }
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) durdur();
+  });
+
+  // Son dakika kontrolü
+  fetch('/api/son-dakika')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.aktifSonDakika && result.data && result.data.length > 0) {
+        var baslik = result.data[0].baslik || 'Son Dakika';
+        // Sadece sekme arka plandayken başlat
+        if (document.hidden) basla(baslik);
+        document.addEventListener('visibilitychange', function() {
+          if (document.hidden && result.aktifSonDakika) basla(baslik);
+        });
+      }
+    })
+    .catch(function() {});
+}
+
 // ----- KVKK / Çerez Banner -----
 function initCerezBanner() {
   var banner = document.getElementById('cerez-banner');
@@ -1272,6 +1325,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initVefat();
   initUzumFiyat();
   initCerezBanner();
+  initBrokenImageFallback();
+  initTabBildirimi();
   // Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function() {});

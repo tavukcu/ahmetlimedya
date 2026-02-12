@@ -2685,6 +2685,85 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
 }
 
 /* ============================================
+   Skeleton / Shimmer Loading
+   ============================================ */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-6) 25%, var(--gray-5) 50%, var(--gray-6) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: var(--radius);
+}
+.skeleton--text {
+  height: 14px;
+  margin-bottom: 8px;
+  width: 80%;
+}
+.skeleton--text:last-child { width: 50%; }
+.sidebar__box .eczane__bos,
+.sidebar__box .anket__bos {
+  background: linear-gradient(90deg, var(--gray-6) 25%, var(--gray-5) 50%, var(--gray-6) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  color: transparent;
+  border-radius: var(--radius);
+  min-height: 40px;
+}
+
+/* ============================================
+   Haber Detay Paylaş Butonları
+   ============================================ */
+.detay__paylas {
+  margin: 32px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--gray-5);
+}
+.detay__paylas-baslik {
+  font-family: var(--font-head);
+  font-size: 16px;
+  color: var(--gray-2);
+  margin: 0 0 12px;
+}
+.detay__paylas-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.detay__paylas-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid var(--gray-5);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-2);
+  background: var(--bg-card);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.detay__paylas-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.detay__paylas-btn svg { flex-shrink: 0; }
+.detay__paylas-btn--facebook:hover { color: #1877f2; border-color: #1877f2; }
+.detay__paylas-btn--twitter:hover { color: #000; border-color: #000; }
+.detay__paylas-btn--whatsapp:hover { color: #25d366; border-color: #25d366; }
+.detay__paylas-btn--kopyala:hover { color: var(--primary); border-color: var(--primary); }
+[data-theme="dark"] .detay__paylas-btn--twitter:hover { color: #fff; }
+@media (max-width: 480px) {
+  .detay__paylas-btns { flex-direction: column; }
+  .detay__paylas-btn { justify-content: center; }
+}
+
+/* ============================================
    Print Stilleri
    ============================================ */
 @media print {
