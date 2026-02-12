@@ -3,6 +3,33 @@
  * Okuma çubuğu, Beğen/Paylaş, Bülten, Sidebar sekmeler
  */
 
+// ----- Karanlık Mod -----
+function initDarkMode() {
+  var saved = localStorage.getItem('ahmetli-theme');
+  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  function updateIcon() {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = isDark ? '&#9788;' : '&#9790;';
+    btn.setAttribute('aria-label', isDark ? 'Aydınlık mod' : 'Karanlık mod');
+  }
+  updateIcon();
+  btn.addEventListener('click', function() {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('ahmetli-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('ahmetli-theme', 'dark');
+    }
+    updateIcon();
+  });
+}
+
 // ----- Tarih (Türkçe) -----
 function setCurrentDate() {
   const el = document.getElementById('currentDate');
@@ -1040,8 +1067,102 @@ function takvimDoldur(data) {
   }
 }
 
+// ----- Scroll Reveal Animasyonları -----
+function initScrollReveal() {
+  var items = document.querySelectorAll('.uc-kart__item, .haber-iki__item, .sidebar__box, .uzum-bolumu, .whatsapp-hatti, .vefat-bolumu, .newsletter');
+  if (!items.length || !('IntersectionObserver' in window)) return;
+  items.forEach(function(el) { el.classList.add('reveal'); });
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  items.forEach(function(el) { observer.observe(el); });
+}
+
+// ----- Nöbetçi Eczane -----
+function initEczane() {
+  var container = document.getElementById('eczane-icerik');
+  if (!container) return;
+  fetch('/api/eczane')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      var liste = result.data || [];
+      if (liste.length === 0) {
+        container.innerHTML = '<p class="eczane__bos">Nöbetçi eczane bilgisi girilmemiş.</p>';
+        return;
+      }
+      container.innerHTML = liste.map(function(e) {
+        return '<div class="eczane__item">'
+          + '<span class="eczane__ad">' + escapeHtmlFront(e.ad) + '</span>'
+          + '<span class="eczane__adres">' + escapeHtmlFront(e.adres) + '</span>'
+          + (e.telefon ? '<a href="tel:' + e.telefon + '" class="eczane__tel">' + escapeHtmlFront(e.telefon) + '</a>' : '')
+          + '</div>';
+      }).join('');
+    })
+    .catch(function() {
+      container.innerHTML = '<p class="eczane__bos">Bilgi yüklenemedi.</p>';
+    });
+}
+
+// ----- Vefat Duyuruları -----
+function initVefat() {
+  var section = document.getElementById('vefat-section');
+  var list = document.getElementById('vefat-list');
+  if (!section || !list) return;
+  fetch('/api/vefat')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      var items = result.data || [];
+      if (items.length === 0) return;
+      section.hidden = false;
+      list.innerHTML = items.map(function(v) {
+        return '<div class="vefat__item">'
+          + '<div class="vefat__ad">' + escapeHtmlFront(v.ad) + '</div>'
+          + '<div class="vefat__detay">' + escapeHtmlFront(v.detay || '') + '</div>'
+          + '<div class="vefat__tarih">' + escapeHtmlFront(v.tarih || '') + '</div>'
+          + '</div>';
+      }).join('');
+    })
+    .catch(function() {});
+}
+
+// ----- Üzüm Piyasa Fiyatları -----
+function initUzumFiyat() {
+  var container = document.getElementById('uzum-fiyat-icerik');
+  if (!container) return;
+  fetch('/api/uzum-fiyat')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      var liste = result.data || [];
+      if (liste.length === 0) {
+        container.innerHTML = '<p class="eczane__bos">Fiyat bilgisi girilmemiş.</p>';
+        return;
+      }
+      var html = '<div class="uzum-fiyat__list">';
+      liste.forEach(function(f) {
+        html += '<div class="uzum-fiyat__item">'
+          + '<span class="uzum-fiyat__ad">' + escapeHtmlFront(f.tur) + '</span>'
+          + '<span class="uzum-fiyat__deger">' + escapeHtmlFront(f.fiyat) + ' TL/kg</span>'
+          + '</div>';
+      });
+      html += '</div>';
+      if (result.guncelleme) {
+        html += '<p class="uzum-fiyat__guncelleme">Son güncelleme: ' + escapeHtmlFront(result.guncelleme) + '</p>';
+      }
+      container.innerHTML = html;
+    })
+    .catch(function() {
+      container.innerHTML = '<p class="eczane__bos">Fiyat bilgisi yüklenemedi.</p>';
+    });
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
   setCurrentDate();
   setFooterYear();
   initReadingProgress();
@@ -1060,4 +1181,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnket();
   initVideoHaberler();
   loadReklamlar();
+  initScrollReveal();
+  initEczane();
+  initVefat();
+  initUzumFiyat();
+  // Service Worker (PWA)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function() {});
+  }
 });

@@ -31,6 +31,51 @@
   --shadow-hover: 0 8px 24px rgba(13, 77, 61, 0.1);
 }
 
+/* Dark mode */
+[data-theme="dark"] {
+  --primary: #1a8a6e;
+  --primary-dark: #0d4d3d;
+  --primary-light: #1a2e28;
+  --accent: #e0b940;
+  --accent-hover: #c9a227;
+  --accent-soft: #2a2518;
+  --black: #e8e6e3;
+  --gray-1: #d4d4d4;
+  --gray-2: #b0b0b0;
+  --gray-3: #8a8a8a;
+  --gray-4: #6a6a6a;
+  --gray-5: #3a3a3a;
+  --gray-6: #2a2a2a;
+  --white: #1a1a1a;
+  --bg: #121212;
+  --bg-card: #1e1e1e;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .search-input { background: #333; border-color: #555; }
+[data-theme="dark"] .reklam-alani__icerik { background: #252525; border-color: #3a3a3a; }
+[data-theme="dark"] img { opacity: 0.92; }
+[data-theme="dark"] img:hover { opacity: 1; }
+
+/* Dark mode toggle */
+.theme-toggle {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--white);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -2111,4 +2156,262 @@ a.haber-aksiyonlar__btn {
   .reklam-alani--sidebar .reklam-alani__icerik {
     min-height: 200px;
   }
+}
+
+/* ============================================
+   Scroll Reveal Animasyonları
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal--delay-1 { transition-delay: 0.1s; }
+.reveal--delay-2 { transition-delay: 0.2s; }
+.reveal--delay-3 { transition-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+.skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--gray-6) 25%, var(--gray-5) 50%, var(--gray-6) 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .skeleton-line { animation: none; }
+}
+
+/* ============================================
+   Nöbetçi Eczane
+   ============================================ */
+.sidebar__box--eczane {
+  border-top-color: #e74c3c;
+}
+.eczane__item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-6);
+}
+.eczane__item:last-child { border-bottom: none; }
+.eczane__ad {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.eczane__adres {
+  display: block;
+  font-size: 13px;
+  color: var(--gray-2);
+  margin-bottom: 4px;
+}
+.eczane__tel {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e74c3c;
+}
+.eczane__bos {
+  font-size: 13px;
+  color: var(--gray-3);
+  text-align: center;
+  padding: 12px 0;
+}
+.sidebar__title--eczane::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #e74c3c;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: eczanePulse 2s ease-in-out infinite;
+}
+@keyframes eczanePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ============================================
+   Vefat / Taziye Duyuruları
+   ============================================ */
+.vefat-bolumu {
+  margin: 28px 0;
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid #2c3e50;
+  box-shadow: var(--shadow);
+}
+.vefat-bolumu__baslik {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vefat-bolumu__baslik::before {
+  content: '🕯';
+  font-size: 18px;
+}
+.vefat-bolumu__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.vefat__item {
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-6);
+}
+.vefat__ad {
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+.vefat__detay {
+  font-size: 13px;
+  color: var(--gray-2);
+  line-height: 1.6;
+}
+.vefat__tarih {
+  font-size: 12px;
+  color: var(--gray-3);
+  margin-top: 6px;
+}
+@media (min-width: 600px) {
+  .vefat-bolumu__list { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================
+   Üzüm Piyasa Fiyatları
+   ============================================ */
+.sidebar__box--uzum-fiyat {
+  border-top-color: #8e44ad;
+}
+.sidebar__title--uzum-fiyat::before {
+  content: '🍇';
+  margin-right: 6px;
+}
+.uzum-fiyat__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.uzum-fiyat__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-6);
+  font-size: 14px;
+}
+.uzum-fiyat__item:last-child { border-bottom: none; }
+.uzum-fiyat__ad { color: var(--gray-1); font-weight: 500; }
+.uzum-fiyat__deger { font-weight: 700; color: var(--primary); }
+.uzum-fiyat__guncelleme {
+  font-size: 11px;
+  color: var(--gray-4);
+  text-align: right;
+  margin-top: 8px;
+}
+
+/* ============================================
+   Okuma Modu (haber detay)
+   ============================================ */
+.okuma-modu-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 90;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  display: none;
+}
+.okuma-modu-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+.detay__wrap .okuma-modu-btn { display: block; }
+
+body.okuma-modu .detay__sidebar { display: none; }
+body.okuma-modu .reklam-alani { display: none; }
+body.okuma-modu .detay__wrap { max-width: 720px; margin: 0 auto; }
+body.okuma-modu .detay__baslik { font-size: 32px; }
+body.okuma-modu .detay__icerik { font-size: 18px; line-height: 1.8; }
+body.okuma-modu .detay__ozet { font-size: 17px; }
+body.okuma-modu .okuma-modu-btn { background: var(--accent); color: var(--black); }
+
+/* ============================================
+   Dolmuş Saatleri Sayfası
+   ============================================ */
+.dolmus-sayfa { max-width: 800px; margin: 0 auto; padding: 40px var(--gutter); }
+.dolmus-sayfa h1 {
+  font-family: var(--font-head);
+  font-size: 28px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.dolmus-sayfa__aciklama {
+  color: var(--gray-2);
+  margin-bottom: 24px;
+}
+.dolmus-tablo {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.dolmus-tablo th {
+  background: var(--primary);
+  color: var(--white);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+}
+.dolmus-tablo td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-6);
+  font-size: 14px;
+}
+.dolmus-tablo tr:last-child td { border-bottom: none; }
+.dolmus-tablo tr:nth-child(even) { background: var(--primary-light); }
+.dolmus-uyari {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--gray-1);
 }

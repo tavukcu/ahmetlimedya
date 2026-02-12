@@ -28,6 +28,9 @@ const HABERLER_PATH = path.join(DATA_DIR, 'haberler.json');
 const BULTEN_PATH = path.join(DATA_DIR, 'bulten.json');
 const ANKET_PATH = path.join(DATA_DIR, 'anket.json');
 const REKLAMLAR_PATH = path.join(DATA_DIR, 'reklamlar.json');
+const ECZANE_PATH = path.join(DATA_DIR, 'eczane.json');
+const VEFAT_PATH = path.join(DATA_DIR, 'vefat.json');
+const UZUM_FIYAT_PATH = path.join(DATA_DIR, 'uzum-fiyat.json');
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || ADMIN_PASSWORD + '_ahmetli_secret';
 const TOKEN_MAX_AGE = 24 * 60 * 60 * 1000; // 24 saat
@@ -91,7 +94,7 @@ async function okuBlob(blobAdi, lokalYol) {
 
 async function yazBlob(blobAdi, liste) {
   if (!blob) {
-    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH, 'reklamlar.json': REKLAMLAR_PATH };
+    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH, 'reklamlar.json': REKLAMLAR_PATH, 'eczane.json': ECZANE_PATH, 'vefat.json': VEFAT_PATH, 'uzum-fiyat.json': UZUM_FIYAT_PATH };
     return yazLokal(lokalMap[blobAdi] || BULTEN_PATH, liste);
   }
   try {
@@ -137,6 +140,30 @@ async function okuReklamlar() {
 
 async function yazReklamlar(liste) {
   return yazBlob('reklamlar.json', liste);
+}
+
+async function okuEczane() {
+  return okuBlob('eczane.json', ECZANE_PATH);
+}
+
+async function yazEczane(liste) {
+  return yazBlob('eczane.json', liste);
+}
+
+async function okuVefat() {
+  return okuBlob('vefat.json', VEFAT_PATH);
+}
+
+async function yazVefat(liste) {
+  return yazBlob('vefat.json', liste);
+}
+
+async function okuUzumFiyat() {
+  return okuBlob('uzum-fiyat.json', UZUM_FIYAT_PATH);
+}
+
+async function yazUzumFiyat(veri) {
+  return yazBlob('uzum-fiyat.json', veri);
 }
 
 function getClientIP(req) {
@@ -670,6 +697,175 @@ app.delete('/api/admin/reklamlar/:id', async (req, res) => {
     reklamlar.splice(idx, 1);
     await yazReklamlar(reklamlar);
     res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- API: Nöbetçi Eczane (Public) -----
+app.get('/api/eczane', async (req, res) => {
+  try {
+    const liste = await okuEczane();
+    res.json({ data: Array.isArray(liste) ? liste : [] });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- API: Vefat Duyuruları (Public) -----
+app.get('/api/vefat', async (req, res) => {
+  try {
+    const liste = await okuVefat();
+    // Son 30 gün
+    const now = Date.now();
+    const aktif = (Array.isArray(liste) ? liste : []).filter(function(v) {
+      if (!v.olusturma) return true;
+      return (now - new Date(v.olusturma).getTime()) < 30 * 86400000;
+    });
+    res.json({ data: aktif });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- API: Üzüm Piyasa Fiyatları (Public) -----
+app.get('/api/uzum-fiyat', async (req, res) => {
+  try {
+    const veri = await okuUzumFiyat();
+    if (Array.isArray(veri)) {
+      res.json({ data: veri, guncelleme: '' });
+    } else {
+      res.json({ data: veri.fiyatlar || [], guncelleme: veri.guncelleme || '' });
+    }
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- Admin: Nöbetçi Eczane CRUD -----
+app.get('/api/admin/eczane', async (req, res) => {
+  try {
+    res.json({ data: await okuEczane() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/admin/eczane', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const ad = (body.ad || '').trim();
+    if (!ad) return res.status(400).json({ hata: 'Eczane adı gerekli' });
+    const liste = await okuEczane();
+    const arr = Array.isArray(liste) ? liste : [];
+    arr.push({
+      id: Date.now(),
+      ad: ad,
+      adres: (body.adres || '').trim(),
+      telefon: (body.telefon || '').trim(),
+      tarih: new Date().toISOString().slice(0, 10)
+    });
+    await yazEczane(arr);
+    res.status(201).json({ mesaj: 'Eklendi', data: arr });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.put('/api/admin/eczane', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const liste = Array.isArray(body.liste) ? body.liste : [];
+    await yazEczane(liste);
+    res.json({ mesaj: 'Güncellendi', data: liste });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/eczane/:id', async (req, res) => {
+  try {
+    const liste = await okuEczane();
+    const arr = Array.isArray(liste) ? liste : [];
+    const id = parseInt(req.params.id, 10);
+    const idx = arr.findIndex(function(e) { return e.id === id; });
+    if (idx === -1) return res.status(404).json({ hata: 'Bulunamadı' });
+    arr.splice(idx, 1);
+    await yazEczane(arr);
+    res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- Admin: Vefat CRUD -----
+app.get('/api/admin/vefat', async (req, res) => {
+  try {
+    res.json({ data: await okuVefat() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/admin/vefat', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const ad = (body.ad || '').trim();
+    if (!ad) return res.status(400).json({ hata: 'İsim gerekli' });
+    const liste = await okuVefat();
+    const arr = Array.isArray(liste) ? liste : [];
+    arr.unshift({
+      id: Date.now(),
+      ad: ad,
+      detay: (body.detay || '').trim(),
+      tarih: (body.tarih || '').trim() || new Date().toLocaleDateString('tr-TR'),
+      olusturma: new Date().toISOString()
+    });
+    await yazVefat(arr);
+    res.status(201).json({ mesaj: 'Eklendi', data: arr });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/vefat/:id', async (req, res) => {
+  try {
+    const liste = await okuVefat();
+    const arr = Array.isArray(liste) ? liste : [];
+    const id = parseInt(req.params.id, 10);
+    const idx = arr.findIndex(function(v) { return v.id === id; });
+    if (idx === -1) return res.status(404).json({ hata: 'Bulunamadı' });
+    arr.splice(idx, 1);
+    await yazVefat(arr);
+    res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- Admin: Üzüm Fiyat CRUD -----
+app.get('/api/admin/uzum-fiyat', async (req, res) => {
+  try {
+    const veri = await okuUzumFiyat();
+    if (Array.isArray(veri)) {
+      res.json({ data: { fiyatlar: veri, guncelleme: '' } });
+    } else {
+      res.json({ data: veri });
+    }
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.put('/api/admin/uzum-fiyat', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const veri = {
+      fiyatlar: Array.isArray(body.fiyatlar) ? body.fiyatlar : [],
+      guncelleme: new Date().toLocaleDateString('tr-TR')
+    };
+    await yazUzumFiyat(veri);
+    res.json({ mesaj: 'Güncellendi', data: veri });
   } catch (err) {
     res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }

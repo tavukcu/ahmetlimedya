@@ -2169,6 +2169,161 @@
       }
     });
 
+    // ========== NÖBETÇİ ECZANE ==========
+    function loadEczane() {
+      var list = $('eczane-admin-list');
+      if (!list) return;
+      apiFetch('/api/admin/eczane').then(function(r) { return r.json(); }).then(function(result) {
+        var data = result.data || [];
+        if (!Array.isArray(data) || data.length === 0) {
+          list.innerHTML = '<p class="muted">Henüz eczane eklenmemiş.</p>';
+          return;
+        }
+        list.innerHTML = data.map(function(e) {
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee">'
+            + '<div><strong>' + escapeHtml(e.ad) + '</strong><br><small>' + escapeHtml(e.adres || '') + ' ' + escapeHtml(e.telefon || '') + '</small></div>'
+            + '<button class="btn btn-sm btn-danger" data-eczane-sil="' + e.id + '">Sil</button>'
+            + '</div>';
+        }).join('');
+        list.querySelectorAll('[data-eczane-sil]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            apiFetch('/api/admin/eczane/' + btn.dataset.eczaneSil, { method: 'DELETE' }).then(function() { loadEczane(); });
+          });
+        });
+      }).catch(function() { list.innerHTML = '<p class="muted">Yüklenemedi.</p>'; });
+    }
+
+    var eczaneAddBtn = $('eczane-add-btn');
+    if (eczaneAddBtn) eczaneAddBtn.addEventListener('click', function() { $('eczane-modal').showModal(); });
+    var eczaneModalClose = $('eczane-modal-close');
+    if (eczaneModalClose) eczaneModalClose.addEventListener('click', function() { $('eczane-modal').close(); });
+    var eczaneFormCancel = $('eczane-form-cancel');
+    if (eczaneFormCancel) eczaneFormCancel.addEventListener('click', function() { $('eczane-modal').close(); });
+    var eczaneForm = $('eczane-form');
+    if (eczaneForm) eczaneForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      apiFetch('/api/admin/eczane', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ad: $('eczane-ad').value, adres: $('eczane-adres').value, telefon: $('eczane-tel').value })
+      }).then(function() {
+        $('eczane-modal').close();
+        eczaneForm.reset();
+        loadEczane();
+        showToast('Eczane eklendi', 'success');
+      }).catch(function() { showToast('Eklenemedi', 'error'); });
+    });
+
+    // ========== VEFAT İLANLARI ==========
+    function loadVefat() {
+      var list = $('vefat-admin-list');
+      if (!list) return;
+      apiFetch('/api/admin/vefat').then(function(r) { return r.json(); }).then(function(result) {
+        var data = result.data || [];
+        if (!Array.isArray(data) || data.length === 0) {
+          list.innerHTML = '<p class="muted">Henüz ilan eklenmemiş.</p>';
+          return;
+        }
+        list.innerHTML = data.map(function(v) {
+          return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eee">'
+            + '<div><strong>' + escapeHtml(v.ad) + '</strong><br><small>' + escapeHtml(v.detay || '') + '</small><br><small style="color:#999">' + escapeHtml(v.tarih || '') + '</small></div>'
+            + '<button class="btn btn-sm btn-danger" data-vefat-sil="' + v.id + '">Sil</button>'
+            + '</div>';
+        }).join('');
+        list.querySelectorAll('[data-vefat-sil]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            apiFetch('/api/admin/vefat/' + btn.dataset.vefatSil, { method: 'DELETE' }).then(function() { loadVefat(); });
+          });
+        });
+      }).catch(function() { list.innerHTML = '<p class="muted">Yüklenemedi.</p>'; });
+    }
+
+    var vefatAddBtn = $('vefat-add-btn');
+    if (vefatAddBtn) vefatAddBtn.addEventListener('click', function() { $('vefat-modal').showModal(); });
+    var vefatModalClose = $('vefat-modal-close');
+    if (vefatModalClose) vefatModalClose.addEventListener('click', function() { $('vefat-modal').close(); });
+    var vefatFormCancel = $('vefat-form-cancel');
+    if (vefatFormCancel) vefatFormCancel.addEventListener('click', function() { $('vefat-modal').close(); });
+    var vefatForm = $('vefat-form');
+    if (vefatForm) vefatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      apiFetch('/api/admin/vefat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ad: $('vefat-ad').value, detay: $('vefat-detay').value, tarih: $('vefat-tarih').value })
+      }).then(function() {
+        $('vefat-modal').close();
+        vefatForm.reset();
+        loadVefat();
+        showToast('Vefat ilanı eklendi', 'success');
+      }).catch(function() { showToast('Eklenemedi', 'error'); });
+    });
+
+    // ========== ÜZÜM FİYATLARI ==========
+    function loadUzumFiyat() {
+      var rows = $('uzum-fiyat-rows');
+      if (!rows) return;
+      apiFetch('/api/admin/uzum-fiyat').then(function(r) { return r.json(); }).then(function(result) {
+        var veri = result.data || {};
+        var fiyatlar = veri.fiyatlar || [];
+        if (fiyatlar.length === 0) {
+          fiyatlar = [{ tur: 'Sultaniye (Kuru)', fiyat: '' }, { tur: 'Sultaniye (Yaş)', fiyat: '' }];
+        }
+        rows.innerHTML = fiyatlar.map(function(f, i) {
+          return '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center" class="uzum-fiyat-row">'
+            + '<input type="text" placeholder="Üzüm türü" value="' + escapeHtml(f.tur || '') + '" style="flex:2;padding:8px;border:1px solid #ddd;border-radius:4px" class="uzum-tur">'
+            + '<input type="text" placeholder="Fiyat (TL/kg)" value="' + escapeHtml(f.fiyat || '') + '" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px" class="uzum-fyt">'
+            + '<button type="button" class="btn btn-sm btn-ghost uzum-row-sil" style="color:red">&times;</button>'
+            + '</div>';
+        }).join('');
+        rows.querySelectorAll('.uzum-row-sil').forEach(function(btn) {
+          btn.addEventListener('click', function() { btn.parentElement.remove(); });
+        });
+      }).catch(function() {});
+    }
+
+    var uzumAddRow = $('uzum-fiyat-add-row');
+    if (uzumAddRow) uzumAddRow.addEventListener('click', function() {
+      var rows = $('uzum-fiyat-rows');
+      var div = document.createElement('div');
+      div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center';
+      div.className = 'uzum-fiyat-row';
+      div.innerHTML = '<input type="text" placeholder="Üzüm türü" style="flex:2;padding:8px;border:1px solid #ddd;border-radius:4px" class="uzum-tur">'
+        + '<input type="text" placeholder="Fiyat (TL/kg)" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px" class="uzum-fyt">'
+        + '<button type="button" class="btn btn-sm btn-ghost uzum-row-sil" style="color:red">&times;</button>';
+      rows.appendChild(div);
+      div.querySelector('.uzum-row-sil').addEventListener('click', function() { div.remove(); });
+    });
+
+    var uzumSaveBtn = $('uzum-fiyat-save-btn');
+    if (uzumSaveBtn) uzumSaveBtn.addEventListener('click', function() {
+      var rowEls = document.querySelectorAll('.uzum-fiyat-row');
+      var fiyatlar = [];
+      rowEls.forEach(function(row) {
+        var tur = row.querySelector('.uzum-tur').value.trim();
+        var fiyat = row.querySelector('.uzum-fyt').value.trim();
+        if (tur) fiyatlar.push({ tur: tur, fiyat: fiyat });
+      });
+      apiFetch('/api/admin/uzum-fiyat', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fiyatlar: fiyatlar })
+      }).then(function() {
+        showToast('Fiyatlar güncellendi', 'success');
+      }).catch(function() { showToast('Güncellenemedi', 'error'); });
+    });
+
+    // Sayfa navigasyonunda yeni bölümleri yükle
+    var origShowPage = null;
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        var page = item.dataset.page;
+        if (page === 'eczane') setTimeout(loadEczane, 100);
+        if (page === 'vefat') setTimeout(loadVefat, 100);
+        if (page === 'uzum-fiyat') setTimeout(loadUzumFiyat, 100);
+      });
+    });
+
     // Oturum kontrolü
     if (isLoggedIn()) {
       validateToken();

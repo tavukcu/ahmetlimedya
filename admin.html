@@ -62,6 +62,18 @@
               <span class="nav-icon"><i data-lucide="megaphone"></i></span>
               <span>Reklamlar</span>
             </a>
+            <a href="#" class="nav-item" data-page="eczane">
+              <span class="nav-icon"><i data-lucide="cross"></i></span>
+              <span>Nöbetçi Eczane</span>
+            </a>
+            <a href="#" class="nav-item" data-page="vefat">
+              <span class="nav-icon"><i data-lucide="book-open"></i></span>
+              <span>Vefat İlanları</span>
+            </a>
+            <a href="#" class="nav-item" data-page="uzum-fiyat">
+              <span class="nav-icon"><i data-lucide="grape"></i></span>
+              <span>Üzüm Fiyatları</span>
+            </a>
           </nav>
         </aside>
 
@@ -365,6 +377,67 @@
             <div id="reklamlar-loading" class="loading" hidden>Yükleniyor...</div>
             <div id="reklamlar-list" class="reklamlar-grid"></div>
           </div>
+          <!-- Nöbetçi Eczane -->
+          <div id="page-eczane" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Nöbetçi Eczane</h2>
+              <button type="button" class="btn btn-primary" id="eczane-add-btn">+ Eczane Ekle</button>
+            </div>
+            <p class="text-muted" style="margin-bottom:1rem">Bugünkü nöbetçi eczane bilgilerini girin. Eski kayıtları silerek güncelleyebilirsiniz.</p>
+            <div id="eczane-admin-list" class="card" style="padding:1rem"></div>
+            <dialog id="eczane-modal" class="modal modal-sm">
+              <form id="eczane-form" class="modal-form">
+                <div class="modal-header"><h2>Eczane Ekle</h2><button type="button" class="modal-close" id="eczane-modal-close" aria-label="Kapat"></button></div>
+                <div class="modal-body">
+                  <div class="form-row"><label for="eczane-ad">Eczane Adı *</label><input type="text" id="eczane-ad" required placeholder="Örn: Merkez Eczanesi"></div>
+                  <div class="form-row"><label for="eczane-adres">Adres</label><input type="text" id="eczane-adres" placeholder="Adres"></div>
+                  <div class="form-row"><label for="eczane-tel">Telefon</label><input type="tel" id="eczane-tel" placeholder="0 (236) 000 00 00"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-ghost" id="eczane-form-cancel">İptal</button>
+                  <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+              </form>
+            </dialog>
+          </div>
+
+          <!-- Vefat İlanları -->
+          <div id="page-vefat" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Vefat / Taziye İlanları</h2>
+              <button type="button" class="btn btn-primary" id="vefat-add-btn">+ Yeni İlan</button>
+            </div>
+            <p class="text-muted" style="margin-bottom:1rem">Son 30 gündeki ilanlar anasayfada görünür.</p>
+            <div id="vefat-admin-list" class="card" style="padding:1rem"></div>
+            <dialog id="vefat-modal" class="modal modal-sm">
+              <form id="vefat-form" class="modal-form">
+                <div class="modal-header"><h2>Vefat İlanı Ekle</h2><button type="button" class="modal-close" id="vefat-modal-close" aria-label="Kapat"></button></div>
+                <div class="modal-body">
+                  <div class="form-row"><label for="vefat-ad">Vefat Eden *</label><input type="text" id="vefat-ad" required placeholder="Ad Soyad"></div>
+                  <div class="form-row"><label for="vefat-detay">Detay</label><textarea id="vefat-detay" rows="3" placeholder="Cenaze bilgileri, taziye yeri vb."></textarea></div>
+                  <div class="form-row"><label for="vefat-tarih">Tarih</label><input type="text" id="vefat-tarih" placeholder="Örn: 12 Şubat 2026"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-ghost" id="vefat-form-cancel">İptal</button>
+                  <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+              </form>
+            </dialog>
+          </div>
+
+          <!-- Üzüm Piyasa Fiyatları -->
+          <div id="page-uzum-fiyat" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Üzüm Piyasa Fiyatları</h2>
+              <button type="button" class="btn btn-primary" id="uzum-fiyat-save-btn">Kaydet</button>
+            </div>
+            <p class="text-muted" style="margin-bottom:1rem">Üzüm türlerini ve güncel kg fiyatlarını girin.</p>
+            <div class="card" style="padding:1rem">
+              <div id="uzum-fiyat-rows"></div>
+              <button type="button" class="btn btn-ghost btn-sm" id="uzum-fiyat-add-row" style="margin-top:0.5rem">+ Satır Ekle</button>
+            </div>
+          </div>
+
         </main>
       </div>
     </section>

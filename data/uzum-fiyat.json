@@ -1,0 +1,10 @@
+{
+  "fiyatlar": [
+    { "tur": "Sultaniye (Kuru)", "fiyat": "95" },
+    { "tur": "Sultaniye (Yaş)", "fiyat": "28" },
+    { "tur": "Çekirdeksiz (Kuru)", "fiyat": "110" },
+    { "tur": "Razakı (Sofralık)", "fiyat": "35" },
+    { "tur": "Yuvarlak Çekirdeksiz", "fiyat": "90" }
+  ],
+  "guncelleme": "12 Şubat 2026"
+}

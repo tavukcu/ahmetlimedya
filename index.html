@@ -9,6 +9,10 @@
   <meta property="og:description" content="Güvenilir yerel haberler, gündem, ekonomi, spor ve magazin.">
   <meta property="og:type" content="website">
   <title>Ahmetli Medya - Güncel Haberler</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ahmetli Medya">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -37,6 +41,7 @@
           <input type="search" class="search-input" placeholder="Ara..." aria-label="Ara">
           <button type="submit" class="search-btn" aria-label="Ara">Ara</button>
         </form>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Karanlık mod" title="Karanlık/Aydınlık mod">&#9790;</button>
         <nav class="top-nav">
           <a href="#">Giriş</a>
           <a href="#">Abone Ol</a>
@@ -296,6 +301,12 @@
             </div>
           </div>
 
+          <!-- Vefat / Taziye Duyuruları -->
+          <section class="vefat-bolumu" id="vefat-section" hidden>
+            <h2 class="vefat-bolumu__baslik">Vefat / Taziye</h2>
+            <div class="vefat-bolumu__list" id="vefat-list"></div>
+          </section>
+
           <!-- Bülten -->
           <section id="newsletter" class="newsletter">
             <h2 class="newsletter__title">Bültenimize Abone Olun</h2>
@@ -448,6 +459,22 @@
               <li><a href="#">Don riski ve önlemler</a></li>
             </ul>
           </div>
+          <!-- Nöbetçi Eczane -->
+          <div class="sidebar__box sidebar__box--eczane">
+            <h3 class="sidebar__title sidebar__title--eczane">Nöbetçi Eczane</h3>
+            <div id="eczane-icerik">
+              <p class="eczane__bos">Yükleniyor...</p>
+            </div>
+          </div>
+
+          <!-- Üzüm Piyasa Fiyatları -->
+          <div class="sidebar__box sidebar__box--uzum-fiyat">
+            <h3 class="sidebar__title sidebar__title--uzum-fiyat">Üzüm Piyasa Fiyatları</h3>
+            <div id="uzum-fiyat-icerik">
+              <p class="eczane__bos">Yükleniyor...</p>
+            </div>
+          </div>
+
           <div class="sidebar__box sidebar__box--hava">
             <div class="hava-durumu__baslik">
               <h3 class="sidebar__title">Hava Durumu</h3>
@@ -501,6 +528,7 @@
             <li><a href="#">İletişim</a></li>
             <li><a href="#">Gizlilik</a></li>
             <li><a href="#">Kullanım Koşulları</a></li>
+            <li><a href="dolmus.html">Dolmuş Saatleri</a></li>
           </ul>
         </div>
         <div class="footer-col">
