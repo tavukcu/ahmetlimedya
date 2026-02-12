@@ -27,6 +27,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const HABERLER_PATH = path.join(DATA_DIR, 'haberler.json');
 const BULTEN_PATH = path.join(DATA_DIR, 'bulten.json');
 const ANKET_PATH = path.join(DATA_DIR, 'anket.json');
+const REKLAMLAR_PATH = path.join(DATA_DIR, 'reklamlar.json');
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || ADMIN_PASSWORD + '_ahmetli_secret';
 const TOKEN_MAX_AGE = 24 * 60 * 60 * 1000; // 24 saat
@@ -90,7 +91,7 @@ async function okuBlob(blobAdi, lokalYol) {
 
 async function yazBlob(blobAdi, liste) {
   if (!blob) {
-    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH };
+    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH, 'reklamlar.json': REKLAMLAR_PATH };
     return yazLokal(lokalMap[blobAdi] || BULTEN_PATH, liste);
   }
   try {
@@ -128,6 +129,14 @@ async function okuAnketler() {
 
 async function yazAnketler(liste) {
   return yazBlob('anket.json', liste);
+}
+
+async function okuReklamlar() {
+  return okuBlob('reklamlar.json', REKLAMLAR_PATH);
+}
+
+async function yazReklamlar(liste) {
+  return yazBlob('reklamlar.json', liste);
 }
 
 function getClientIP(req) {
@@ -306,6 +315,17 @@ app.get('/api/cok-okunan', async (req, res) => {
     const siralanmis = [...haberler].sort((a, b) => (b.goruntulenme || 0) - (a.goruntulenme || 0));
     const ilk5 = siralanmis.slice(0, 5).map((h) => ({ id: h.id, baslik: h.baslik, slug: h.slug }));
     res.json({ data: ilk5 });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- API: Reklamlar (public) -----
+app.get('/api/reklamlar', async (req, res) => {
+  try {
+    const reklamlar = await okuReklamlar();
+    const aktif = reklamlar.filter((r) => r.aktif === true);
+    res.json({ data: aktif });
   } catch (err) {
     res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
   }
@@ -592,6 +612,63 @@ app.delete('/api/admin/anket/:id', async (req, res) => {
     if (idx === -1) return res.status(404).json({ hata: 'Anket bulunamadı' });
     anketler.splice(idx, 1);
     await yazAnketler(anketler);
+    res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- Admin: Reklamlar CRUD -----
+app.get('/api/admin/reklamlar', async (req, res) => {
+  try {
+    res.json({ data: await okuReklamlar() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/admin/reklamlar', async (req, res) => {
+  try {
+    const reklamlar = await okuReklamlar();
+    const body = req.body || {};
+    const slot = (body.slot || '').trim();
+    if (!slot) return res.status(400).json({ hata: 'Slot gerekli' });
+
+    // Aynı slot varsa güncelle, yoksa ekle
+    const idx = reklamlar.findIndex((r) => r.slot === slot);
+    const maxId = reklamlar.length ? Math.max(...reklamlar.map((r) => r.id)) : 0;
+
+    const reklam = {
+      id: idx !== -1 ? reklamlar[idx].id : maxId + 1,
+      slot: slot,
+      baslik: (body.baslik || '').trim() || slot,
+      gorsel: (body.gorsel || '').trim(),
+      link: (body.link || '').trim(),
+      aktif: body.aktif !== undefined ? !!body.aktif : true,
+    };
+
+    if (idx !== -1) {
+      reklamlar[idx] = reklam;
+    } else {
+      reklamlar.push(reklam);
+    }
+
+    await yazReklamlar(reklamlar);
+    res.status(idx !== -1 ? 200 : 201).json(reklam);
+  } catch (err) {
+    console.error('[POST /api/admin/reklamlar] Hata:', err.message);
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/reklamlar/:id', async (req, res) => {
+  try {
+    const reklamlar = await okuReklamlar();
+    const id = parseInt(req.params.id, 10);
+    const idx = reklamlar.findIndex((r) => r.id === id);
+    if (idx === -1) return res.status(404).json({ hata: 'Reklam bulunamadı' });
+    reklamlar.splice(idx, 1);
+    await yazReklamlar(reklamlar);
     res.json({ mesaj: 'Silindi' });
   } catch (err) {
     res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });

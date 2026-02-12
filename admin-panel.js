@@ -165,6 +165,7 @@
     if (pageId === 'categories') renderCategories();
     if (pageId === 'bulten') loadBulten();
     if (pageId === 'anket') loadAnketler();
+    if (pageId === 'reklamlar') loadReklamlar();
   }
 
   // ===================== DASHBOARD =====================
@@ -1404,6 +1405,216 @@
         showToast('Anket silindi.');
         anketDeleteId = null;
         loadAnketler();
+      })
+      .catch(function (err) { showToast(err.message || 'Silinemedi', 'error'); });
+  }
+
+  // ===================== REKLAMLAR =====================
+
+  var REKLAM_SLOTS = [
+    { slot: 'ana-1', label: 'Ana Sayfa - Üst Reklam' },
+    { slot: 'ana-2', label: 'Ana Sayfa - Alt Reklam' },
+    { slot: 'sidebar-1', label: 'Sidebar Reklam' }
+  ];
+  var reklamCache = [];
+
+  function loadReklamlar() {
+    var loadingEl = $('reklamlar-loading');
+    var listEl = $('reklamlar-list');
+    if (loadingEl) loadingEl.hidden = false;
+
+    apiJson('/api/admin/reklamlar')
+      .then(function (result) {
+        reklamCache = result.data || [];
+        renderReklamlar();
+      })
+      .catch(function () {
+        reklamCache = [];
+        renderReklamlar();
+        showToast('Reklamlar yüklenemedi', 'error');
+      })
+      .finally(function () {
+        if (loadingEl) loadingEl.hidden = true;
+      });
+  }
+
+  function renderReklamlar() {
+    var listEl = $('reklamlar-list');
+    if (!listEl) return;
+
+    listEl.innerHTML = REKLAM_SLOTS.map(function (s) {
+      var reklam = reklamCache.find(function (r) { return r.slot === s.slot; });
+      var gorsel = reklam ? reklam.gorsel : '';
+      var link = reklam ? reklam.link : '';
+      var aktif = reklam ? reklam.aktif : false;
+      var reklamId = reklam ? reklam.id : '';
+
+      return '<div class="reklam-slot-card" data-slot="' + s.slot + '">' +
+        '<div class="reklam-slot-card__header">' +
+        '<h3 class="reklam-slot-card__title">' + escapeHtml(s.label) + '</h3>' +
+        '<span class="reklam-slot-card__slot">' + escapeHtml(s.slot) + '</span>' +
+        '</div>' +
+        '<div class="reklam-slot-card__preview" id="reklam-preview-' + s.slot + '">' +
+        (gorsel ? '<img src="' + escapeHtml(gorsel) + '" alt="Reklam önizleme">' : '<span class="reklam-slot-card__empty">Görsel yüklenmemiş</span>') +
+        '</div>' +
+        '<div class="reklam-slot-card__body">' +
+        '<div class="form-row">' +
+        '<label>Görsel</label>' +
+        '<div class="reklam-upload-row">' +
+        '<input type="file" accept="image/*" id="reklam-file-' + s.slot + '" hidden>' +
+        '<button type="button" class="btn btn-sm btn-ghost" data-reklam-browse="' + s.slot + '">Dosya Seç</button>' +
+        '<span class="reklam-file-name" id="reklam-fname-' + s.slot + '">' + (gorsel ? 'Görsel yüklü' : 'Seçilmedi') + '</span>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-row">' +
+        '<label>Link (URL)</label>' +
+        '<input type="url" class="reklam-link-input" id="reklam-link-' + s.slot + '" placeholder="https://example.com" value="' + escapeHtml(link) + '">' +
+        '</div>' +
+        '<div class="form-row">' +
+        '<label class="checkbox-label"><input type="checkbox" id="reklam-aktif-' + s.slot + '"' + (aktif ? ' checked' : '') + '><span>Aktif</span></label>' +
+        '</div>' +
+        '</div>' +
+        '<div class="reklam-slot-card__footer">' +
+        '<button type="button" class="btn btn-primary btn-sm" data-reklam-save="' + s.slot + '">Kaydet</button>' +
+        (reklamId ? '<button type="button" class="btn btn-danger btn-sm" data-reklam-delete="' + reklamId + '">Sil</button>' : '') +
+        '</div>' +
+        '</div>';
+    }).join('');
+
+    // Bind events
+    listEl.querySelectorAll('[data-reklam-browse]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var slot = btn.dataset.reklamBrowse;
+        var fileInput = $('reklam-file-' + slot);
+        if (fileInput) fileInput.click();
+      });
+    });
+
+    REKLAM_SLOTS.forEach(function (s) {
+      var fileInput = $('reklam-file-' + s.slot);
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          if (this.files[0]) handleReklamFile(s.slot, this.files[0]);
+        });
+      }
+    });
+
+    listEl.querySelectorAll('[data-reklam-save]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        saveReklam(btn.dataset.reklamSave);
+      });
+    });
+
+    listEl.querySelectorAll('[data-reklam-delete]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        deleteReklam(btn.dataset.reklamDelete);
+      });
+    });
+  }
+
+  function handleReklamFile(slot, file) {
+    if (!file || !file.type.startsWith('image/')) { showToast('Görsel dosyası seçin', 'error'); return; }
+    if (file.size > 10 * 1024 * 1024) { showToast('Dosya 10MB\'dan küçük olmalı', 'error'); return; }
+
+    var reader = new FileReader();
+    reader.onerror = function () { showToast('Dosya okunamadı', 'error'); };
+    reader.onload = function (e) {
+      var originalDataUrl = e.target.result;
+      var img = new Image();
+      img.onerror = function () {
+        setReklamPreview(slot, originalDataUrl, file.name);
+      };
+      img.onload = function () {
+        try {
+          var w = img.width, h = img.height;
+          var MAX = 1200;
+          if (w > MAX || h > MAX) {
+            var ratio = Math.min(MAX / w, MAX / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          var resized = canvas.toDataURL('image/jpeg', 0.82);
+          if (!resized || resized.length < 100) {
+            setReklamPreview(slot, originalDataUrl, file.name);
+          } else {
+            setReklamPreview(slot, resized, file.name);
+          }
+        } catch (err) {
+          setReklamPreview(slot, originalDataUrl, file.name);
+        }
+      };
+      img.src = originalDataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setReklamPreview(slot, dataUrl, fileName) {
+    var previewEl = $('reklam-preview-' + slot);
+    if (previewEl) {
+      previewEl.innerHTML = '<img src="' + dataUrl + '" alt="Reklam önizleme">';
+      previewEl.dataset.gorsel = dataUrl;
+    }
+    var fnameEl = $('reklam-fname-' + slot);
+    if (fnameEl) fnameEl.textContent = fileName || 'Görsel yüklü';
+  }
+
+  function saveReklam(slot) {
+    var previewEl = $('reklam-preview-' + slot);
+    var linkEl = $('reklam-link-' + slot);
+    var aktifEl = $('reklam-aktif-' + slot);
+
+    // Görseli al: önce dataset'ten (yeni yüklenen), yoksa mevcut img src
+    var gorsel = '';
+    if (previewEl && previewEl.dataset.gorsel) {
+      gorsel = previewEl.dataset.gorsel;
+    } else if (previewEl) {
+      var imgTag = previewEl.querySelector('img');
+      if (imgTag) gorsel = imgTag.src;
+    }
+
+    var link = linkEl ? linkEl.value.trim() : '';
+    var aktif = aktifEl ? aktifEl.checked : false;
+
+    if (!gorsel) { showToast('Görsel yükleyin', 'error'); return; }
+
+    var data = {
+      slot: slot,
+      baslik: slot,
+      gorsel: gorsel,
+      link: link,
+      aktif: aktif
+    };
+
+    api('/api/admin/reklamlar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function (r) {
+      if (!r.ok) return r.json().then(function (d) { throw new Error(d.hata || 'Kayıt başarısız'); });
+      return r.json();
+    })
+    .then(function () {
+      showToast('Reklam kaydedildi.');
+      loadReklamlar();
+    })
+    .catch(function (err) { showToast(err.message || 'Kaydedilemedi', 'error'); });
+  }
+
+  function deleteReklam(id) {
+    if (!id) return;
+    api('/api/admin/reklamlar/' + id, { method: 'DELETE' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Silinemedi');
+        return r.json();
+      })
+      .then(function () {
+        showToast('Reklam silindi.');
+        loadReklamlar();
       })
       .catch(function (err) { showToast(err.message || 'Silinemedi', 'error'); });
   }

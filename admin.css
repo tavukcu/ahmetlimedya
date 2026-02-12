@@ -2816,3 +2816,115 @@ kbd {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+/* ========== Reklamlar ========== */
+.reklamlar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.reklam-slot-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.reklam-slot-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.reklam-slot-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.reklam-slot-card__slot {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.reklam-slot-card__preview {
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.reklam-slot-card__preview img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.reklam-slot-card__empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.reklam-slot-card__body {
+  padding: 1rem;
+}
+
+.reklam-slot-card__body .form-row {
+  margin-bottom: 0.75rem;
+}
+
+.reklam-slot-card__body .form-row:last-child {
+  margin-bottom: 0;
+}
+
+.reklam-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reklam-file-name {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.reklam-link-input {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.reklam-link-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.reklam-slot-card__footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+  .reklamlar-grid {
+    grid-template-columns: 1fr;
+  }
+}

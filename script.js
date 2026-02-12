@@ -826,6 +826,27 @@ function initVideoHaberler() {
     .catch(function() {});
 }
 
+// ----- Reklamlar -----
+function loadReklamlar() {
+  fetch('/api/reklamlar')
+    .then(function (r) { return r.json(); })
+    .then(function (result) {
+      var reklamlar = result.data || [];
+      reklamlar.forEach(function (r) {
+        var slotEl = document.querySelector('[data-reklam-slot="' + r.slot + '"]');
+        if (!slotEl) return;
+        if (r.gorsel) {
+          var html = '<img src="' + r.gorsel + '" alt="' + (r.baslik || 'Reklam') + '" style="max-width:100%;height:auto;display:block">';
+          if (r.link) {
+            html = '<a href="' + r.link + '" target="_blank" rel="noopener noreferrer">' + html + '</a>';
+          }
+          slotEl.innerHTML = html;
+        }
+      });
+    })
+    .catch(function () {});
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   setCurrentDate();
@@ -844,4 +865,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initDynamicNews();
   initAnket();
   initVideoHaberler();
+  loadReklamlar();
 });
