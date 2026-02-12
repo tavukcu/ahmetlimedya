@@ -57,6 +57,12 @@
       <h1>Ahmetli - Manisa Dolmuş Saatleri</h1>
       <p class="dolmus-sayfa__aciklama">Ahmetli ile Manisa merkez arası minibüs/dolmuş tahmini kalkış saatleri.</p>
 
+      <div class="dolmus-sonraki" id="dolmus-sonraki" hidden>
+        <div class="dolmus-sonraki__yon" id="sonraki-yon"></div>
+        <div class="dolmus-sonraki__saat" id="sonraki-saat"></div>
+        <div class="dolmus-sonraki__kalan" id="sonraki-kalan"></div>
+      </div>
+
       <h2 style="font-family:var(--font-head);font-size:20px;color:var(--primary);margin:24px 0 12px;">Ahmetli &#10132; Manisa</h2>
       <table class="dolmus-tablo">
         <thead>
@@ -146,6 +152,74 @@
     if (dateEl) dateEl.textContent = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     var yrEl = document.getElementById('footer-year');
     if (yrEl) yrEl.textContent = new Date().getFullYear();
+
+    // Sonraki sefer göstergesi + tablo vurgulama
+    var ahmetliSaatler = ['06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+    var manisaSaatler = ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+
+    function saatDakika(str) {
+      var p = str.split(':');
+      return parseInt(p[0],10) * 60 + parseInt(p[1],10);
+    }
+
+    function guncelleSonraki() {
+      var now = new Date();
+      var simdi = now.getHours() * 60 + now.getMinutes();
+      var sonrakiA = null, sonrakiM = null;
+
+      for (var i = 0; i < ahmetliSaatler.length; i++) {
+        if (saatDakika(ahmetliSaatler[i]) > simdi) { sonrakiA = { saat: ahmetliSaatler[i], idx: i }; break; }
+      }
+      for (var j = 0; j < manisaSaatler.length; j++) {
+        if (saatDakika(manisaSaatler[j]) > simdi) { sonrakiM = { saat: manisaSaatler[j], idx: j }; break; }
+      }
+
+      // En yakın seferi bul
+      var en = null, yon = '';
+      if (sonrakiA && sonrakiM) {
+        if (saatDakika(sonrakiA.saat) <= saatDakika(sonrakiM.saat)) {
+          en = sonrakiA; yon = 'Ahmetli → Manisa';
+        } else {
+          en = sonrakiM; yon = 'Manisa → Ahmetli';
+        }
+      } else if (sonrakiA) { en = sonrakiA; yon = 'Ahmetli → Manisa'; }
+      else if (sonrakiM) { en = sonrakiM; yon = 'Manisa → Ahmetli'; }
+
+      var kutu = document.getElementById('dolmus-sonraki');
+      if (!en) {
+        if (kutu) { kutu.hidden = false; document.getElementById('sonraki-yon').textContent = ''; document.getElementById('sonraki-saat').textContent = 'Bugün sefer kalmadı'; document.getElementById('sonraki-kalan').textContent = 'İlk sefer yarın 06:30'; }
+        return;
+      }
+
+      var kalan = saatDakika(en.saat) - simdi;
+      var kalanStr = kalan >= 60 ? Math.floor(kalan/60) + ' saat ' + (kalan%60) + ' dk' : kalan + ' dk';
+
+      if (kutu) {
+        kutu.hidden = false;
+        document.getElementById('sonraki-yon').textContent = yon;
+        document.getElementById('sonraki-saat').textContent = en.saat;
+        document.getElementById('sonraki-kalan').textContent = kalanStr + ' kaldı';
+      }
+
+      // Tablo satırı vurgulama
+      var tablolar = document.querySelectorAll('.dolmus-tablo');
+      tablolar.forEach(function(tablo) {
+        var rows = tablo.querySelectorAll('tbody tr');
+        rows.forEach(function(row) { row.classList.remove('dolmus-tablo__aktif'); });
+      });
+
+      if (sonrakiA && tablolar[0]) {
+        var rows0 = tablolar[0].querySelectorAll('tbody tr');
+        if (rows0[sonrakiA.idx]) rows0[sonrakiA.idx].classList.add('dolmus-tablo__aktif');
+      }
+      if (sonrakiM && tablolar[1]) {
+        var rows1 = tablolar[1].querySelectorAll('tbody tr');
+        if (rows1[sonrakiM.idx]) rows1[sonrakiM.idx].classList.add('dolmus-tablo__aktif');
+      }
+    }
+
+    guncelleSonraki();
+    setInterval(guncelleSonraki, 30000);
   })();
   </script>
 </body>

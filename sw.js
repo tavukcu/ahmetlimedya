@@ -1,7 +1,10 @@
-var CACHE_NAME = 'ahmetli-medya-v2';
+var CACHE_NAME = 'ahmetli-medya-v3';
 var STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/arsiv.html',
+  '/dolmus.html',
+  '/haber.html',
   '/styles.css',
   '/script.js',
   '/manifest.json',

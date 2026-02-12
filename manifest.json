@@ -24,6 +24,12 @@
       "description": "Ahmetli - Manisa dolmuş saatleri"
     },
     {
+      "name": "Haber Arşivi",
+      "short_name": "Arşiv",
+      "url": "/arsiv.html",
+      "description": "Tüm haberler ve kategoriler"
+    },
+    {
       "name": "İletişim",
       "short_name": "İletişim",
       "url": "/iletisim.html",

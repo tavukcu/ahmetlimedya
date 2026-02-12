@@ -31,7 +31,7 @@
     <div class="top-bar__ticker-wrap" aria-label="Son dakika özeti">
       <span class="top-bar__ticker-label">Son Dakika</span>
       <div class="top-bar__ticker">
-        <div class="top-bar__ticker-inner" id="ticker-inner">
+        <div class="top-bar__ticker-inner" id="ticker-inner" aria-live="polite">
           <span>Haberler yükleniyor…</span>
         </div>
       </div>
@@ -114,7 +114,7 @@
         <button type="button" class="okuma-modu-btn" id="okuma-modu-btn" title="Okuma Modu">Okuma Modu</button>
         <!-- Sol: Makale -->
         <article class="detay" id="detay-article">
-          <div class="detay__yukleniyor" id="detay-loading">
+          <div class="detay__yukleniyor" id="detay-loading" aria-live="polite">
             <p>Haber yükleniyor…</p>
           </div>
           <div class="detay__404" id="detay-404" hidden>
@@ -136,6 +136,7 @@
             </figure>
             <div class="detay__ozet" id="detay-ozet"></div>
             <div class="detay__icerik" id="detay-icerik"></div>
+            <div class="detay__etiketler" id="detay-etiketler" hidden></div>
             <div class="detay__paylas" id="detay-paylas" hidden>
               <h4 class="detay__paylas-baslik">Bu haberi paylaş</h4>
               <div class="detay__paylas-btns">
@@ -389,6 +390,20 @@
           if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); document.head.appendChild(ogTitle); }
           ogTitle.setAttribute('content', haber.baslik);
 
+          var ogDesc = document.querySelector('meta[property="og:description"]');
+          if (!ogDesc) { ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); document.head.appendChild(ogDesc); }
+          ogDesc.setAttribute('content', haber.ozet || '');
+
+          // Dinamik OG image
+          if (haber.gorsel) {
+            var ogImage = document.querySelector('meta[property="og:image"]');
+            if (!ogImage) { ogImage = document.createElement('meta'); ogImage.setAttribute('property', 'og:image'); document.head.appendChild(ogImage); }
+            ogImage.setAttribute('content', haber.gorsel);
+            var twImage = document.querySelector('meta[name="twitter:image"]');
+            if (!twImage) { twImage = document.createElement('meta'); twImage.setAttribute('name', 'twitter:image'); document.head.appendChild(twImage); }
+            twImage.setAttribute('content', haber.gorsel);
+          }
+
           var desc = document.querySelector('meta[name="description"]');
           if (desc) desc.setAttribute('content', haber.ozet || '');
 
@@ -449,6 +464,19 @@
           // İçerik
           var icerikEl = document.getElementById('detay-icerik');
           if (icerikEl) icerikEl.innerHTML = haber.icerik || '';
+
+          // Etiketler
+          var etiketler = haber.etiketler || [];
+          if (haber.kategori && etiketler.indexOf(haber.kategori) === -1) {
+            etiketler.unshift(haber.kategori);
+          }
+          var etiketlerEl = document.getElementById('detay-etiketler');
+          if (etiketlerEl && etiketler.length > 0) {
+            etiketlerEl.hidden = false;
+            etiketlerEl.innerHTML = etiketler.map(function(t) {
+              return '<a href="arsiv.html?kategori=' + encodeURIComponent(t) + '" class="detay__etiket">#' + escapeHtml(t) + '</a>';
+            }).join('');
+          }
 
           // JSON-LD Article schema
           var jsonLd = {
