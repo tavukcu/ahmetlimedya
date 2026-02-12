@@ -15,5 +15,19 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dolmuş Saatleri",
+      "short_name": "Dolmuş",
+      "url": "/dolmus.html",
+      "description": "Ahmetli - Manisa dolmuş saatleri"
+    },
+    {
+      "name": "İletişim",
+      "short_name": "İletişim",
+      "url": "/iletisim.html",
+      "description": "Bize ulaşın"
+    }
   ]
 }
