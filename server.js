@@ -17,7 +17,26 @@ const DATA_DIR = path.join(__dirname, 'data');
 const HABERLER_PATH = path.join(DATA_DIR, 'haberler.json');
 const BULTEN_PATH = path.join(DATA_DIR, 'bulten.json');
 
-const adminTokens = new Set();
+const TOKEN_SECRET = process.env.TOKEN_SECRET || ADMIN_PASSWORD + '_ahmetli_secret';
+const TOKEN_MAX_AGE = 24 * 60 * 60 * 1000; // 24 saat
+
+function createToken() {
+  const ts = Date.now().toString();
+  const sig = crypto.createHmac('sha256', TOKEN_SECRET).update(ts).digest('hex');
+  return ts + '.' + sig;
+}
+
+function verifyToken(token) {
+  if (!token || typeof token !== 'string') return false;
+  const parts = token.split('.');
+  if (parts.length !== 2) return false;
+  const ts = parts[0];
+  const sig = parts[1];
+  const expected = crypto.createHmac('sha256', TOKEN_SECRET).update(ts).digest('hex');
+  if (!crypto.timingSafeEqual(Buffer.from(sig, 'hex'), Buffer.from(expected, 'hex'))) return false;
+  const age = Date.now() - parseInt(ts, 10);
+  return age >= 0 && age < TOKEN_MAX_AGE;
+}
 
 app.use(cors());
 app.use(express.json());
@@ -67,7 +86,7 @@ function okumaSuresiHesapla(metin) {
 function adminAuth(req, res, next) {
   const auth = req.headers.authorization;
   const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
-  if (!token || !adminTokens.has(token)) {
+  if (!token || !verifyToken(token)) {
     return res.status(401).json({ hata: 'Yetkisiz' });
   }
   next();
@@ -175,8 +194,7 @@ app.post('/api/admin-login', (req, res) => {
     console.log('[Admin] Giriş reddedildi. Gelen şifre uzunluğu:', password.length, 'Beklenen uzunluk:', expected.length);
     return res.status(401).json({ hata: 'Şifre hatalı. Varsayılan: admin123' });
   }
-  const token = crypto.randomBytes(24).toString('hex');
-  adminTokens.add(token);
+  const token = createToken();
   res.json({ token });
 });
 
