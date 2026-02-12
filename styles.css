@@ -1894,3 +1894,56 @@ a.haber-aksiyonlar__btn {
     text-align: center;
   }
 }
+
+/* ============================================
+   Reklam Alanları
+   ============================================ */
+.reklam-alani {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.reklam-alani__etiket {
+  display: block;
+  font-size: 10px;
+  color: var(--gray-3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.reklam-alani__icerik {
+  background: #f5f5f5;
+  border: 1px dashed #d0d0d0;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.reklam-alani--yatay .reklam-alani__icerik {
+  min-height: 90px;
+  max-width: 728px;
+  margin: 0 auto;
+}
+
+.reklam-alani--sidebar .reklam-alani__icerik {
+  min-height: 250px;
+}
+
+.reklam-alani__placeholder {
+  font-size: 13px;
+  color: #bbb;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .reklam-alani--yatay .reklam-alani__icerik {
+    min-height: 70px;
+  }
+
+  .reklam-alani--sidebar .reklam-alani__icerik {
+    min-height: 200px;
+  }
+}
