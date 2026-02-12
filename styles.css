@@ -2541,3 +2541,132 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
     width: 100%;
   }
 }
+
+/* ============================================
+   Kurumsal Sayfalar (Hakkımızda, İletişim, Gizlilik)
+   ============================================ */
+.kurumsal-sayfa {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px var(--gutter);
+}
+.kurumsal-sayfa h1 {
+  font-family: var(--font-head);
+  font-size: 32px;
+  color: var(--primary);
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--accent);
+}
+.kurumsal-sayfa__icerik h2 {
+  font-family: var(--font-head);
+  font-size: 20px;
+  color: var(--primary);
+  margin: 28px 0 12px;
+}
+.kurumsal-sayfa__icerik p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray-1);
+  margin: 0 0 14px;
+}
+.kurumsal-sayfa__icerik ul {
+  padding-left: 20px;
+  margin: 0 0 14px;
+  list-style: disc;
+}
+.kurumsal-sayfa__icerik li {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray-1);
+  margin-bottom: 6px;
+}
+.kurumsal-sayfa__icerik a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.kurumsal-sayfa__icerik a:hover {
+  color: var(--accent);
+}
+
+/* İletişim sayfası */
+.iletisim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 36px;
+}
+.iletisim-bilgi__item {
+  margin-bottom: 16px;
+}
+.iletisim-bilgi__item strong {
+  display: block;
+  font-size: 13px;
+  color: var(--gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.iletisim-bilgi__item p {
+  margin: 0;
+}
+.iletisim-form__alan {
+  margin-bottom: 16px;
+}
+.iletisim-form__alan label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-2);
+  margin-bottom: 6px;
+}
+.iletisim-form__alan input,
+.iletisim-form__alan textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--gray-5);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--black);
+  background: var(--bg-card);
+  transition: border-color 0.2s;
+}
+.iletisim-form__alan input:focus,
+.iletisim-form__alan textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.iletisim-form__alan textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+.iletisim-form__btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.iletisim-form__btn:hover {
+  background: var(--primary-dark);
+}
+.iletisim-form__basari {
+  text-align: center;
+  padding: 20px;
+  background: var(--primary-light);
+  border-radius: var(--radius);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 15px;
+}
+@media (max-width: 768px) {
+  .iletisim-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
