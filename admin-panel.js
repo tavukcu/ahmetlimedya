@@ -164,6 +164,7 @@
     if (pageId === 'news') loadNews();
     if (pageId === 'categories') renderCategories();
     if (pageId === 'bulten') loadBulten();
+    if (pageId === 'anket') loadAnketler();
   }
 
   // ===================== DASHBOARD =====================
@@ -1170,6 +1171,228 @@
       .finally(function () { if (loading) loading.hidden = true; });
   }
 
+  // ===================== ANKETLER =====================
+
+  var anketCache = [];
+  var currentAnketEditId = null;
+  var anketDeleteId = null;
+
+  function loadAnketler() {
+    var loadingEl = $('anket-loading');
+    var emptyEl = $('anket-empty');
+    var listEl = $('anket-list');
+    if (loadingEl) loadingEl.hidden = false;
+    if (emptyEl) emptyEl.hidden = true;
+
+    apiJson('/api/admin/anket')
+      .then(function (result) {
+        anketCache = result.data || [];
+        renderAnketList();
+      })
+      .catch(function () {
+        anketCache = [];
+        renderAnketList();
+        showToast('Anketler yüklenemedi', 'error');
+      })
+      .finally(function () {
+        if (loadingEl) loadingEl.hidden = true;
+      });
+  }
+
+  function renderAnketList() {
+    var listEl = $('anket-list');
+    var emptyEl = $('anket-empty');
+    if (!listEl) return;
+
+    if (anketCache.length === 0) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.hidden = false;
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
+
+    listEl.innerHTML = anketCache.map(function (a) {
+      var durumClass = a.aktif ? 'badge-published' : 'badge-draft';
+      var durumText = a.aktif ? 'Aktif' : 'Pasif';
+      var seceneklerHtml = (a.secenekler || []).map(function (s) {
+        var oy = s.oy || 0;
+        var yuzde = a.toplamOy > 0 ? Math.round((oy / a.toplamOy) * 100) : 0;
+        return '<div class="anket-card__secenek">' +
+          '<span class="anket-card__secenek-metin">' + escapeHtml(s.metin) + '</span>' +
+          '<span class="anket-card__secenek-oy">' + oy + ' oy (%' + yuzde + ')</span>' +
+          '</div>';
+      }).join('');
+
+      return '<div class="anket-card">' +
+        '<div class="anket-card__header">' +
+        '<h3 class="anket-card__soru">' + escapeHtml(a.soru) + '</h3>' +
+        '<span class="badge ' + durumClass + '">' + durumText + '</span>' +
+        '</div>' +
+        '<div class="anket-card__secenekler">' + seceneklerHtml + '</div>' +
+        '<div class="anket-card__footer">' +
+        '<span class="anket-card__meta">Toplam: ' + (a.toplamOy || 0) + ' oy' +
+        (a.baslangicTarihi ? ' &middot; ' + a.baslangicTarihi : '') +
+        (a.bitisTarihi ? ' – ' + a.bitisTarihi : '') +
+        '</span>' +
+        '<div class="anket-card__actions">' +
+        (!a.aktif ? '<button type="button" class="btn btn-sm btn-primary" data-anket-aktif="' + a.id + '">Aktif Yap</button>' : '') +
+        '<button type="button" class="btn btn-sm btn-ghost" data-anket-edit="' + a.id + '">Düzenle</button>' +
+        '<button type="button" class="btn btn-sm btn-danger" data-anket-delete="' + a.id + '">Sil</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+
+    // Bind events
+    listEl.querySelectorAll('[data-anket-aktif]').forEach(function (btn) {
+      btn.addEventListener('click', function () { anketAktifYap(btn.dataset.anketAktif); });
+    });
+    listEl.querySelectorAll('[data-anket-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function () { openAnketEditModal(btn.dataset.anketEdit); });
+    });
+    listEl.querySelectorAll('[data-anket-delete]').forEach(function (btn) {
+      btn.addEventListener('click', function () { confirmAnketSil(btn.dataset.anketDelete); });
+    });
+  }
+
+  function anketAktifYap(id) {
+    api('/api/admin/anket/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ aktif: true })
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('Güncellenemedi');
+      showToast('Anket aktif yapıldı.');
+      loadAnketler();
+    })
+    .catch(function () { showToast('İşlem başarısız', 'error'); });
+  }
+
+  function openAnketNewModal() {
+    currentAnketEditId = null;
+    $('anket-modal-title').textContent = 'Yeni Anket';
+    $('anket-id').value = '';
+    $('anket-soru').value = '';
+    $('anket-baslangic').value = new Date().toISOString().slice(0, 10);
+    $('anket-bitis').value = '';
+    $('anket-aktif').checked = false;
+    // Reset seçenekler to 2
+    var wrap = $('anket-secenekler-wrap');
+    wrap.innerHTML =
+      '<div class="anket-secenek-input"><input type="text" placeholder="Seçenek 1" required><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button></div>' +
+      '<div class="anket-secenek-input"><input type="text" placeholder="Seçenek 2" required><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button></div>';
+    bindAnketSecenekRemove();
+    $('anket-modal').showModal();
+  }
+
+  function openAnketEditModal(id) {
+    var anket = anketCache.find(function (a) { return String(a.id) === String(id); });
+    if (!anket) return;
+    currentAnketEditId = id;
+    $('anket-modal-title').textContent = 'Anketi Düzenle';
+    $('anket-id').value = id;
+    $('anket-soru').value = anket.soru || '';
+    $('anket-baslangic').value = anket.baslangicTarihi || '';
+    $('anket-bitis').value = anket.bitisTarihi || '';
+    $('anket-aktif').checked = !!anket.aktif;
+    // Seçenekleri doldur
+    var wrap = $('anket-secenekler-wrap');
+    wrap.innerHTML = (anket.secenekler || []).map(function (s, i) {
+      return '<div class="anket-secenek-input"><input type="text" placeholder="Seçenek ' + (i + 1) + '" required value="' + escapeHtml(s.metin) + '"><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button></div>';
+    }).join('');
+    bindAnketSecenekRemove();
+    $('anket-modal').showModal();
+  }
+
+  function bindAnketSecenekRemove() {
+    var wrap = $('anket-secenekler-wrap');
+    wrap.querySelectorAll('.anket-secenek-remove').forEach(function (btn) {
+      btn.onclick = function () {
+        if (wrap.children.length <= 2) { showToast('En az 2 seçenek gerekli', 'error'); return; }
+        btn.parentElement.remove();
+      };
+    });
+  }
+
+  function anketSecenekEkle() {
+    var wrap = $('anket-secenekler-wrap');
+    if (wrap.children.length >= 5) { showToast('En fazla 5 seçenek eklenebilir', 'error'); return; }
+    var div = document.createElement('div');
+    div.className = 'anket-secenek-input';
+    div.innerHTML = '<input type="text" placeholder="Seçenek ' + (wrap.children.length + 1) + '" required><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button>';
+    wrap.appendChild(div);
+    bindAnketSecenekRemove();
+    div.querySelector('input').focus();
+  }
+
+  function saveAnket(e) {
+    e.preventDefault();
+    var id = currentAnketEditId;
+    var soru = $('anket-soru').value.trim();
+    if (!soru) { showToast('Soru gerekli', 'error'); return; }
+
+    var wrap = $('anket-secenekler-wrap');
+    var inputs = wrap.querySelectorAll('input[type="text"]');
+    var secenekler = [];
+    inputs.forEach(function (inp) {
+      var val = inp.value.trim();
+      if (val) secenekler.push({ metin: val });
+    });
+    if (secenekler.length < 2) { showToast('En az 2 seçenek gerekli', 'error'); return; }
+
+    var data = {
+      soru: soru,
+      secenekler: secenekler,
+      aktif: $('anket-aktif').checked,
+      baslangicTarihi: $('anket-baslangic').value || '',
+      bitisTarihi: $('anket-bitis').value || ''
+    };
+
+    var btn = $('anket-form-submit');
+    btn.disabled = true;
+
+    api(id ? '/api/admin/anket/' + id : '/api/admin/anket', {
+      method: id ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function (r) {
+      if (!r.ok) return r.json().then(function (d) { throw new Error(d.hata || 'Kayıt başarısız'); });
+      return r.json();
+    })
+    .then(function () {
+      showToast(id ? 'Anket güncellendi.' : 'Anket eklendi.');
+      $('anket-modal').close();
+      loadAnketler();
+    })
+    .catch(function (err) { showToast(err.message || 'Kaydedilemedi', 'error'); })
+    .finally(function () { btn.disabled = false; });
+  }
+
+  function confirmAnketSil(id) {
+    anketDeleteId = id;
+    var anket = anketCache.find(function (a) { return String(a.id) === String(id); });
+    $('anket-delete-message').textContent = anket ? '"' + anket.soru + '" silinsin mi?' : 'Bu anket silinsin mi?';
+    $('anket-delete-modal').showModal();
+  }
+
+  function anketSil() {
+    if (!anketDeleteId) return;
+    $('anket-delete-modal').close();
+    api('/api/admin/anket/' + anketDeleteId, { method: 'DELETE' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Silinemedi');
+        return r.json();
+      })
+      .then(function () {
+        showToast('Anket silindi.');
+        anketDeleteId = null;
+        loadAnketler();
+      })
+      .catch(function (err) { showToast(err.message || 'Silinemedi', 'error'); });
+  }
+
   // ===================== KARAKTER SAYAÇLARI =====================
 
   function updateCounters() {
@@ -1461,6 +1684,22 @@
     $('news-excerpt').addEventListener('input', function () {
       updateCounter('news-excerpt', 'excerpt-counter', 300);
     });
+
+    // Anket
+    var anketAddBtn = $('anket-add-btn');
+    if (anketAddBtn) anketAddBtn.addEventListener('click', openAnketNewModal);
+    var anketForm = $('anket-form');
+    if (anketForm) anketForm.addEventListener('submit', saveAnket);
+    var anketModalClose = $('anket-modal-close');
+    if (anketModalClose) anketModalClose.addEventListener('click', function () { $('anket-modal').close(); });
+    var anketFormCancel = $('anket-form-cancel');
+    if (anketFormCancel) anketFormCancel.addEventListener('click', function () { $('anket-modal').close(); });
+    var anketSecenekEkleBtn = $('anket-secenek-ekle');
+    if (anketSecenekEkleBtn) anketSecenekEkleBtn.addEventListener('click', anketSecenekEkle);
+    var anketDeleteCancel = $('anket-delete-cancel');
+    if (anketDeleteCancel) anketDeleteCancel.addEventListener('click', function () { $('anket-delete-modal').close(); });
+    var anketDeleteConfirm = $('anket-delete-confirm');
+    if (anketDeleteConfirm) anketDeleteConfirm.addEventListener('click', anketSil);
 
     // Görsel kaldır
     $('news-image-remove').addEventListener('click', function () {

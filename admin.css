@@ -2524,6 +2524,146 @@ kbd {
   padding: 1rem;
 }
 
+/* ========== Anket Admin ========== */
+.anket-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.anket-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: border-color 0.2s;
+}
+
+.anket-card:hover {
+  border-color: var(--text-muted);
+}
+
+.anket-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.anket-card__soru {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.anket-card__secenekler {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.anket-card__secenek {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.65rem;
+  background: var(--surface-hover);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.anket-card__secenek-metin {
+  color: var(--text);
+}
+
+.anket-card__secenek-oy {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.anket-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.anket-card__meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.anket-card__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.anket-secenekler-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.anket-secenek-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.anket-secenek-input input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.anket-secenek-input input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.anket-secenek-remove {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  padding: 0;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.anket-secenek-remove:hover {
+  color: var(--danger);
+}
+
+/* date inputs in admin */
+.form-row input[type="date"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.form-row input[type="date"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
 /* Drag-drop hover */
 .image-drop-zone.drag-over {
   border-color: var(--primary);

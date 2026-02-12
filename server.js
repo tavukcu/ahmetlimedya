@@ -23,6 +23,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const DATA_DIR = path.join(__dirname, 'data');
 const HABERLER_PATH = path.join(DATA_DIR, 'haberler.json');
 const BULTEN_PATH = path.join(DATA_DIR, 'bulten.json');
+const ANKET_PATH = path.join(DATA_DIR, 'anket.json');
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || ADMIN_PASSWORD + '_ahmetli_secret';
 const TOKEN_MAX_AGE = 24 * 60 * 60 * 1000; // 24 saat
@@ -85,7 +86,10 @@ async function okuBlob(blobAdi, lokalYol) {
 }
 
 async function yazBlob(blobAdi, liste) {
-  if (!blob) return yazLokal(blobAdi === 'haberler.json' ? HABERLER_PATH : BULTEN_PATH, liste);
+  if (!blob) {
+    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH };
+    return yazLokal(lokalMap[blobAdi] || BULTEN_PATH, liste);
+  }
   try {
     await blob.put(blobAdi, JSON.stringify(liste, null, 2), {
       access: 'public',
@@ -113,6 +117,20 @@ async function okuBulten() {
 
 async function yazBulten(liste) {
   return yazBlob('bulten.json', liste);
+}
+
+async function okuAnketler() {
+  return okuBlob('anket.json', ANKET_PATH);
+}
+
+async function yazAnketler(liste) {
+  return yazBlob('anket.json', liste);
+}
+
+function getClientIP(req) {
+  var forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.ip || req.connection.remoteAddress || '';
 }
 
 // ----- Yardımcılar -----
@@ -403,6 +421,134 @@ app.delete('/api/admin/haberler/:id', async (req, res) => {
     if (idx === -1) return res.status(404).json({ hata: 'Haber bulunamadı' });
     haberler.splice(idx, 1);
     await yazHaberler(haberler);
+    res.json({ mesaj: 'Silindi' });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- API: Anket (Public) -----
+app.get('/api/anket', async (req, res) => {
+  try {
+    const anketler = await okuAnketler();
+    const aktif = anketler.find((a) => a.aktif === true);
+    if (!aktif) return res.json({ data: null });
+    const ip = getClientIP(req);
+    const oyVerdi = (aktif.oyVerenIpler || []).includes(ip);
+    const { oyVerenIpler, ...publicData } = aktif;
+    res.json({ data: { ...publicData, oyVerdi } });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/anket/oy', async (req, res) => {
+  try {
+    const anketler = await okuAnketler();
+    const aktifIdx = anketler.findIndex((a) => a.aktif === true);
+    if (aktifIdx === -1) return res.status(404).json({ hata: 'Aktif anket bulunamadı' });
+    const anket = anketler[aktifIdx];
+    const ip = getClientIP(req);
+    if ((anket.oyVerenIpler || []).includes(ip)) {
+      return res.status(400).json({ hata: 'Bu ankete zaten oy verdiniz.' });
+    }
+    const secenekIdx = parseInt((req.body || {}).secenekIdx, 10);
+    if (isNaN(secenekIdx) || secenekIdx < 0 || secenekIdx >= (anket.secenekler || []).length) {
+      return res.status(400).json({ hata: 'Geçersiz seçenek' });
+    }
+    anket.secenekler[secenekIdx].oy = (anket.secenekler[secenekIdx].oy || 0) + 1;
+    anket.toplamOy = (anket.toplamOy || 0) + 1;
+    if (!anket.oyVerenIpler) anket.oyVerenIpler = [];
+    anket.oyVerenIpler.push(ip);
+    anketler[aktifIdx] = anket;
+    await yazAnketler(anketler);
+    const { oyVerenIpler, ...publicData } = anket;
+    res.json({ data: { ...publicData, oyVerdi: true } });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+// ----- Admin: Anket CRUD -----
+app.get('/api/admin/anket', async (req, res) => {
+  try {
+    res.json({ data: await okuAnketler() });
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.post('/api/admin/anket', async (req, res) => {
+  try {
+    const anketler = await okuAnketler();
+    const body = req.body || {};
+    const maxId = anketler.length ? Math.max(...anketler.map((a) => a.id)) : 0;
+    const soru = (body.soru || '').trim();
+    if (!soru) return res.status(400).json({ hata: 'Soru gerekli' });
+    const secenekler = (body.secenekler || []).filter((s) => s && s.metin && s.metin.trim());
+    if (secenekler.length < 2) return res.status(400).json({ hata: 'En az 2 seçenek gerekli' });
+    const aktif = !!body.aktif;
+    if (aktif) {
+      anketler.forEach((a) => { a.aktif = false; });
+    }
+    const yeni = {
+      id: maxId + 1,
+      soru,
+      secenekler: secenekler.map((s) => ({ metin: s.metin.trim(), oy: 0 })),
+      aktif,
+      baslangicTarihi: body.baslangicTarihi || new Date().toISOString().slice(0, 10),
+      bitisTarihi: body.bitisTarihi || '',
+      olusturmaTarihi: new Date().toISOString(),
+      toplamOy: 0,
+      oyVerenIpler: [],
+    };
+    anketler.push(yeni);
+    await yazAnketler(anketler);
+    res.status(201).json(yeni);
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.put('/api/admin/anket/:id', async (req, res) => {
+  try {
+    const anketler = await okuAnketler();
+    const id = parseInt(req.params.id, 10);
+    const idx = anketler.findIndex((a) => a.id === id);
+    if (idx === -1) return res.status(404).json({ hata: 'Anket bulunamadı' });
+    const body = req.body || {};
+    const mevcut = anketler[idx];
+    if (body.aktif === true) {
+      anketler.forEach((a) => { a.aktif = false; });
+    }
+    anketler[idx] = {
+      ...mevcut,
+      soru: body.soru !== undefined ? body.soru.trim() : mevcut.soru,
+      secenekler: body.secenekler !== undefined
+        ? body.secenekler.map((s, i) => ({
+            metin: (s.metin || '').trim(),
+            oy: mevcut.secenekler[i] ? mevcut.secenekler[i].oy : 0,
+          }))
+        : mevcut.secenekler,
+      aktif: body.aktif !== undefined ? !!body.aktif : mevcut.aktif,
+      baslangicTarihi: body.baslangicTarihi !== undefined ? body.baslangicTarihi : mevcut.baslangicTarihi,
+      bitisTarihi: body.bitisTarihi !== undefined ? body.bitisTarihi : mevcut.bitisTarihi,
+    };
+    await yazAnketler(anketler);
+    res.json(anketler[idx]);
+  } catch (err) {
+    res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/anket/:id', async (req, res) => {
+  try {
+    const anketler = await okuAnketler();
+    const id = parseInt(req.params.id, 10);
+    const idx = anketler.findIndex((a) => a.id === id);
+    if (idx === -1) return res.status(404).json({ hata: 'Anket bulunamadı' });
+    anketler.splice(idx, 1);
+    await yazAnketler(anketler);
     res.json({ mesaj: 'Silindi' });
   } catch (err) {
     res.status(500).json({ hata: 'Sunucu hatası: ' + err.message });

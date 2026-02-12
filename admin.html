@@ -54,6 +54,10 @@
               <span class="nav-icon"><i data-lucide="mail"></i></span>
               <span>Bülten</span>
             </a>
+            <a href="#" class="nav-item" data-page="anket">
+              <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>
+              <span>Anketler</span>
+            </a>
           </nav>
         </aside>
 
@@ -335,6 +339,20 @@
             </div>
             <div id="bulten-empty" class="empty-state" hidden>Henüz abone yok.</div>
           </div>
+
+          <!-- Anketler -->
+          <div id="page-anket" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Anketler</h2>
+              <button type="button" class="btn btn-primary" id="anket-add-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                Yeni Anket
+              </button>
+            </div>
+            <div id="anket-loading" class="loading" hidden>Yükleniyor...</div>
+            <div id="anket-list" class="anket-admin-list"></div>
+            <div id="anket-empty" class="empty-state" hidden>Henüz anket eklenmemiş.</div>
+          </div>
         </main>
       </div>
     </section>
@@ -459,6 +477,57 @@
       <div class="modal-body">
         <div id="breaking-pick-list" class="breaking-pick-list"></div>
         <div id="breaking-pick-empty" class="muted" hidden>Uygun haber bulunamadı.</div>
+      </div>
+    </dialog>
+
+    <!-- ========== ANKET MODAL ========== -->
+    <dialog id="anket-modal" class="modal">
+      <form id="anket-form" class="modal-form">
+        <div class="modal-header">
+          <h2 id="anket-modal-title">Yeni Anket</h2>
+          <button type="button" class="modal-close" id="anket-modal-close" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="anket-id">
+          <div class="form-row">
+            <label for="anket-soru">Soru *</label>
+            <input type="text" id="anket-soru" required placeholder="Anket sorusu">
+          </div>
+          <div class="form-row">
+            <label>Seçenekler (2-5 adet) *</label>
+            <div id="anket-secenekler-wrap" class="anket-secenekler-wrap">
+              <div class="anket-secenek-input"><input type="text" placeholder="Seçenek 1" required><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button></div>
+              <div class="anket-secenek-input"><input type="text" placeholder="Seçenek 2" required><button type="button" class="anket-secenek-remove btn btn-sm btn-ghost" title="Kaldır">&times;</button></div>
+            </div>
+            <button type="button" class="btn btn-sm btn-ghost" id="anket-secenek-ekle" style="margin-top:0.5rem">+ Seçenek ekle</button>
+          </div>
+          <div class="form-row form-row-inline">
+            <div style="flex:1">
+              <label for="anket-baslangic">Başlangıç tarihi</label>
+              <input type="date" id="anket-baslangic">
+            </div>
+            <div style="flex:1">
+              <label for="anket-bitis">Bitiş tarihi</label>
+              <input type="date" id="anket-bitis">
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-label"><input type="checkbox" id="anket-aktif"><span>Aktif (yayında)</span></label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="anket-form-cancel">İptal</button>
+          <button type="submit" class="btn btn-primary" id="anket-form-submit">Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ========== ANKET SİLME MODAL ========== -->
+    <dialog id="anket-delete-modal" class="modal modal-sm">
+      <div class="modal-body"><p id="anket-delete-message">Bu anketi silmek istediğinize emin misiniz?</p></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="anket-delete-cancel">Vazgeç</button>
+        <button type="button" class="btn btn-danger" id="anket-delete-confirm">Sil</button>
       </div>
     </dialog>
 

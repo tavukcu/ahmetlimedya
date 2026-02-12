@@ -675,6 +675,116 @@ function initDovizAltin() {
   setInterval(guncelle, 5 * 60 * 1000);
 }
 
+// ----- Anket -----
+function initAnket() {
+  var container = document.getElementById('anket-icerik');
+  if (!container) return;
+
+  fetch('/api/anket')
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      var anket = result.data;
+      if (!anket) {
+        container.innerHTML = '<p class="anket__bos">Anket yakında</p>';
+        return;
+      }
+
+      if (anket.oyVerdi) {
+        renderAnketSonuc(container, anket);
+      } else {
+        renderAnketForm(container, anket);
+      }
+    })
+    .catch(function() {
+      container.innerHTML = '<p class="anket__bos">Anket yakında</p>';
+    });
+}
+
+function renderAnketForm(container, anket) {
+  var html = '<p class="anket__soru">' + escapeHtmlFront(anket.soru) + '</p>';
+  html += '<div class="anket__form">';
+  anket.secenekler.forEach(function(s, i) {
+    html += '<label class="anket__secenek">' +
+      '<input type="radio" name="anket-oy" value="' + i + '">' +
+      '<span class="anket__secenek-metin">' + escapeHtmlFront(s.metin) + '</span>' +
+      '</label>';
+  });
+  html += '<button type="button" class="anket__btn" id="anket-gonder-btn" disabled>Oy Ver</button>';
+  html += '</div>';
+  container.innerHTML = html;
+
+  var radios = container.querySelectorAll('input[name="anket-oy"]');
+  var btn = document.getElementById('anket-gonder-btn');
+
+  radios.forEach(function(r) {
+    r.addEventListener('change', function() {
+      btn.disabled = false;
+    });
+  });
+
+  btn.addEventListener('click', function() {
+    var selected = container.querySelector('input[name="anket-oy"]:checked');
+    if (!selected) return;
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor...';
+
+    fetch('/api/anket/oy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secenekIdx: parseInt(selected.value, 10) })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (!res.ok) {
+        var mesaj = res.data.hata || 'Oy gönderilemedi';
+        btn.textContent = 'Oy Ver';
+        btn.disabled = false;
+        var existing = container.querySelector('.anket__mesaj');
+        if (existing) existing.remove();
+        var msgEl = document.createElement('p');
+        msgEl.className = 'anket__mesaj anket__mesaj--hata';
+        msgEl.textContent = mesaj;
+        container.querySelector('.anket__form').appendChild(msgEl);
+        return;
+      }
+      renderAnketSonuc(container, res.data.data || res.data);
+    })
+    .catch(function() {
+      btn.textContent = 'Oy Ver';
+      btn.disabled = false;
+    });
+  });
+}
+
+function renderAnketSonuc(container, anket) {
+  var toplam = anket.toplamOy || 0;
+  var html = '<p class="anket__soru">' + escapeHtmlFront(anket.soru) + '</p>';
+  html += '<div class="anket__sonuclar">';
+  anket.secenekler.forEach(function(s) {
+    var oy = s.oy || 0;
+    var yuzde = toplam > 0 ? Math.round((oy / toplam) * 100) : 0;
+    html += '<div class="anket__sonuc-item">' +
+      '<div class="anket__sonuc-baslik">' +
+      '<span>' + escapeHtmlFront(s.metin) + '</span>' +
+      '<span class="anket__sonuc-yuzde">%' + yuzde + '</span>' +
+      '</div>' +
+      '<div class="anket__sonuc-bar">' +
+      '<div class="anket__sonuc-dolgu" data-yuzde="' + yuzde + '"></div>' +
+      '</div>' +
+      '</div>';
+  });
+  html += '</div>';
+  html += '<p class="anket__toplam">Toplam ' + toplam + ' oy</p>';
+  container.innerHTML = html;
+
+  // Animasyonlu bar geçişi
+  requestAnimationFrame(function() {
+    container.querySelectorAll('.anket__sonuc-dolgu').forEach(function(bar) {
+      bar.style.width = bar.dataset.yuzde + '%';
+    });
+  });
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   setCurrentDate();
@@ -691,4 +801,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initSonDakika();
   initDovizAltin();
   initDynamicNews();
+  initAnket();
 });
