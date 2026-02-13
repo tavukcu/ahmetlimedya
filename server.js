@@ -13,10 +13,18 @@ const multer = require('multer');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
-// Vercel Blob: sadece BLOB_READ_WRITE_TOKEN varsa kullan
+// Vercel Blob: sadece video/görsel upload için
 let blob = null;
 if (process.env.BLOB_READ_WRITE_TOKEN) {
   blob = require('@vercel/blob');
+}
+
+// Neon Postgres: DATABASE_URL varsa kullan, yoksa lokal JSON fallback
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+let sql = null;
+if (DATABASE_URL) {
+  const { neon } = require('@neondatabase/serverless');
+  sql = neon(DATABASE_URL);
 }
 
 const app = express();
@@ -58,7 +66,70 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// ----- Veri okuma/yazma (Blob veya lokal dosya) -----
+// ----- DB başlatma (Postgres varsa tablo oluştur) -----
+
+let dbReady = false;
+async function initDB() {
+  if (!sql || dbReady) return;
+  try {
+    await sql`CREATE TABLE IF NOT EXISTS haberler (
+      id SERIAL PRIMARY KEY, slug TEXT, kategori TEXT, baslik TEXT, ozet TEXT,
+      icerik TEXT, gorsel TEXT, video JSONB, yazar TEXT, yayin_tarihi TEXT,
+      okuma_suresi INT DEFAULT 1, goruntulenme INT DEFAULT 0,
+      son_dakika BOOLEAN DEFAULT false, son_dakika_sure INT DEFAULT 6,
+      son_dakika_baslangic TEXT, one_cikan BOOLEAN DEFAULT false
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS bulten (
+      id SERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, tarih TEXT
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS anket (
+      id SERIAL PRIMARY KEY, soru TEXT, secenekler JSONB,
+      aktif BOOLEAN DEFAULT false, baslangic_tarihi TEXT, bitis_tarihi TEXT,
+      olusturma_tarihi TEXT, toplam_oy INT DEFAULT 0, oy_veren_ipler TEXT[] DEFAULT '{}'
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS reklamlar (
+      id SERIAL PRIMARY KEY, slot TEXT, baslik TEXT, gorsel TEXT, link TEXT, aktif BOOLEAN DEFAULT true
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS eczane (
+      id BIGINT PRIMARY KEY, ad TEXT, adres TEXT, telefon TEXT, tarih TEXT
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS vefat (
+      id BIGINT PRIMARY KEY, ad TEXT, gorsel TEXT, detay TEXT, tarih TEXT, olusturma TEXT
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS uzum_fiyat (
+      id INT PRIMARY KEY DEFAULT 1, fiyatlar JSONB, guncelleme TEXT
+    )`;
+    dbReady = true;
+  } catch (e) {
+    console.error('[initDB hatası]', e.message);
+  }
+}
+
+// ----- Satır dönüştürücüler (DB row -> JS object) -----
+
+function haberRowToObj(r) {
+  return {
+    id: r.id, slug: r.slug, kategori: r.kategori, baslik: r.baslik,
+    ozet: r.ozet, icerik: r.icerik, gorsel: r.gorsel,
+    video: r.video || undefined,
+    yazar: r.yazar, yayinTarihi: r.yayin_tarihi,
+    okumaSuresi: r.okuma_suresi, goruntulenme: r.goruntulenme,
+    sonDakika: r.son_dakika, sonDakikaSure: r.son_dakika_sure,
+    sonDakikaBaslangic: r.son_dakika_baslangic,
+    oneCikan: r.one_cikan,
+  };
+}
+
+function anketRowToObj(r) {
+  return {
+    id: r.id, soru: r.soru, secenekler: r.secenekler,
+    aktif: r.aktif, baslangicTarihi: r.baslangic_tarihi,
+    bitisTarihi: r.bitis_tarihi, olusturmaTarihi: r.olusturma_tarihi,
+    toplamOy: r.toplam_oy, oyVerenIpler: r.oy_veren_ipler || [],
+  };
+}
+
+// ----- Veri okuma/yazma (Postgres veya lokal JSON fallback) -----
 
 function okuLokal(dosyaYolu) {
   try {
@@ -72,98 +143,125 @@ function yazLokal(dosyaYolu, liste) {
   fs.writeFileSync(dosyaYolu, JSON.stringify(liste, null, 2), 'utf8');
 }
 
-async function okuBlob(blobAdi, lokalYol) {
-  if (!blob) return okuLokal(lokalYol);
-  try {
-    const { blobs } = await blob.list({ prefix: blobAdi, limit: 1 });
-    if (blobs.length > 0) {
-      const res = await fetch(blobs[0].url);
-      if (res.ok) return await res.json();
-    }
-    // Blob yoksa lokal dosyadan seed'le
-    const lokal = okuLokal(lokalYol);
-    if (lokal.length > 0) {
-      await yazBlob(blobAdi, lokal);
-    }
-    return lokal;
-  } catch (e) {
-    console.error('[Blob okuma hatası]', blobAdi, e.message);
-    return okuLokal(lokalYol);
-  }
-}
-
-async function yazBlob(blobAdi, liste) {
-  if (!blob) {
-    var lokalMap = { 'haberler.json': HABERLER_PATH, 'bulten.json': BULTEN_PATH, 'anket.json': ANKET_PATH, 'reklamlar.json': REKLAMLAR_PATH, 'eczane.json': ECZANE_PATH, 'vefat.json': VEFAT_PATH, 'uzum-fiyat.json': UZUM_FIYAT_PATH };
-    return yazLokal(lokalMap[blobAdi] || BULTEN_PATH, liste);
-  }
-  try {
-    await blob.put(blobAdi, JSON.stringify(liste, null, 2), {
-      access: 'public',
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType: 'application/json',
-    });
-  } catch (e) {
-    console.error('[Blob yazma hatası]', blobAdi, e.message);
-    throw e;
-  }
-}
-
 async function okuHaberler() {
-  return okuBlob('haberler.json', HABERLER_PATH);
+  if (!sql) return okuLokal(HABERLER_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM haberler ORDER BY id DESC`;
+  return rows.map(haberRowToObj);
 }
 
 async function yazHaberler(liste) {
-  return yazBlob('haberler.json', liste);
+  if (!sql) return yazLokal(HABERLER_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE haberler RESTART IDENTITY`;
+  for (const h of liste) {
+    await sql`INSERT INTO haberler (id, slug, kategori, baslik, ozet, icerik, gorsel, video, yazar, yayin_tarihi, okuma_suresi, goruntulenme, son_dakika, son_dakika_sure, son_dakika_baslangic, one_cikan)
+      VALUES (${h.id}, ${h.slug}, ${h.kategori}, ${h.baslik}, ${h.ozet || ''}, ${h.icerik || ''}, ${h.gorsel || ''}, ${h.video ? JSON.stringify(h.video) : null}, ${h.yazar || ''}, ${h.yayinTarihi || ''}, ${h.okumaSuresi || 1}, ${h.goruntulenme || 0}, ${h.sonDakika || false}, ${h.sonDakikaSure || 6}, ${h.sonDakikaBaslangic || null}, ${h.oneCikan || false})`;
+  }
+  await sql`SELECT setval('haberler_id_seq', (SELECT COALESCE(MAX(id),0) FROM haberler))`;
 }
 
 async function okuBulten() {
-  return okuBlob('bulten.json', BULTEN_PATH);
+  if (!sql) return okuLokal(BULTEN_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM bulten ORDER BY id`;
+  return rows.map(r => ({ email: r.email, tarih: r.tarih }));
 }
 
 async function yazBulten(liste) {
-  return yazBlob('bulten.json', liste);
+  if (!sql) return yazLokal(BULTEN_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE bulten RESTART IDENTITY`;
+  for (const b of liste) {
+    await sql`INSERT INTO bulten (email, tarih) VALUES (${b.email}, ${b.tarih || ''}) ON CONFLICT (email) DO NOTHING`;
+  }
 }
 
 async function okuAnketler() {
-  return okuBlob('anket.json', ANKET_PATH);
+  if (!sql) return okuLokal(ANKET_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM anket ORDER BY id`;
+  return rows.map(anketRowToObj);
 }
 
 async function yazAnketler(liste) {
-  return yazBlob('anket.json', liste);
+  if (!sql) return yazLokal(ANKET_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE anket RESTART IDENTITY`;
+  for (const a of liste) {
+    await sql`INSERT INTO anket (id, soru, secenekler, aktif, baslangic_tarihi, bitis_tarihi, olusturma_tarihi, toplam_oy, oy_veren_ipler)
+      VALUES (${a.id}, ${a.soru}, ${JSON.stringify(a.secenekler)}, ${a.aktif || false}, ${a.baslangicTarihi || ''}, ${a.bitisTarihi || ''}, ${a.olusturmaTarihi || ''}, ${a.toplamOy || 0}, ${a.oyVerenIpler || []})`;
+  }
+  await sql`SELECT setval('anket_id_seq', (SELECT COALESCE(MAX(id),0) FROM anket))`;
 }
 
 async function okuReklamlar() {
-  return okuBlob('reklamlar.json', REKLAMLAR_PATH);
+  if (!sql) return okuLokal(REKLAMLAR_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM reklamlar ORDER BY id`;
+  return rows.map(r => ({ id: r.id, slot: r.slot, baslik: r.baslik, gorsel: r.gorsel, link: r.link, aktif: r.aktif }));
 }
 
 async function yazReklamlar(liste) {
-  return yazBlob('reklamlar.json', liste);
+  if (!sql) return yazLokal(REKLAMLAR_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE reklamlar RESTART IDENTITY`;
+  for (const r of liste) {
+    await sql`INSERT INTO reklamlar (id, slot, baslik, gorsel, link, aktif)
+      VALUES (${r.id}, ${r.slot || ''}, ${r.baslik || ''}, ${r.gorsel || ''}, ${r.link || ''}, ${r.aktif !== false})`;
+  }
+  await sql`SELECT setval('reklamlar_id_seq', (SELECT COALESCE(MAX(id),0) FROM reklamlar))`;
 }
 
 async function okuEczane() {
-  return okuBlob('eczane.json', ECZANE_PATH);
+  if (!sql) return okuLokal(ECZANE_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM eczane ORDER BY id`;
+  return rows.map(r => ({ id: r.id, ad: r.ad, adres: r.adres, telefon: r.telefon, tarih: r.tarih }));
 }
 
 async function yazEczane(liste) {
-  return yazBlob('eczane.json', liste);
+  if (!sql) return yazLokal(ECZANE_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE eczane`;
+  for (const e of liste) {
+    await sql`INSERT INTO eczane (id, ad, adres, telefon, tarih)
+      VALUES (${e.id}, ${e.ad || ''}, ${e.adres || ''}, ${e.telefon || ''}, ${e.tarih || ''})`;
+  }
 }
 
 async function okuVefat() {
-  return okuBlob('vefat.json', VEFAT_PATH);
+  if (!sql) return okuLokal(VEFAT_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM vefat ORDER BY id DESC`;
+  return rows.map(r => ({ id: r.id, ad: r.ad, gorsel: r.gorsel, detay: r.detay, tarih: r.tarih, olusturma: r.olusturma }));
 }
 
 async function yazVefat(liste) {
-  return yazBlob('vefat.json', liste);
+  if (!sql) return yazLokal(VEFAT_PATH, liste);
+  await initDB();
+  await sql`TRUNCATE vefat`;
+  for (const v of liste) {
+    await sql`INSERT INTO vefat (id, ad, gorsel, detay, tarih, olusturma)
+      VALUES (${v.id}, ${v.ad || ''}, ${v.gorsel || ''}, ${v.detay || ''}, ${v.tarih || ''}, ${v.olusturma || ''})`;
+  }
 }
 
 async function okuUzumFiyat() {
-  return okuBlob('uzum-fiyat.json', UZUM_FIYAT_PATH);
+  if (!sql) return okuLokal(UZUM_FIYAT_PATH);
+  await initDB();
+  const rows = await sql`SELECT * FROM uzum_fiyat WHERE id = 1`;
+  if (rows.length === 0) return { fiyatlar: [], guncelleme: '' };
+  return { fiyatlar: rows[0].fiyatlar || [], guncelleme: rows[0].guncelleme || '' };
 }
 
 async function yazUzumFiyat(veri) {
-  return yazBlob('uzum-fiyat.json', veri);
+  if (!sql) return yazLokal(UZUM_FIYAT_PATH, veri);
+  await initDB();
+  const fiyatlar = Array.isArray(veri) ? veri : (veri.fiyatlar || []);
+  const guncelleme = Array.isArray(veri) ? '' : (veri.guncelleme || '');
+  await sql`INSERT INTO uzum_fiyat (id, fiyatlar, guncelleme) VALUES (1, ${JSON.stringify(fiyatlar)}, ${guncelleme})
+    ON CONFLICT (id) DO UPDATE SET fiyatlar = EXCLUDED.fiyatlar, guncelleme = EXCLUDED.guncelleme`;
 }
 
 function getClientIP(req) {
