@@ -3222,7 +3222,11 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
     padding: 0 8px;
   }
   .top-bar__ticker-inner {
-    animation-duration: 20s;
+    animation-duration: 25s;
+    padding-left: 60%;
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
   /* Overlay menüye eklenen header */
   .nav-overlay__header {
