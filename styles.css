@@ -2225,13 +2225,74 @@ a.haber-aksiyonlar__btn {
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .skeleton-line { animation: none; }
+  .eczane-tabela { animation: none; }
 }
 
 /* ============================================
    Nöbetçi Eczane
    ============================================ */
 .sidebar__box--eczane {
-  border-top-color: #e74c3c;
+  border-top-color: #00b341;
+}
+.eczane-tabela {
+  display: inline-block;
+  font-size: 22px;
+  color: #00e650;
+  margin-right: 4px;
+  vertical-align: middle;
+  text-shadow:
+    0 0 6px #00e650,
+    0 0 12px #00e650,
+    0 0 24px #00b341,
+    0 0 36px #00b341;
+  animation: eczaneNeon 1.4s ease-in-out infinite;
+}
+@keyframes eczaneNeon {
+  0%, 100% {
+    color: #00e650;
+    text-shadow:
+      0 0 6px #00e650,
+      0 0 12px #00e650,
+      0 0 24px #00b341,
+      0 0 36px #00b341;
+    opacity: 1;
+  }
+  18% {
+    opacity: 0.2;
+    text-shadow: none;
+    color: #006622;
+  }
+  22% {
+    opacity: 1;
+    color: #00e650;
+    text-shadow:
+      0 0 6px #00e650,
+      0 0 12px #00e650,
+      0 0 24px #00b341;
+  }
+  36% {
+    opacity: 0.15;
+    text-shadow: none;
+    color: #006622;
+  }
+  42% {
+    opacity: 1;
+    color: #00e650;
+    text-shadow:
+      0 0 6px #00e650,
+      0 0 14px #00e650,
+      0 0 28px #00b341,
+      0 0 42px #00b341;
+  }
+  70% {
+    opacity: 1;
+    color: #00e650;
+    text-shadow:
+      0 0 6px #00e650,
+      0 0 12px #00e650,
+      0 0 24px #00b341,
+      0 0 36px #00b341;
+  }
 }
 .eczane__item {
   padding: 10px 0;
@@ -2264,18 +2325,7 @@ a.haber-aksiyonlar__btn {
   padding: 12px 0;
 }
 .sidebar__title--eczane::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #e74c3c;
-  border-radius: 50%;
-  margin-right: 8px;
-  animation: eczanePulse 2s ease-in-out infinite;
-}
-@keyframes eczanePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  display: none;
 }
 
 /* ============================================
