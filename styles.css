@@ -3221,6 +3221,9 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
     font-size: 10px;
     padding: 0 8px;
   }
+  .top-bar__ticker-inner {
+    animation-duration: 25s;
+  }
   /* Overlay menüye eklenen header */
   .nav-overlay__header {
     display: flex;
