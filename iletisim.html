@@ -49,6 +49,27 @@
         <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
         <li><a href="dolmus.html" class="nav-link">Dolmus Saatleri</a></li>
       </ul>
+      <button type="button" class="nav-toggle" aria-label="Menü" aria-expanded="false" aria-controls="main-menu">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+    </div>
+    <div id="main-menu" class="nav-overlay" aria-hidden="true">
+      <div class="nav-overlay__header">
+        <form class="nav-overlay__search" role="search" id="overlay-search-form">
+          <input type="search" class="nav-overlay__search-input" placeholder="Haber ara..." aria-label="Haber ara" id="overlay-search-input">
+          <button type="submit" class="nav-overlay__search-btn">Ara</button>
+        </form>
+        <div class="nav-overlay__meta">
+          <span class="nav-overlay__date" id="overlay-date"></span>
+          <button type="button" class="nav-overlay__theme-toggle" id="overlay-theme-toggle" aria-label="Tema değiştir">&#9790;</button>
+        </div>
+      </div>
+      <ul class="nav-list nav-list--overlay">
+        <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
+        <li><a href="dolmus.html" class="nav-link">Dolmus Saatleri</a></li>
+      </ul>
     </div>
   </nav>
 
@@ -146,6 +167,72 @@
         basari.hidden = false;
       });
     }
+  })();
+  </script>
+
+  <!-- Bottom Nav (mobilde görünür) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Mobil navigasyon">
+    <a href="index.html" class="bottom-nav__item" data-page="index">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 14 15 14 15 21"/></svg></span>
+      <span class="bottom-nav__label">Anasayfa</span>
+    </a>
+    <button type="button" class="bottom-nav__item" id="bottom-nav-search">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></span>
+      <span class="bottom-nav__label">Ara</span>
+    </button>
+    <a href="arsiv.html" class="bottom-nav__item" data-page="arsiv">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      <span class="bottom-nav__label">Kategoriler</span>
+    </a>
+    <button type="button" class="bottom-nav__item" id="bottom-nav-menu">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+      <span class="bottom-nav__label">Menu</span>
+    </button>
+  </nav>
+  <script>
+  (function() {
+    var nav = document.getElementById('bottom-nav');
+    if (!nav) return;
+    var p = window.location.pathname, pg = 'index';
+    if (p.indexOf('iletisim') !== -1) pg = 'iletisim';
+    else if (p.indexOf('arsiv') !== -1) pg = 'arsiv';
+    else if (p.indexOf('haber') !== -1) pg = 'haber';
+    else if (p.indexOf('dolmus') !== -1) pg = 'dolmus';
+    else if (p.indexOf('hakkimizda') !== -1) pg = 'hakkimizda';
+    else if (p.indexOf('gizlilik') !== -1) pg = 'gizlilik';
+    nav.querySelectorAll('.bottom-nav__item[data-page]').forEach(function(i) {
+      if (i.dataset.page === pg) i.classList.add('is-active');
+    });
+    var menuBtn = document.getElementById('bottom-nav-menu');
+    if (menuBtn) menuBtn.addEventListener('click', function() {
+      var t = document.querySelector('.nav-toggle'); if (t) t.click();
+    });
+    var searchBtn = document.getElementById('bottom-nav-search');
+    if (searchBtn) searchBtn.addEventListener('click', function() {
+      var oi = document.getElementById('overlay-search-input');
+      if (oi) {
+        var t = document.querySelector('.nav-toggle'), o = document.getElementById('main-menu');
+        if (o && o.getAttribute('aria-hidden') !== 'false') { if (t) t.click(); }
+        setTimeout(function() { oi.focus(); }, 200);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        var mi = document.querySelector('.search-input');
+        if (mi) setTimeout(function() { mi.focus(); }, 400);
+      }
+    });
+    var od = document.getElementById('overlay-date');
+    if (od) od.textContent = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    var ot = document.getElementById('overlay-theme-toggle');
+    if (ot) {
+      function ui() { ot.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? '&#9788;' : '&#9790;'; }
+      ui();
+      ot.addEventListener('click', function() { var m = document.getElementById('theme-toggle'); if (m) m.click(); ui(); });
+    }
+    var sf = document.getElementById('overlay-search-form'), si = document.getElementById('overlay-search-input');
+    if (sf && si) sf.addEventListener('submit', function(e) {
+      e.preventDefault(); var q = si.value.trim();
+      if (q) window.location.href = 'arsiv.html?q=' + encodeURIComponent(q);
+    });
   })();
   </script>
 </body>

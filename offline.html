@@ -68,5 +68,34 @@
     <p class="offline__text">İnternet bağlantınız kesilmiş görünüyor. Bağlantınızı kontrol edip tekrar deneyin.</p>
     <button class="offline__btn" onclick="window.location.reload()">Tekrar Dene</button>
   </div>
+  <!-- Bottom Nav (mobilde görünür) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Mobil navigasyon">
+    <a href="index.html" class="bottom-nav__item" data-page="index">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 14 15 14 15 21"/></svg></span>
+      <span class="bottom-nav__label">Anasayfa</span>
+    </a>
+    <button type="button" class="bottom-nav__item" id="bottom-nav-search">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></span>
+      <span class="bottom-nav__label">Ara</span>
+    </button>
+    <a href="arsiv.html" class="bottom-nav__item" data-page="arsiv">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      <span class="bottom-nav__label">Kategoriler</span>
+    </a>
+    <button type="button" class="bottom-nav__item" id="bottom-nav-menu">
+      <span class="bottom-nav__icon"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+      <span class="bottom-nav__label">Menu</span>
+    </button>
+  </nav>
+  <script>
+  (function() {
+    var nav = document.getElementById('bottom-nav');
+    if (!nav) return;
+    var searchBtn = document.getElementById('bottom-nav-search');
+    if (searchBtn) searchBtn.addEventListener('click', function() {
+      window.location.href = 'arsiv.html';
+    });
+  })();
+  </script>
 </body>
 </html>

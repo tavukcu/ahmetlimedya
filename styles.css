@@ -29,6 +29,11 @@
   --radius-lg: 12px;
   --shadow: 0 2px 8px rgba(13, 77, 61, 0.06);
   --shadow-hover: 0 8px 24px rgba(13, 77, 61, 0.1);
+  /* Mobil altyapı */
+  --bottom-nav-h: 60px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --m-gutter: 16px;
+  --touch-min: 44px;
 }
 
 /* Dark mode */
@@ -3103,4 +3108,546 @@ html { scrollbar-width: thin; scrollbar-color: var(--primary) var(--bg); }
     max-width: 100%;
     page-break-inside: avoid;
   }
+}
+
+/* ============================================
+   BOTTOM NAV - Desktop'ta gizli
+   ============================================ */
+.bottom-nav {
+  display: none;
+}
+
+/* ============================================
+   MOBIL RESPONSIVE - Dünya Standartları
+   Tüm değişiklikler @media içinde.
+   Desktop DOKUNULMAZ.
+   ============================================ */
+
+/* ---------- FAZ 1: Altyapı ---------- */
+@media (max-width: 768px) {
+  html {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  body {
+    padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom));
+  }
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ---------- FAZ 2: Bottom Nav ---------- */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--bottom-nav-h) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: var(--bg-card);
+    border-top: 1px solid var(--gray-5);
+    z-index: 150;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+  }
+  .bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--gray-3);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.15s;
+    font-family: var(--font-body);
+    min-height: var(--touch-min);
+  }
+  .bottom-nav__item:active {
+    color: var(--primary);
+  }
+  .bottom-nav__item.is-active {
+    color: var(--primary);
+  }
+  .bottom-nav__icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bottom-nav__icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .bottom-nav__label {
+    line-height: 1;
+  }
+  /* Yukarı çık ve çerez banner'ı bottom nav üstüne taşı */
+  .yukari-cik {
+    bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px) !important;
+  }
+  .cerez-banner {
+    bottom: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  }
+  .okuma-modu-btn {
+    bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px) !important;
+  }
+}
+
+/* ---------- FAZ 3: Üst Bar Sadeleştirme ---------- */
+@media (max-width: 768px) {
+  .top-bar__inner {
+    display: none !important;
+  }
+  .top-bar__ticker-wrap {
+    padding: 7px 0;
+    font-size: 13px;
+  }
+  .top-bar__ticker-label {
+    font-size: 10px;
+    padding: 0 8px;
+  }
+  /* Overlay menüye eklenen header */
+  .nav-overlay__header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .nav-overlay__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-overlay__search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 15px;
+    font-family: var(--font-body);
+  }
+  .nav-overlay__search-input::placeholder {
+    color: rgba(255,255,255,0.5);
+  }
+  .nav-overlay__search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.15);
+  }
+  .nav-overlay__search-btn {
+    padding: 10px 16px;
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .nav-overlay__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-overlay__date {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+  .nav-overlay__theme-toggle {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+  }
+}
+/* Desktop: overlay header gizli */
+@media (min-width: 769px) {
+  .nav-overlay__header {
+    display: none;
+  }
+}
+
+/* ---------- FAZ 4: Touch Feedback ---------- */
+@media (max-width: 768px) {
+  /* Kartlar */
+  .uc-kart__item a:active,
+  .haber-iki__item a:active,
+  .arsiv-kart:active,
+  .video-haberler__item:active {
+    transform: scale(0.97);
+  }
+  /* Butonlar */
+  .arsiv-filtre__btn:active,
+  .whatsapp-hatti__btn:active,
+  .newsletter-form__btn:active,
+  .detay__paylas-btn:active {
+    transform: scale(0.95);
+  }
+  /* Liste öğeleri */
+  .baslik-listesi ul li a:active,
+  .sidebar-list a:active {
+    background: var(--primary-light);
+    border-radius: 4px;
+  }
+  /* Nav linkleri */
+  .nav-list--overlay .nav-link:active {
+    background: rgba(255,255,255,0.1);
+  }
+  /* Hover efektlerini kaldır (touch'ta gereksiz) */
+  .uc-kart__item a:hover,
+  .haber-iki__item a:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+  .manset:hover {
+    box-shadow: var(--shadow);
+  }
+  /* Kart aksiyonları her zaman görünür */
+  .haber-aksiyonlar--kart {
+    opacity: 1 !important;
+  }
+}
+
+/* ---------- FAZ 5: Mobil Kart Düzenleri ---------- */
+@media (max-width: 768px) {
+  /* Manşet: Full-width */
+  .manset {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    border-left: none;
+  }
+  .manset__link {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .manset__img-wrap {
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+  .manset__body {
+    padding: 16px var(--m-gutter);
+  }
+  .manset__title {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+  .manset__ozet {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .manset__meta {
+    font-size: 12px;
+  }
+  .manset__nav {
+    padding: 8px var(--m-gutter);
+  }
+
+  /* 3'lü kartlar → Yatay scroll snap */
+  .uc-kart {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+    grid-template-columns: unset;
+  }
+  .uc-kart::-webkit-scrollbar { display: none; }
+  .uc-kart { scrollbar-width: none; }
+  .uc-kart__item {
+    flex: 0 0 75vw;
+    max-width: 280px;
+    scroll-snap-align: start;
+  }
+
+  /* 2'li kartlar → Yatay kompakt */
+  .haber-iki {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .haber-iki__item a {
+    display: flex;
+    flex-direction: row;
+  }
+  .haber-iki__img {
+    width: 120px;
+    min-width: 120px;
+    aspect-ratio: 1/1;
+    border-radius: var(--radius) 0 0 var(--radius);
+    overflow: hidden;
+  }
+  .haber-iki__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .haber-iki__kategori {
+    margin: 10px 12px 0;
+    font-size: 10px;
+  }
+  .haber-iki__title {
+    font-size: 15px;
+    padding: 6px 12px 8px;
+  }
+  .haber-iki__meta {
+    padding: 0 12px 10px;
+  }
+
+  /* Video kartları → Yatay scroll snap */
+  .video-haberler__grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+    grid-template-columns: unset;
+  }
+  .video-haberler__grid::-webkit-scrollbar { display: none; }
+  .video-haberler__grid { scrollbar-width: none; }
+  .video-haberler__item {
+    flex: 0 0 70vw;
+    max-width: 260px;
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------- FAZ 6: Makale Okuma Deneyimi ---------- */
+@media (max-width: 768px) {
+  .detay__baslik {
+    font-size: clamp(22px, 6vw, 28px);
+    margin: 0 var(--m-gutter) 12px;
+  }
+  .detay__kategori {
+    margin: 16px var(--m-gutter) 12px;
+  }
+  .detay__meta {
+    padding: 0 var(--m-gutter) 16px;
+    font-size: 12px;
+    gap: 10px;
+  }
+  .detay__icerik {
+    padding: 0 var(--m-gutter) 28px;
+    font-size: clamp(15px, 4vw, 17px);
+    line-height: 1.75;
+  }
+  .detay__icerik img {
+    margin-left: calc(-1 * var(--m-gutter));
+    margin-right: calc(-1 * var(--m-gutter));
+    width: calc(100% + var(--m-gutter) * 2);
+    max-width: none;
+    border-radius: 0;
+  }
+  .detay__ozet {
+    margin: 16px var(--m-gutter);
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+  .detay__paylas-btns {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+  .detay__paylas-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 8px;
+    min-height: var(--touch-min);
+  }
+  .detay__gorsel img {
+    max-height: 260px;
+  }
+}
+
+/* ---------- FAZ 7: Header/Nav Cilalama ---------- */
+@media (max-width: 768px) {
+  .main-header {
+    padding: 14px 0;
+  }
+  .logo__mark {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+  .logo__word {
+    font-size: 20px;
+  }
+  .tagline {
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  .tagline--uzum {
+    font-size: 10px;
+  }
+  /* Overlay menü iyileştirme */
+  .nav-overlay {
+    background: linear-gradient(180deg, var(--primary-dark) 0%, rgba(8,58,46,0.98) 100%);
+    padding: 20px var(--m-gutter) 24px;
+  }
+  .nav-list--overlay .nav-link {
+    font-size: 17px;
+    padding: 14px 8px;
+    min-height: var(--touch-min);
+    display: flex;
+    align-items: center;
+  }
+  .nav-overlay__social a {
+    width: var(--touch-min);
+    height: var(--touch-min);
+  }
+}
+@media (max-width: 480px) {
+  .logo__mark {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  .logo__word {
+    font-size: 18px;
+  }
+}
+
+/* ---------- FAZ 8: Widget/Footer/Diğer Cilalamalar ---------- */
+@media (max-width: 768px) {
+  /* Sidebar box'lar */
+  .sidebar__box {
+    padding: 14px 14px;
+  }
+  /* WhatsApp banner */
+  .whatsapp-hatti {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    padding: 20px var(--m-gutter);
+  }
+  /* Newsletter: iOS zoom engelleme */
+  .newsletter-form__input {
+    font-size: 16px;
+  }
+  /* Footer: bottom nav için ekstra padding */
+  .main-footer {
+    padding-bottom: calc(24px + var(--bottom-nav-h) + var(--safe-bottom));
+  }
+  /* Vefat bölümü */
+  .vefat-bolumu {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    border-left: none;
+    border-top: 4px solid #2c3e50;
+    padding: 20px var(--m-gutter);
+  }
+  /* Dolmuş sayfası */
+  .dolmus-sayfa {
+    padding: 24px var(--m-gutter);
+  }
+  .dolmus-sayfa h1 {
+    font-size: 22px;
+  }
+  .dolmus-tablo th {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+  .dolmus-tablo td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  /* Cookie banner - bottom nav üstünde (yukarıda zaten tanımlı) */
+  /* Kart giriş animasyonları mobilde daha hafif */
+  .reveal {
+    transform: translateY(16px);
+  }
+  /* Baslik listesi full-width */
+  .baslik-listesi {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    padding: 16px var(--m-gutter);
+  }
+  /* Reklam alanı */
+  .reklam-alani {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+  }
+  /* Üzüm bölümü */
+  .uzum-bolumu {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    padding: 16px var(--m-gutter);
+  }
+  /* Editor seçimi */
+  .editor-secimi {
+    margin-left: calc(-1 * var(--gutter));
+    margin-right: calc(-1 * var(--gutter));
+    border-radius: 0;
+    padding: 16px var(--m-gutter);
+  }
+  /* İletişim form inputları - iOS zoom */
+  .iletisim-form__alan input,
+  .iletisim-form__alan textarea {
+    font-size: 16px;
+  }
+  /* Kurumsal sayfa */
+  .kurumsal-sayfa {
+    padding: 24px var(--m-gutter);
+  }
+  .kurumsal-sayfa h1 {
+    font-size: 24px;
+  }
+  /* Arşiv */
+  .arsiv-sayfa__baslik {
+    font-size: 22px;
+  }
+}
+
+/* ---------- Dark mode: Bottom nav ---------- */
+[data-theme="dark"] .bottom-nav {
+  background: #1e1e1e;
+  border-top-color: #333;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .bottom-nav__item {
+  color: var(--gray-3);
+}
+[data-theme="dark"] .bottom-nav__item.is-active {
+  color: var(--accent);
 }

@@ -1303,6 +1303,98 @@ function initCerezBanner() {
   });
 }
 
+// ----- Bottom Nav (Mobil) -----
+function initBottomNav() {
+  var nav = document.getElementById('bottom-nav');
+  if (!nav) return;
+
+  // Aktif sayfa tespiti
+  var path = window.location.pathname;
+  var page = 'index';
+  if (path.indexOf('arsiv') !== -1) page = 'arsiv';
+  else if (path.indexOf('haber') !== -1) page = 'haber';
+  else if (path.indexOf('dolmus') !== -1) page = 'dolmus';
+  else if (path.indexOf('hakkimizda') !== -1) page = 'hakkimizda';
+  else if (path.indexOf('iletisim') !== -1) page = 'iletisim';
+  else if (path.indexOf('gizlilik') !== -1) page = 'gizlilik';
+  else if (path === '/' || path.indexOf('index') !== -1) page = 'index';
+
+  nav.querySelectorAll('.bottom-nav__item[data-page]').forEach(function(item) {
+    if (item.dataset.page === page) {
+      item.classList.add('is-active');
+    }
+  });
+
+  // Menü butonu: mevcut nav-toggle mantığını tetikle
+  var menuBtn = document.getElementById('bottom-nav-menu');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function() {
+      var toggle = document.querySelector('.nav-toggle');
+      if (toggle) toggle.click();
+    });
+  }
+
+  // Ara butonu: overlay menüyü aç ve search input'a focusla
+  var searchBtn = document.getElementById('bottom-nav-search');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', function() {
+      var overlayInput = document.getElementById('overlay-search-input');
+      if (overlayInput) {
+        // Overlay menüyü aç
+        var toggle = document.querySelector('.nav-toggle');
+        var overlay = document.getElementById('main-menu');
+        if (overlay && overlay.getAttribute('aria-hidden') !== 'false') {
+          if (toggle) toggle.click();
+        }
+        setTimeout(function() { overlayInput.focus(); }, 200);
+      } else {
+        // Fallback: sayfanın üstüne scroll + ana search input'a focus
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        var mainInput = document.querySelector('.search-input');
+        if (mainInput) setTimeout(function() { mainInput.focus(); }, 400);
+      }
+    });
+  }
+}
+
+// ----- Overlay Header (Mobil menüdeki arama/tarih/tema) -----
+function initOverlayHeader() {
+  // Overlay tarih
+  var overlayDate = document.getElementById('overlay-date');
+  if (overlayDate) {
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    overlayDate.textContent = new Date().toLocaleDateString('tr-TR', options);
+  }
+
+  // Overlay tema toggle
+  var overlayTheme = document.getElementById('overlay-theme-toggle');
+  if (overlayTheme) {
+    function updateOverlayIcon() {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      overlayTheme.innerHTML = isDark ? '&#9788;' : '&#9790;';
+    }
+    updateOverlayIcon();
+    overlayTheme.addEventListener('click', function() {
+      var mainToggle = document.getElementById('theme-toggle');
+      if (mainToggle) mainToggle.click();
+      updateOverlayIcon();
+    });
+  }
+
+  // Overlay arama formu
+  var overlayForm = document.getElementById('overlay-search-form');
+  var overlayInput = document.getElementById('overlay-search-input');
+  if (overlayForm && overlayInput) {
+    overlayForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var q = overlayInput.value.trim();
+      if (q) {
+        window.location.href = 'arsiv.html?q=' + encodeURIComponent(q);
+      }
+    });
+  }
+}
+
 // ----- Init -----
 document.addEventListener('DOMContentLoaded', () => {
   initDarkMode();
@@ -1331,6 +1423,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initCerezBanner();
   initBrokenImageFallback();
   initTabBildirimi();
+  initBottomNav();
+  initOverlayHeader();
   // Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function() {});
